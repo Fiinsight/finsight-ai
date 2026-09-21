@@ -109,6 +109,136 @@ def _extract_json(text: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# 0) 뉴스 시장 영향 분석 (대상 / 방향 / 근거 / 불확실성)
+# ---------------------------------------------------------------------------
+
+
+_IMPACT_POSITIVE_KEYWORDS = (
+    "상승", "급등", "강세", "호조", "개선", "성장", "흑자", "회복", "증가", "상향", "돌파", "확대",
+)
+_IMPACT_NEGATIVE_KEYWORDS = (
+    "하락", "급락", "약세", "부진", "우려", "적자", "감소", "하향", "둔화", "축소", "침체", "리스크",
+)
+_IMPACT_TARGET_KEYWORDS = {
+    "반도체": "반도체 업종",
+    "수출": "수출 기업",
+    "환율": "환율 민감 기업 및 국내 시장",
+    "금리": "금리 민감 업종",
+    "코스피": "코스피 시장",
+    "코스닥": "코스닥 시장",
+    "채권": "채권 시장",
+    "은행": "은행 업종",
+    "자동차": "자동차 업종",
+    "원자재": "원자재 관련 업종",
+}
+
+
+def _split_sentences(text: str) -> list[str]:
+    return [part.strip() for part in re.split(r"(?<=[.!?。！？])\s*", text.strip()) if part.strip()]
+
+
+def _mock_market_impact(title: str, body: str, related_symbol: str | None) -> dict:
+    """Produce a cautious, explainable result without a network or paid model call."""
+    source_text = ". ".join(part.rstrip(".!?。！？") for part in (title.strip(), body.strip()) if part)
+    positive_hits = sum(source_text.count(keyword) for keyword in _IMPACT_POSITIVE_KEYWORDS)
+    negative_hits = sum(source_text.count(keyword) for keyword in _IMPACT_NEGATIVE_KEYWORDS)
+    score = positive_hits - negative_hits
+
+    if score > 0:
+        direction = "POSITIVE"
+        confidence = min(0.85, 0.55 + score * 0.05)
+    elif score < 0:
+        direction = "NEGATIVE"
+        confidence = min(0.85, 0.55 + abs(score) * 0.05)
+    else:
+        direction = "NEUTRAL"
+        confidence = 0.35
+
+    sentences = _split_sentences(source_text)
+    evidence_keywords = _IMPACT_POSITIVE_KEYWORDS if score >= 0 else _IMPACT_NEGATIVE_KEYWORDS
+    evidence = [
+        sentence for sentence in sentences
+        if any(keyword in sentence for keyword in evidence_keywords)
+    ][:2]
+    if not evidence:
+        evidence = ["본문에서 시장 방향을 단정할 수 있는 근거가 충분히 확인되지 않았습니다."]
+
+    targets = [label for keyword, label in _IMPACT_TARGET_KEYWORDS.items() if keyword in source_text]
+    if related_symbol:
+        targets.insert(0, f"관련 종목 {related_symbol}")
+    targets = list(dict.fromkeys(targets))[:4]
+    if not targets:
+        targets = ["관련 시장·업종(종목 정보 미제공)"]
+
+    caveats = [
+        "이 결과는 본문 키워드 기반의 비용 없는 fallback 분석이며 투자 판단이 아닙니다.",
+        "실제 가격 반응은 발표 시점, 기대치, 수급과 다른 거시 변수에 따라 달라질 수 있습니다.",
+    ]
+    return {
+        "direction": direction,
+        "confidence": round(confidence, 2),
+        "targets": targets,
+        "evidence": evidence,
+        "caveats": caveats,
+        "basis": "RULE_BASED_FALLBACK",
+    }
+
+
+def _build_market_impact_prompt(title: str, body: str, related_symbol: str | None) -> str:
+    symbol_text = related_symbol or "없음"
+    return f"""당신은 금융 뉴스의 시장 영향을 분석하는 보수적인 리서치 도우미입니다.
+기사에 없는 사실을 추측하지 말고, 본문에서 직접 확인 가능한 근거만 사용하세요.
+영향 방향은 시장·업종·관련 종목 중 무엇을 기준으로 하는지 targets에 명시하세요.
+근거가 부족하거나 방향이 충돌하면 NEUTRAL을 선택하고 confidence를 낮게 주세요.
+
+[관련 종목 코드]
+{symbol_text}
+
+[뉴스 제목]
+{title}
+
+[뉴스 본문]
+{body}
+
+다음 JSON만 반환하세요.
+{{
+  "direction": "POSITIVE|NEUTRAL|NEGATIVE",
+  "confidence": 0.0에서 1.0 사이의 숫자,
+  "targets": ["영향 대상"],
+  "evidence": ["본문에서 그대로 확인 가능한 근거를 요약한 문장"],
+  "caveats": ["판단의 한계 또는 추가 확인사항"],
+  "basis": "LLM"
+}}
+"""
+
+
+def analyze_market_impact(title: str, body: str, related_symbol: str | None = None) -> dict:
+    """Analyze direction with explicit targets and evidence, safely by default."""
+    mock = _mock_market_impact(title, body, related_symbol)
+    if not config.USE_REAL_LLM:
+        return mock
+
+    try:
+        raw = _call_llm(_build_market_impact_prompt(title, body, related_symbol), max_tokens=900)
+        data = _extract_json(raw)
+        direction = str(data.get("direction", "NEUTRAL")).upper()
+        if direction not in {"POSITIVE", "NEUTRAL", "NEGATIVE"}:
+            direction = "NEUTRAL"
+        confidence = float(data.get("confidence", mock["confidence"]))
+        return {
+            "direction": direction,
+            "confidence": round(max(0.0, min(1.0, confidence)), 2),
+            "targets": [str(item) for item in data.get("targets", mock["targets"])][:4],
+            "evidence": [str(item) for item in data.get("evidence", mock["evidence"])][:3],
+            "caveats": [str(item) for item in data.get("caveats", mock["caveats"])][:3],
+            "basis": "LLM",
+        }
+    except Exception as exc:
+        logger.warning("시장 영향 분석 LLM 호출 실패, fallback 응답으로 대체합니다: %s", exc)
+        return mock
+
+
+# ---------------------------------------------------------------------------
 # 1) 뉴스 리라이팅 (초보자 / 일반 / 분석용 + 중요도 이유 + 핵심 용어)
 # ---------------------------------------------------------------------------
 
