@@ -13,4 +13,14 @@ app.include_router(feedback.router, prefix="/ai/feedback", tags=["feedback"])
 
 @app.get("/health")
 def health() -> dict[str, object]:
-    return {"status": "ok", "useRealLlm": config.USE_REAL_LLM}
+    # Keep this endpoint useful on a laptop or school GPU server without
+    # revealing API keys. It makes it explicit whether the optional local
+    # classifier is active instead of presenting a rule fallback as deep learning.
+    from app.services.ml_sentiment import model_status
+
+    return {
+        "status": "ok",
+        "useRealLlm": config.USE_REAL_LLM,
+        "llmProvider": config.LLM_PROVIDER if config.USE_REAL_LLM else "disabled",
+        "sentimentModel": model_status(),
+    }
