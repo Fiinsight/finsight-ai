@@ -21,6 +21,18 @@ def _load_model():
         return None
 
 
+def model_status() -> dict[str, object]:
+    """Expose safe model diagnostics for /health without loading secrets."""
+    model_path = os.getenv("ML_SENTIMENT_MODEL_PATH", "").strip()
+    if not model_path:
+        return {"mode": "rule_fallback", "configured": False}
+    if not Path(model_path).exists():
+        return {"mode": "rule_fallback", "configured": True, "pathExists": False}
+    if _load_model() is None:
+        return {"mode": "rule_fallback", "configured": True, "pathExists": True, "loadable": False}
+    return {"mode": "local_transformer", "configured": True, "pathExists": True, "loadable": True}
+
+
 def predict_sentiment(title: str, body: str) -> dict[str, object]:
     loaded = _load_model()
     text = f"{title}\n{body}"
