@@ -1,0 +1,7 @@
+# Optional, free/open-source training dependencies.
+# Keep these out of requirements.txt so the API service stays lightweight.
+numpy>=1.26,<3
+torch>=2.2,<3
+transformers>=4.40,<5
+scikit-learn>=1.4,<2
+accelerate>=0.30,<2

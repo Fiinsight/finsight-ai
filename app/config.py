@@ -47,3 +47,6 @@ OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 
 CHROMA_HOST: str = os.getenv("CHROMA_HOST", "localhost")
 CHROMA_PORT: int = _get_int("CHROMA_PORT", 8000)
+
+# Optional local model directory. Empty means the API uses the free rule fallback.
+ML_SENTIMENT_MODEL_PATH: str = os.getenv("ML_SENTIMENT_MODEL_PATH", "").strip()
