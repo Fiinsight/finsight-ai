@@ -5,3 +5,4 @@ torch>=2.2,<3
 transformers>=4.40,<5
 scikit-learn>=1.4,<2
 accelerate>=0.30,<2
+sentence-transformers>=3,<6
