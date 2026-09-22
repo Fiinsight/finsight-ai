@@ -50,3 +50,6 @@ CHROMA_PORT: int = _get_int("CHROMA_PORT", 8000)
 
 # Optional local model directory. Empty means the API uses the free rule fallback.
 ML_SENTIMENT_MODEL_PATH: str = os.getenv("ML_SENTIMENT_MODEL_PATH", "").strip()
+
+# Optional local semantic-news index. Empty means the retrieval endpoint is unavailable.
+ML_NEWS_INDEX_PATH: str = os.getenv("ML_NEWS_INDEX_PATH", "").strip()
