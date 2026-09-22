@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
 from app.services import llm_client
+from app.services.ml_sentiment import predict_sentiment
 
 router = APIRouter()
 
@@ -19,6 +20,17 @@ class RewriteResponse(BaseModel):
     detected_terms: list[str]
 
 
+class SentimentRequest(BaseModel):
+    title: str
+    body: str
+
+
+class SentimentResponse(BaseModel):
+    label: str
+    confidence: float
+    basis: str
+
+
 @router.post("/rewrite", response_model=RewriteResponse)
 def rewrite_news(request: RewriteRequest) -> RewriteResponse:
     result = llm_client.rewrite_news(title=request.title, raw_content=request.body)
@@ -28,3 +40,8 @@ def rewrite_news(request: RewriteRequest) -> RewriteResponse:
         importance_reason=result["importanceReason"],
         detected_terms=result.get("detectedTerms", []),
     )
+
+
+@router.post("/sentiment", response_model=SentimentResponse)
+def sentiment(request: SentimentRequest) -> SentimentResponse:
+    return SentimentResponse(**predict_sentiment(request.title, request.body))
