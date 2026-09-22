@@ -1,63 +1,36 @@
-# FinSight AI Service (finsight-ai)
+# FinSight AI·딥러닝 서비스
 
-FinSight(핀사이트)는 초보 투자자가 경제 뉴스를 쉽게 이해하고, 뉴스를 읽은 뒤 스스로 투자 판단을
-연습해볼 수 있도록 돕는 서비스입니다. 이 저장소(`finsight-ai`)는 그중 **AI 서비스(FastAPI)** 부분으로,
-뉴스 리라이팅 · 금융 용어 설명 · 판단 피드백 생성을 LLM 기반으로 담당하는 독립 마이크로서비스입니다.
-사용자가 직접 호출하는 서버가 아니라, Spring Boot 백엔드가 내부적으로 호출하는 형태로 동작합니다.
+> 2026 졸업작품 FinSight의 FastAPI AI 마이크로서비스
 
-## 이 서비스가 하는 일
+FinSight는 경제 뉴스를 초보자도 이해할 수 있게 바꾸고, 뉴스의 근거를 바탕으로 투자 판단을 연습하도록 돕는 서비스입니다. 이 저장소는 Spring Boot 백엔드가 내부적으로 호출하는 AI 계층입니다.
 
-### 1. `POST /ai/news/rewrite` — 뉴스 리라이팅
+## 현재 제공하는 기능
 
-뉴스 제목/본문과 사용자 레벨(`beginner` / `normal` / `analyst`)을 입력받아, 해당 레벨에 맞게
-재구성된 요약과 "이 뉴스가 왜 중요한지", 기사에 등장한 핵심 금융 용어 목록을 반환합니다.
-내부적으로는 한 번의 LLM 호출로 초보자용·일반용·분석용 세 가지 버전을 모두 생성한 뒤, 요청받은
-레벨의 버전만 골라 응답합니다.
+- `POST /ai/news/rewrite`: beginner / normal / analyst 수준별 뉴스 재작성
+- `POST /ai/terms/explain`: 금융 용어의 정의·기사 맥락·시장 영향 설명
+- `POST /ai/feedback/judgement`: 사용자의 판단과 실제 결과를 비교한 피드백
+- Chroma 기반 용어 설명 캐시와 서버 장애 시 인메모리 폴백
+- 무료로 실행할 수 있는 한국어 뉴스 감성 분류·의미 검색 baseline
 
-### 2. `POST /ai/terms/explain` — 금융 용어 설명
+## 비용 없이 동작하는 구조
 
-용어와 기사 맥락을 입력받아 "정의 / 이 뉴스에서의 의미 / 시장 영향" 3단 구조로 설명합니다.
-같은 용어를 같은 맥락에서 다시 물어보면, LLM을 다시 호출하지 않고 Chroma에 저장된 이전 응답을
-그대로 재사용합니다(RAG 캐싱). 이는 같은 질문에 매번 비용을 지불하지 않도록 하기 위함입니다.
+기본값은 `USE_REAL_LLM=false`입니다. 이 상태에서는 외부 LLM을 호출하지 않고 검증용 응답을 사용하므로 API 키와 결제 없이 앱·백엔드 연동을 테스트할 수 있습니다. 실제 LLM은 명시적으로 스위치를 켜고 키를 넣었을 때만 사용합니다.
 
-### 3. `POST /ai/feedback/judgement` — 판단 피드백
+실제 모델을 사용하더라도 실패하면 서비스가 중단되지 않고 경고 로그와 안전한 폴백 응답을 반환합니다. 따라서 졸업작품 시연은 무료 로컬 모드로 진행하고, 품질 비교가 필요할 때만 제한적으로 실제 모델을 켜는 방식입니다.
 
-사용자가 뉴스를 보고 예측한 방향(UP/NEUTRAL/DOWN)과 실제 시장 결과를 비교해, 판단이 맞았는지
-여부와 그 이유를 2~4개의 짧은 근거 목록으로 반환합니다.
+## 딥러닝 계획
 
-## `USE_REAL_LLM` 스위치 — 비용은 여기서만 발생합니다
+GPU 서버가 없어도 데이터 정리, 평가셋 작성, baseline 학습, API 연결 테스트는 노트북에서 진행할 수 있습니다. 학교 GPU 서버를 사용하게 되면 다음 순서로 확장합니다.
 
-이 서비스는 **기본값이 목업(가짜 응답) 모드**입니다. `.env`의 `USE_REAL_LLM`이 `false`(기본값)인
-동안에는 위 세 엔드포인트 모두 실제 LLM API를 전혀 호출하지 않고, 미리 준비된 자연스러운 한국어
-응답을 반환합니다. 따라서 데모/스크린샷/프론트엔드·백엔드 연동 테스트를 API 키 없이, 비용 없이
-바로 진행할 수 있습니다.
+1. 한국어 금융 뉴스에 상승·중립·하락 라벨을 만들고 시간 순서로 train/validation/test를 분리합니다.
+2. 사전학습 한국어 문장 모델을 뉴스 분류에 fine-tuning해 키워드 규칙 baseline과 비교합니다.
+3. 문장 임베딩과 FAISS/Chroma 검색으로 비슷한 과거 뉴스와 판단 사례를 찾습니다.
+4. 모델의 예측, 근거 문장, 유사 사례를 함께 반환해 사용자가 결과를 검증할 수 있게 합니다.
+5. 정확도만 보지 않고 F1, 시간 누수 여부, 근거의 일관성, 실제 판단 피드백 품질을 평가합니다.
 
-`.env`에서 `USE_REAL_LLM=true`로 바꾸고 `ANTHROPIC_API_KEY`를 채워 넣으면, 그 순간부터
-`app/services/llm_client.py`가 실제 Anthropic(Claude) API를 호출합니다. 이때 사용할 모델은
-`ANTHROPIC_MODEL` 환경변수로 지정하며 기본값은 저비용 모델인 `claude-haiku-4-5`입니다.
+딥러닝이 수익률을 보장하는 구조는 아닙니다. 이 프로젝트에서는 예측을 단정하는 대신 뉴스 이해와 판단 회고를 돕는 보조 모델로 사용합니다.
 
-이 프로젝트에서 **금전적 비용이 발생하는 지점은 정확히 이 하나뿐**입니다 — `USE_REAL_LLM=true`이고
-실제로 LLM 호출이 이루어지는 순간. 만약 실제 호출이 실패하더라도(키 오류, 네트워크 문제, 요청 한도
-초과 등) 서비스는 500 에러를 내지 않고 경고 로그만 남긴 뒤 자동으로 목업 응답으로 대체합니다.
-
-## Chroma 기반 RAG 캐싱 구조
-
-`app/services/vector_store.py`는 Chroma 벡터 DB(`term_explanations` 컬렉션)를 이용해 용어 설명을
-캐싱합니다. Chroma 자체는 무료로 로컬에서 돌릴 수 있는 벡터 DB이므로 `USE_REAL_LLM` 값과 관계없이
-항상 연결을 시도합니다.
-
-- 용어를 처음 물어보면: LLM(또는 목업)이 설명을 생성 → 그 결과를 임베딩과 함께 Chroma에 저장.
-- 같은 용어 + 같은 맥락을 다시 물어보면: 임베딩 유사도 검색으로 캐시를 찾아 LLM을 재호출하지 않고
-  즉시 응답.
-- `USE_REAL_LLM=false`일 때는 임베딩도 텍스트 해시로 만든 결정적(deterministic) 가짜 벡터를
-  사용합니다 — 같은 텍스트는 항상 같은 벡터가 되므로 저장/조회 흐름 자체는 실제와 동일하게
-  검증할 수 있습니다. `USE_REAL_LLM=true`일 때는 OpenAI `text-embedding-3-small`로 실제 임베딩을
-  생성합니다(이 호출도 실패 시 자동으로 가짜 임베딩으로 대체됩니다).
-- Chroma 서버가 꺼져 있거나 `docker-compose`를 아직 안 띄운 경우에도 서비스는 죽지 않습니다.
-  연결 실패를 감지하면 경고 로그를 한 번만 남기고, 메모리 안에서 동작하는 간단한 딕셔너리
-  기반 저장소로 자동 전환하여 계속 동작합니다(재시작 시 캐시는 초기화됩니다).
-
-## 실행 방법
+## 로컬 실행
 
 ```bash
 python3 -m venv .venv
@@ -66,37 +39,48 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8001
 ```
 
-헬스 체크(현재 `USE_REAL_LLM` 상태도 함께 확인 가능):
+헬스 체크:
 
 ```bash
 curl http://localhost:8001/health
 # {"status":"ok","useRealLlm":false}
 ```
 
-## 환경변수
+ML 의존성은 필요할 때만 설치합니다.
 
-필요한 환경변수는 로컬 `.env`에 설정하세요. 실제 API 키 값은 절대 저장소에 커밋하지 마세요.
+```bash
+pip install -r requirements-ml.txt
+python scripts/train_sentiment.py
+```
 
-| 변수명 | 기본값 | 설명 |
+## 주요 환경변수
+
+| 변수 | 기본값 | 설명 |
 | --- | --- | --- |
-| `USE_REAL_LLM` | `false` | `true`일 때만 실제 Claude API를 호출합니다. 비용이 발생하는 유일한 스위치입니다. |
-| `ANTHROPIC_API_KEY` | (빈 값) | `USE_REAL_LLM=true`일 때 사용할 Anthropic API 키. |
-| `ANTHROPIC_MODEL` | `claude-haiku-4-5` | 실제 호출 시 사용할 모델 ID. 필요에 따라 쉽게 교체 가능. |
-| `OPENAI_API_KEY` | (빈 값) | 용어 캐싱용 임베딩(`text-embedding-3-small`) 생성에 사용. `USE_REAL_LLM=true`일 때만 호출. |
-| `CHROMA_HOST` | `localhost` | Chroma 서버 호스트. |
-| `CHROMA_PORT` | `8000` | Chroma 서버 포트. |
+| `USE_REAL_LLM` | `false` | 실제 LLM 호출 여부. 비용 발생 가능성이 있는 스위치 |
+| `ANTHROPIC_API_KEY` | 빈 값 | 실제 LLM을 선택했을 때만 사용 |
+| `ANTHROPIC_MODEL` | `claude-haiku-4-5` | 실제 호출 모델 |
+| `ML_SENTIMENT_MODEL_PATH` | 빈 값 | 학습한 감성 모델 경로 |
+| `CHROMA_HOST` / `CHROMA_PORT` | `localhost` / `8000` | 선택적 로컬 벡터 저장소 |
+
+실제 키와 학습 산출물은 저장소에 커밋하지 않습니다.
 
 ## 프로젝트 구조
 
+```text
+app/                  FastAPI 앱과 AI 라우터
+app/services/         LLM 진입점, 벡터 캐시, 뉴스 분석
+ml/                   감성 분류·검색 baseline
+scripts/              로컬/학교 GPU 학습 스크립트
+datasets/             비식별화된 샘플·스키마
+tests/                API와 서비스 테스트
 ```
-app/
-  config.py              # 환경변수 로딩 (.env)
-  main.py                # FastAPI 앱, 라우터 등록, /health
-  routers/
-    news.py               # POST /ai/news/rewrite
-    terms.py               # POST /ai/terms/explain
-    feedback.py             # POST /ai/feedback/judgement
-  services/
-    llm_client.py          # LLM 호출 단일 진입점 (목업 ↔ 실제 Claude 전환)
-    vector_store.py         # Chroma RAG 캐싱 (실패 시 인메모리 폴백)
-```
+
+## 앞으로의 계획
+
+- 실제 뉴스·판단 데이터 수집 동의와 비식별화 정책 확정
+- 시간 기반 평가셋과 재현 가능한 학습 설정 추가
+- 감성 분류 결과를 백엔드 뉴스 도메인과 연결
+- 유사 뉴스 근거를 피드백 화면에 노출
+- 학교 GPU 학습 모델을 CPU 추론 가능한 artifact로 export
+
