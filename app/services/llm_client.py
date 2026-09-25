@@ -117,7 +117,7 @@ _IMPACT_POSITIVE_KEYWORDS = (
     "상승", "급등", "강세", "호조", "개선", "성장", "흑자", "회복", "증가", "상향", "돌파", "확대",
 )
 _IMPACT_NEGATIVE_KEYWORDS = (
-    "하락", "급락", "약세", "부진", "우려", "적자", "감소", "하향", "둔화", "축소", "침체", "리스크",
+    "하락", "급락", "약세", "부진", "우려", "적자", "감소", "하향", "둔화", "축소", "침체", "리스크", "부담", "비용",
 )
 _IMPACT_TARGET_KEYWORDS = {
     "반도체": "반도체 업종",
@@ -137,6 +137,24 @@ def _split_sentences(text: str) -> list[str]:
     return [part.strip() for part in re.split(r"(?<=[.!?。！？])\s*", text.strip()) if part.strip()]
 
 
+def _article_sentences(title: str, body: str) -> list[str]:
+    """Return source sentences, keeping the title available as evidence."""
+    return _split_sentences(". ".join(part.strip() for part in (title, body) if part.strip()))
+
+
+def _matching_sentences(sentences: list[str], keywords: tuple[str, ...], limit: int = 2) -> list[str]:
+    return [sentence for sentence in sentences if any(keyword in sentence for keyword in keywords)][:limit]
+
+
+def _detected_terms(text: str) -> list[str]:
+    terms = (
+        "기준금리", "금리", "환율", "원달러", "수출", "수입", "반도체", "HBM", "PF",
+        "프로젝트파이낸싱", "연체율", "물가", "인플레이션", "영업이익", "매출", "수급",
+        "변동성", "밸류에이션", "설비투자", "재고 조정", "공모주", "수요예측", "국채금리",
+    )
+    return list(dict.fromkeys(term for term in terms if term in text))[:6]
+
+
 def _mock_market_impact(title: str, body: str, related_symbol: str | None) -> dict:
     """Produce a cautious, explainable result without a network or paid model call."""
     source_text = ". ".join(part.rstrip(".!?。！？") for part in (title.strip(), body.strip()) if part)
@@ -144,7 +162,10 @@ def _mock_market_impact(title: str, body: str, related_symbol: str | None) -> di
     negative_hits = sum(source_text.count(keyword) for keyword in _IMPACT_NEGATIVE_KEYWORDS)
     score = positive_hits - negative_hits
 
-    if score > 0:
+    if positive_hits and negative_hits:
+        direction = "NEUTRAL"
+        confidence = 0.3
+    elif score > 0:
         direction = "POSITIVE"
         confidence = min(0.85, 0.55 + score * 0.05)
     elif score < 0:
@@ -155,7 +176,7 @@ def _mock_market_impact(title: str, body: str, related_symbol: str | None) -> di
         confidence = 0.35
 
     sentences = _split_sentences(source_text)
-    evidence_keywords = _IMPACT_POSITIVE_KEYWORDS if score >= 0 else _IMPACT_NEGATIVE_KEYWORDS
+    evidence_keywords = _IMPACT_POSITIVE_KEYWORDS if score > 0 else _IMPACT_NEGATIVE_KEYWORDS
     evidence = [
         sentence for sentence in sentences
         if any(keyword in sentence for keyword in evidence_keywords)
@@ -225,7 +246,7 @@ def analyze_market_impact(title: str, body: str, related_symbol: str | None = No
         if direction not in {"POSITIVE", "NEUTRAL", "NEGATIVE"}:
             direction = "NEUTRAL"
         confidence = float(data.get("confidence", mock["confidence"]))
-        return {
+        result = {
             "direction": direction,
             "confidence": round(max(0.0, min(1.0, confidence)), 2),
             "targets": [str(item) for item in data.get("targets", mock["targets"])][:4],
@@ -233,6 +254,15 @@ def analyze_market_impact(title: str, body: str, related_symbol: str | None = No
             "caveats": [str(item) for item in data.get("caveats", mock["caveats"])][:3],
             "basis": "LLM",
         }
+        # A model must not invent an evidence-free direction. Keep the
+        # deterministic, article-grounded result when its cited evidence is
+        # missing or unrelated to the supplied article.
+        source_text = f"{title} {body}"
+        if not result["evidence"] or not any(
+            any(token in source_text for token in str(item).split()) for item in result["evidence"]
+        ):
+            return mock
+        return result
     except Exception as exc:
         logger.warning("시장 영향 분석 LLM 호출 실패, fallback 응답으로 대체합니다: %s", exc)
         return mock
@@ -244,24 +274,21 @@ def analyze_market_impact(title: str, body: str, related_symbol: str | None = No
 
 
 def _mock_rewrite_news(title: str, raw_content: str) -> dict:
+    sentences = _article_sentences(title, raw_content)
+    source = " ".join(sentences)
+    facts = sentences[:3] or [title.strip()]
+    fact_text = " ".join(facts)
+    terms = _detected_terms(source) or ["시장 영향"]
+    direction = _mock_market_impact(title, raw_content, None)["direction"]
+    beginner_facts = " ".join(facts[:2])
+    normal_facts = " ".join(facts[:3])
+    analyst_caveat = "다만 실제 가격 반응은 기대치와 수급 등 추가 변수에 따라 달라질 수 있습니다."
     return {
-        "beginner": (
-            f"'{title}' 소식을 쉽게 풀어보면, 마치 우리 동네 가게 매출이 오르내리듯 "
-            "회사나 시장 전체에 영향을 줄 수 있는 소식이에요. 어려운 용어에 얽매이기보다 "
-            "'오늘 어떤 일이 일어났는지'부터 파악해보세요."
-        ),
-        "normal": (
-            f"{title} 관련 핵심 내용을 요약하면, 시장 참여자들이 주목할 만한 변화가 발생했으며 "
-            "관련 지표와 후속 발표를 함께 확인할 필요가 있습니다."
-        ),
-        "analyst": (
-            f"투자 관점에서 '{title}'은(는) 관련 업종의 수급과 실적 전망에 영향을 줄 수 있는 이벤트입니다. "
-            "단기 변동성뿐 아니라 중장기 추세 전환 가능성까지 함께 점검해야 합니다."
-        ),
-        "importanceReason": (
-            "이 뉴스가 기업 실적, 금리, 환율, 수급 중 어떤 요소와 연결되는지 확인해야 합니다."
-        ),
-        "detectedTerms": ["실적", "수급", "환율"],
+        "beginner": f"쉽게 말하면, {beginner_facts} 기사에 나온 사실만 보면 {direction} 방향의 신호가 보이지만, 실제 결과는 달라질 수 있어요.",
+        "normal": f"{normal_facts} 따라서 관련 지표와 후속 발표를 함께 확인할 필요가 있습니다.",
+        "analyst": f"{fact_text} 이 내용은 {', '.join(terms[:3])}와 연결된 이벤트로 해석할 수 있습니다. {analyst_caveat}",
+        "importanceReason": f"기사에서 확인되는 핵심 변수({', '.join(terms[:3])})가 관련 시장·업종의 기대와 비용에 영향을 줄 수 있기 때문입니다.",
+        "detectedTerms": terms,
     }
 
 
@@ -269,6 +296,8 @@ def _build_rewrite_prompt(title: str, raw_content: str) -> str:
     return f"""당신은 초보 투자자를 돕는 금융 뉴스 편집자입니다.
 아래 뉴스를 세 가지 눈높이로 다시 작성하고, 이 뉴스가 왜 중요한지, 그리고 기사에 등장하는
 핵심 금융 용어를 함께 알려주세요.
+원문에 없는 숫자·기업명·원인·전망을 추가하지 말고, 불확실한 내용은 불확실하다고 표현하세요.
+beginner는 쉬운 말과 짧은 문장을 우선하고, analyst도 원문 근거가 없는 투자 의견을 만들지 마세요.
 
 [뉴스 제목]
 {title}
@@ -333,22 +362,30 @@ def rewrite_news(title: str, raw_content: str) -> dict:
 
 
 def _mock_explain_term(term: str, context: str | None) -> dict:
+    definitions = {
+        "기준금리": "중앙은행이 정하는 대표 금리로, 대출·예금 등 시중금리의 기준이 됩니다.",
+        "환율": "한 나라의 통화와 다른 나라 통화를 바꾸는 비율입니다.",
+        "원달러 환율": "1달러를 사기 위해 필요한 원화의 금액입니다.",
+        "HBM": "여러 메모리 칩을 쌓아 데이터 처리 속도와 용량을 높인 고성능 메모리입니다.",
+        "PF(프로젝트파이낸싱)": "사업에서 나올 미래 수익을 바탕으로 자금을 조달하는 방식입니다.",
+        "수요예측": "기관투자자가 공모주 가격과 청약 수요를 제시하는 절차입니다.",
+        "밸류에이션": "기업의 가치가 현재 주가에 비해 어느 정도인지 평가하는 기준입니다.",
+    }
+    definition = definitions.get(term, f"'{term}'은(는) 기사에서 설명이 필요한 금융 용어입니다.")
     result: dict = {
-        "definition": (
-            f"'{term}'은(는) 금융 뉴스에서 자주 등장하는 용어로, 일반적으로 시장 참여자들의 "
-            "심리나 자금 흐름과 관련된 개념입니다."
-        ),
+        "definition": definition,
         "contextExplanation": None,
         "marketImpact": None,
     }
     if context:
-        result["contextExplanation"] = (
-            f"이번 기사에서 '{term}'은(는) 해당 맥락에서 시장 참여자들의 기대감이나 반응을 "
-            "설명하는 근거로 사용되었습니다."
-        )
+        sentences = _split_sentences(context)
+        related = [sentence for sentence in sentences if term in sentence]
+        context_sentence = related[0] if related else sentences[0] if sentences else ""
+        result["contextExplanation"] = f"이 기사에서는 {context_sentence}"
+        impact = _mock_market_impact("", context, None)
         result["marketImpact"] = (
-            f"'{term}'과(와) 관련된 지표가 추가로 확인될 경우 관련 종목이나 업종의 단기 "
-            "변동성이 커질 수 있습니다."
+            f"기사에 나온 {', '.join(impact['targets'][:2])}의 {impact['direction']} 신호와 연결될 수 있습니다. "
+            "다만 실제 가격 반응은 추가 정보에 따라 달라질 수 있습니다."
         )
     return result
 
@@ -358,6 +395,8 @@ def _build_term_prompt(term: str, context: str | None) -> str:
     return f"""당신은 초보 투자자에게 금융 용어를 쉽게 설명하는 도우미입니다.
 아래 용어를 '정의 / 이 뉴스에서의 의미 / 시장 영향' 3단 구조로 설명하세요.
 기사 맥락이 없으면 contextExplanation과 marketImpact는 null로 응답하세요.
+contextExplanation은 반드시 아래 기사에 실제로 포함된 문장이나 사실에 근거하세요.
+기사에 없는 기업·수치·인과관계를 추가하지 말고, 시장 영향은 가능성으로만 표현하세요.
 
 [용어]
 {term}
@@ -447,6 +486,8 @@ def _build_feedback_prompt(
     change_text = f"{actual_change_percent}%" if actual_change_percent is not None else "정보 없음"
     return f"""당신은 초보 투자자의 판단을 코칭하는 금융 튜터입니다.
 아래 정보를 바탕으로 사용자의 예측이 실제 결과와 맞았는지 평가하고, 그 이유를 짧게 알려주세요.
+isAligned는 반드시 사용자 예측과 실제 결과의 방향이 같은지 비교한 값이어야 합니다.
+수익을 보장하거나 사용자를 과도하게 칭찬하지 말고, 제공된 뉴스 요약에서 확인되지 않는 원인은 가능성으로 표현하세요.
 
 [뉴스 요약]
 {news_summary}
@@ -488,7 +529,8 @@ def generate_feedback(
         raw = _call_llm(prompt, max_tokens=700)
         data = _extract_json(raw)
         return {
-            "isAligned": bool(data.get("isAligned", mock["isAligned"])),
+            # Alignment is deterministic business logic, not a model opinion.
+            "isAligned": mock["isAligned"],
             "feedbackText": data.get("feedbackText", mock["feedbackText"]),
             "reasons": data.get("reasons", mock["reasons"]),
         }
