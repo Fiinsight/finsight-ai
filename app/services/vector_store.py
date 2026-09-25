@@ -159,11 +159,11 @@ def _real_embed(text: str) -> list[float]:
 def embed(text: str) -> list[float]:
     """Return an embedding for `text`.
 
-    Uses a real OpenAI embedding call only when USE_REAL_LLM is True and an
-    OPENAI_API_KEY is configured; otherwise (and on any failure) falls back
-    to a deterministic fake embedding.
+    Uses a real OpenAI embedding call only when the separate
+    USE_REAL_EMBEDDINGS opt-in is True and an OPENAI_API_KEY is configured.
+    Otherwise (and on any failure) falls back to a deterministic hash vector.
     """
-    if config.USE_REAL_LLM and config.OPENAI_API_KEY:
+    if config.USE_REAL_EMBEDDINGS and config.OPENAI_API_KEY:
         try:
             return _real_embed(text)
         except Exception as exc:
