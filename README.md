@@ -16,7 +16,9 @@ FinSight는 경제 뉴스를 초보자도 이해할 수 있게 바꾸고, 뉴스
 
 기본값은 `USE_REAL_LLM=false`입니다. 이 상태에서는 외부 LLM을 호출하지 않고 검증용 응답을 사용하므로 API 키와 결제 없이 앱·백엔드 연동을 테스트할 수 있습니다. 실제 LLM은 명시적으로 스위치를 켜고 키를 넣었을 때만 사용합니다.
 
-실제 모델을 사용하더라도 실패하면 서비스가 중단되지 않고 경고 로그와 안전한 폴백 응답을 반환합니다. 따라서 졸업작품 시연은 무료 로컬 모드로 진행하고, 품질 비교가 필요할 때만 제한적으로 실제 모델을 켜는 방식입니다.
+실제 모델 호출은 provider 계정/프로젝트의 요금제에 따라 비용이 발생할 수 있습니다. Gemini도 계정·모델별 무료 한도와 유료 한도가 다르므로 무료라고 가정하지 않습니다. `USE_REAL_LLM=true`를 직접 설정하기 전에는 외부 LLM을 호출하지 않습니다. 실제 호출에는 요청 시간 제한과 자동 재시도 비활성화를 적용하고, 실패 시 fallback 응답을 반환합니다.
+
+임베딩은 LLM 호출과 별도 과금 경로입니다. `USE_REAL_LLM=true`만으로 OpenAI 임베딩이 켜지지 않으며, `USE_REAL_EMBEDDINGS=true`와 `OPENAI_API_KEY`를 모두 설정해야만 호출됩니다. 기본값은 false입니다.
 
 ## 딥러닝 계획
 
@@ -43,7 +45,7 @@ uvicorn app.main:app --reload --port 8001
 
 ```bash
 curl http://localhost:8001/health
-# {"status":"ok","useRealLlm":false}
+# llmEnabled=false, llmFallback=true, llmMode="fallback"이면 외부 LLM 비활성 상태
 ```
 
 ML 의존성은 필요할 때만 설치합니다.
@@ -58,12 +60,20 @@ python scripts/train_sentiment.py
 | 변수 | 기본값 | 설명 |
 | --- | --- | --- |
 | `USE_REAL_LLM` | `false` | 실제 LLM 호출 여부. 비용 발생 가능성이 있는 스위치 |
+| `LLM_PROVIDER` | `claude` | `claude` 또는 `gemini`; 실제 요금제는 제공자 콘솔에서 확인 |
+| `LLM_REQUEST_TIMEOUT_SECONDS` | `20` | 외부 LLM의 최대 요청 시간(초), 자동 재시도 없음 |
 | `ANTHROPIC_API_KEY` | 빈 값 | 실제 LLM을 선택했을 때만 사용 |
 | `ANTHROPIC_MODEL` | `claude-haiku-4-5` | 실제 호출 모델 |
+| `GEMINI_API_KEY` | 빈 값 | Gemini를 명시적으로 선택·활성화했을 때만 사용 |
+| `GEMINI_MODEL` | `gemini-flash-lite-latest` | 실제 호출 모델 |
+| `USE_REAL_EMBEDDINGS` | `false` | OpenAI 유료 임베딩 별도 opt-in |
+| `OPENAI_API_KEY` | 빈 값 | `USE_REAL_EMBEDDINGS=true`일 때만 임베딩에서 사용 |
 | `ML_SENTIMENT_MODEL_PATH` | 빈 값 | 학습한 감성 모델 경로 |
 | `CHROMA_HOST` / `CHROMA_PORT` | `localhost` / `8000` | 선택적 로컬 벡터 저장소 |
 
 실제 키와 학습 산출물은 저장소에 커밋하지 않습니다.
+
+`/health`의 `llmEnabled`, `llmFallback`, `llmMode`, `llmProvider`, `realEmbeddingsEnabled`는 현재 설정 모드를 표시하며 키 값은 노출하지 않습니다. LLM 호출은 제한 시간 내 실패하거나 quota/rate limit 오류가 나면 기존 안전 응답으로 되돌아갑니다. 이 저장소 테스트는 provider SDK를 모킹하므로 실제 API나 유료 quota를 호출하지 않습니다.
 
 ## 프로젝트 구조
 
@@ -83,4 +93,3 @@ tests/                API와 서비스 테스트
 - 감성 분류 결과를 백엔드 뉴스 도메인과 연결
 - 유사 뉴스 근거를 피드백 화면에 노출
 - 학교 GPU 학습 모델을 CPU 추론 가능한 artifact로 export
-

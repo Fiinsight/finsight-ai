@@ -37,7 +37,11 @@ def _get_anthropic_client():
     try:
         import anthropic
 
-        _anthropic_client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
+        _anthropic_client = anthropic.Anthropic(
+            api_key=config.ANTHROPIC_API_KEY,
+            timeout=config.LLM_REQUEST_TIMEOUT_SECONDS,
+            max_retries=0,
+        )
     except Exception as exc:  # pragma: no cover - defensive, e.g. package missing
         if not _anthropic_init_warned:
             logger.warning("Anthropic 클라이언트 초기화에 실패했습니다: %s", exc)
@@ -72,8 +76,14 @@ def _get_gemini_client():
 
     try:
         from google import genai
+        from google.genai import types
 
-        _gemini_client = genai.Client(api_key=config.GEMINI_API_KEY)
+        _gemini_client = genai.Client(
+            api_key=config.GEMINI_API_KEY,
+            http_options=types.HttpOptions(
+                timeout=int(config.LLM_REQUEST_TIMEOUT_SECONDS * 1000)
+            ),
+        )
     except Exception as exc:  # pragma: no cover - defensive, e.g. package missing
         if not _gemini_init_warned:
             logger.warning("Gemini 클라이언트 초기화에 실패했습니다: %s", exc)
