@@ -13,7 +13,6 @@ from __future__ import annotations
 import json
 import logging
 import re
-import threading
 
 from app import config
 
@@ -23,8 +22,6 @@ _anthropic_client = None
 _anthropic_init_warned = False
 _gemini_client = None
 _gemini_init_warned = False
-_real_llm_calls = 0
-_real_llm_calls_lock = threading.Lock()
 
 
 def _get_anthropic_client():
@@ -108,11 +105,6 @@ def _call_gemini(prompt: str, max_tokens: int = 1024) -> str:
 
 def _call_llm(prompt: str, max_tokens: int = 1024) -> str:
     """Dispatch to whichever provider USE_REAL_LLM/LLM_PROVIDER selects."""
-    global _real_llm_calls
-    with _real_llm_calls_lock:
-        if _real_llm_calls >= config.MAX_REAL_LLM_CALLS_PER_PROCESS:
-            raise RuntimeError("프로세스의 실제 LLM 호출 상한에 도달했습니다.")
-        _real_llm_calls += 1
     if config.LLM_PROVIDER == "gemini":
         return _call_gemini(prompt, max_tokens)
     return _call_claude(prompt, max_tokens)
