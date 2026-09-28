@@ -9,8 +9,8 @@ router = APIRouter()
 
 
 class RewriteRequest(BaseModel):
-    title: str
-    body: str
+    title: str = Field(min_length=1, max_length=300)
+    body: str = Field(min_length=1, max_length=20000)
     level: str = Field(pattern="^(beginner|normal|analyst)$")
 
 
@@ -22,8 +22,8 @@ class RewriteResponse(BaseModel):
 
 
 class SentimentRequest(BaseModel):
-    title: str
-    body: str
+    title: str = Field(min_length=1, max_length=300)
+    body: str = Field(min_length=1, max_length=20000)
 
 
 class SentimentResponse(BaseModel):

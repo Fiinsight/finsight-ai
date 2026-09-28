@@ -43,6 +43,14 @@ class MarketImpactFallbackTest(unittest.TestCase):
         self.assertEqual(result["direction"], "NEUTRAL")
         self.assertLessEqual(result["confidence"], 0.3)
 
+    def test_rate_rise_is_not_positive_by_default(self):
+        result = _mock_market_impact(
+            "美 금리 급등에 국고채 3년물 금리 상승",
+            "국고채 금리가 상승했다.",
+            None,
+        )
+        self.assertEqual(result["direction"], "NEGATIVE")
+
     def test_rewrite_fallback_preserves_article_facts_and_levels(self):
         result = _mock_rewrite_news(
             "반도체 수출 증가",
