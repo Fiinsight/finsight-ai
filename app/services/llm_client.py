@@ -99,9 +99,12 @@ def _get_gemini_client():
 def _call_gemini(prompt: str, max_tokens: int = 1024) -> str:
     """Make a single real Gemini call and return the text output."""
     client = _get_gemini_client()
+    from google.genai import types
+
     response = client.models.generate_content(
         model=config.GEMINI_MODEL,
         contents=prompt,
+        config=types.GenerateContentConfig(max_output_tokens=max_tokens),
     )
     return response.text or ""
 
@@ -151,6 +154,20 @@ _IMPACT_TARGET_KEYWORDS = {
 }
 
 
+def _topic_direction(text: str) -> str | None:
+    rate_topic = any(term in text for term in ("금리", "국채", "채권", "수익률"))
+    if rate_topic:
+        rises = any(term in text for term in ("금리 상승", "금리 급등", "금리 인상", "국채금리 상승", "국채 금리 상승", "수익률 상승", "수익률 급등"))
+        falls = any(term in text for term in ("금리 하락", "금리 급락", "금리 인하", "국채금리 하락", "국채 금리 하락", "수익률 하락", "수익률 급락"))
+        if rises and not falls:
+            return "NEGATIVE"
+        if falls and not rises:
+            return "POSITIVE"
+    if "환율" in text and not any(term in text for term in ("수출", "수입")):
+        return "NEUTRAL"
+    return None
+
+
 def _split_sentences(text: str) -> list[str]:
     return [part.strip() for part in re.split(r"(?<=[.!?。！？])\s*", text.strip()) if part.strip()]
 
@@ -179,8 +196,12 @@ def _mock_market_impact(title: str, body: str, related_symbol: str | None) -> di
     positive_hits = sum(source_text.count(keyword) for keyword in _IMPACT_POSITIVE_KEYWORDS)
     negative_hits = sum(source_text.count(keyword) for keyword in _IMPACT_NEGATIVE_KEYWORDS)
     score = positive_hits - negative_hits
+    topic_direction = _topic_direction(source_text)
 
-    if positive_hits and negative_hits:
+    if topic_direction is not None:
+        direction = topic_direction
+        confidence = 0.7 if topic_direction != "NEUTRAL" else 0.35
+    elif positive_hits and negative_hits:
         direction = "NEUTRAL"
         confidence = 0.3
     elif score > 0:

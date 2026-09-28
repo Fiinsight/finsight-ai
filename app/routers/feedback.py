@@ -9,8 +9,8 @@ router = APIRouter()
 class FeedbackRequest(BaseModel):
     news_id: int
     user_choice: str = Field(pattern="^(UP|NEUTRAL|DOWN)$")
-    user_reason: str | None = None
-    market_result: str | None = None
+    user_reason: str | None = Field(default=None, max_length=2000)
+    market_result: str | None = Field(default=None, max_length=20)
 
 
 class FeedbackResponse(BaseModel):

@@ -4,8 +4,22 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-POSITIVE_WORDS = ("상승", "회복", "증가", "흑자", "개선", "호조", "확대", "성장", "수혜")
-NEGATIVE_WORDS = ("하락", "감소", "적자", "악화", "부진", "축소", "우려", "위기", "손실")
+POSITIVE_WORDS = ("상승", "급등", "강세", "회복", "증가", "흑자", "개선", "호조", "확대", "성장", "수혜")
+NEGATIVE_WORDS = ("하락", "급락", "약세", "감소", "적자", "악화", "부진", "축소", "우려", "위기", "손실")
+
+
+def _topic_direction(text: str) -> str | None:
+    rate_topic = any(term in text for term in ("금리", "국채", "채권", "수익률"))
+    if rate_topic:
+        rises = any(term in text for term in ("금리 상승", "금리 급등", "금리 인상", "국채금리 상승", "국채 금리 상승", "수익률 상승", "수익률 급등"))
+        falls = any(term in text for term in ("금리 하락", "금리 급락", "금리 인하", "국채금리 하락", "국채 금리 하락", "수익률 하락", "수익률 급락"))
+        if rises and not falls:
+            return "NEGATIVE"
+        if falls and not rises:
+            return "POSITIVE"
+    if "환율" in text and not any(term in text for term in ("수출", "수입")):
+        return "NEUTRAL"
+    return None
 
 
 @lru_cache(maxsize=1)
@@ -45,6 +59,10 @@ def predict_sentiment(title: str, body: str) -> dict[str, object]:
         label_id = int(probabilities.argmax())
         label = model.config.id2label.get(label_id, str(label_id)).upper()
         return {"label": label, "confidence": round(float(probabilities[label_id]), 4), "basis": "KLUE_ROBERTA_FINE_TUNED"}
+
+    topic_label = _topic_direction(text)
+    if topic_label is not None:
+        return {"label": topic_label, "confidence": 0.7 if topic_label != "NEUTRAL" else 0.35, "basis": "RULE_BASED_FALLBACK"}
 
     positive = sum(text.count(word) for word in POSITIVE_WORDS)
     negative = sum(text.count(word) for word in NEGATIVE_WORDS)
