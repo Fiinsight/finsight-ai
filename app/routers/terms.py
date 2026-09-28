@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.services import llm_client, vector_store
 
@@ -7,8 +7,8 @@ router = APIRouter()
 
 
 class TermExplainRequest(BaseModel):
-    term: str
-    article_context: str
+    term: str = Field(min_length=1, max_length=100)
+    article_context: str = Field(default="", max_length=12000)
 
 
 class TermExplainResponse(BaseModel):

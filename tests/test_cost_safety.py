@@ -4,9 +4,14 @@ from unittest.mock import patch
 from app import config
 from app.main import health
 from app.services import llm_client, vector_store
+from app.services.ml_sentiment import predict_sentiment
 
 
 class CostSafetyTest(unittest.TestCase):
+    def test_rule_fallback_respects_rate_context(self):
+        result = predict_sentiment("美 금리 급등에 국고채 금리 상승", "국채 금리가 올랐다.")
+        self.assertEqual(result["label"], "NEGATIVE")
+
     def test_llm_disabled_never_dispatches_to_provider(self):
         with patch.object(config, "USE_REAL_LLM", False), patch.object(
             llm_client, "_call_llm", side_effect=AssertionError("unexpected provider call")

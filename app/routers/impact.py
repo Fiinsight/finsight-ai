@@ -7,9 +7,9 @@ router = APIRouter()
 
 
 class ImpactRequest(BaseModel):
-    title: str = Field(min_length=1)
-    body: str = Field(min_length=1)
-    related_symbol: str | None = None
+    title: str = Field(min_length=1, max_length=300)
+    body: str = Field(min_length=1, max_length=20000)
+    related_symbol: str | None = Field(default=None, max_length=20)
 
 
 class ImpactResponse(BaseModel):
