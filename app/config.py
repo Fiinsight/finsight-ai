@@ -47,6 +47,9 @@ USE_REAL_LLM: bool = _get_bool("USE_REAL_LLM", False)
 # USE_REAL_LLM=true일 때 어떤 제공자를 쓸지. 제공자에 따라 비용이 발생할 수 있습니다.
 LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "claude").strip().lower()
 LLM_REQUEST_TIMEOUT_SECONDS: float = _get_float("LLM_REQUEST_TIMEOUT_SECONDS", 20.0)
+# A second guard for accidental opt-in: even with USE_REAL_LLM=true, this
+# process will not send unbounded provider requests.
+MAX_REAL_LLM_CALLS_PER_PROCESS: int = _get_int("MAX_REAL_LLM_CALLS_PER_PROCESS", 20)
 
 ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
 ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5")

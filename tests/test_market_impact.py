@@ -53,6 +53,18 @@ class MarketImpactFallbackTest(unittest.TestCase):
         self.assertIn("HBM", result["detectedTerms"])
         self.assertNotEqual(result["beginner"], result["analyst"])
 
+    def test_rewrite_fallback_removes_search_chrome_and_internal_label(self):
+        result = _mock_rewrite_news(
+            "원화값 강세에도 순항",
+            "원화값 강세에도 순항. Google 검색에서 매일경제 기사를 더 자주 볼 수 있습니다. AI 부품 수요가 늘었습니다.",
+        )
+
+        self.assertNotIn("Google 검색", result["beginner"])
+        self.assertNotIn("NEUTRAL", result["beginner"])
+        self.assertNotIn("원화값 강세에도 순항", result["beginner"])
+        self.assertIn("AI", result["detectedTerms"])
+        self.assertIn("수요가 늘었습니다", result["beginner"])
+
     def test_term_fallback_is_grounded_in_context(self):
         result = _mock_explain_term("기준금리", "한국은행이 기준금리를 동결했다.")
         self.assertIn("한국은행이 기준금리를 동결했다", result["contextExplanation"])

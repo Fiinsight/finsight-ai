@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import threading
 
 from app import config
 
@@ -22,6 +23,8 @@ _anthropic_client = None
 _anthropic_init_warned = False
 _gemini_client = None
 _gemini_init_warned = False
+_real_llm_calls = 0
+_real_llm_calls_lock = threading.Lock()
 
 
 def _get_anthropic_client():
@@ -105,6 +108,11 @@ def _call_gemini(prompt: str, max_tokens: int = 1024) -> str:
 
 def _call_llm(prompt: str, max_tokens: int = 1024) -> str:
     """Dispatch to whichever provider USE_REAL_LLM/LLM_PROVIDER selects."""
+    global _real_llm_calls
+    with _real_llm_calls_lock:
+        if _real_llm_calls >= config.MAX_REAL_LLM_CALLS_PER_PROCESS:
+            raise RuntimeError("프로세스의 실제 LLM 호출 상한에 도달했습니다.")
+        _real_llm_calls += 1
     if config.LLM_PROVIDER == "gemini":
         return _call_gemini(prompt, max_tokens)
     return _call_claude(prompt, max_tokens)
@@ -160,7 +168,7 @@ def _detected_terms(text: str) -> list[str]:
     terms = (
         "기준금리", "금리", "환율", "원달러", "수출", "수입", "반도체", "HBM", "PF",
         "프로젝트파이낸싱", "연체율", "물가", "인플레이션", "영업이익", "매출", "수급",
-        "변동성", "밸류에이션", "설비투자", "재고 조정", "공모주", "수요예측", "국채금리",
+        "변동성", "밸류에이션", "설비투자", "재고 조정", "공모주", "수요예측", "국채금리", "AI", "원화",
     )
     return list(dict.fromkeys(term for term in terms if term in text))[:6]
 
@@ -283,21 +291,80 @@ def analyze_market_impact(title: str, body: str, related_symbol: str | None = No
 # ---------------------------------------------------------------------------
 
 
+_ARTICLE_NOISE_MARKERS = (
+    "Google 검색에서",
+    "검색에서 매일경제",
+    "검색에서 한국경제",
+    "기사를 더 자주 볼 수 있습니다",
+    "원문 보기",
+    "관련기사",
+    "개인정보처리방침",
+    "쿠키 설정",
+)
+
+
+def _clean_article_text(title: str, raw_content: str) -> str:
+    """Remove publisher chrome and title duplication before any rewrite."""
+    title_text = " ".join(title.split()).strip(" \t\n\r\"“”'‘’")
+    title_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", title_text).lower()
+    title_prefix = re.split(r"[…,:：]", title_text, maxsplit=1)[0].strip()
+    title_prefix_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", title_prefix).lower()
+    sentences = _split_sentences(raw_content.replace("\r", "\n"))
+    cleaned: list[str] = []
+    for sentence in sentences:
+        item = " ".join(sentence.split()).strip()
+        if not item or any(marker in item for marker in _ARTICLE_NOISE_MARKERS):
+            continue
+        item_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", item).lower()
+        if title_key and item_key == title_key:
+            continue
+        if len(title_prefix_key) >= 8 and title_prefix_key in item_key:
+            continue
+        cleaned.append(item)
+    return " ".join(cleaned).strip() or title_text
+
+
+def _beginner_topic_hint(terms: list[str]) -> str:
+    hints = {
+        "환율": "환율은 수출로 버는 돈과 해외에서 사오는 원재료 비용에 영향을 줄 수 있어요.",
+        "원화": "원화 가치가 바뀌면 수출기업의 매출과 원재료 비용도 달라질 수 있어요.",
+        "수출": "수출이 늘면 관련 기업의 매출과 이익 전망이 달라질 수 있어요.",
+        "반도체": "반도체 수요와 가격은 관련 기업의 실적 기대에 영향을 줄 수 있어요.",
+        "AI": "AI 관련 투자가 늘면 관련 부품과 장비를 만드는 기업의 수요가 달라질 수 있어요.",
+        "금리": "금리는 기업의 이자 비용과 투자자들이 주식을 평가하는 방식에 영향을 줘요.",
+        "실적": "실적은 기업이 실제로 얼마나 벌었는지 보여주는 중요한 자료예요.",
+    }
+    for term in terms:
+        if term in hints:
+            return hints[term]
+    return "이런 경제 변화는 관련 기업의 매출·비용·실적 기대에 영향을 줄 수 있어요."
+
+
+def _beginner_direction_hint(direction: str) -> str:
+    return {
+        "POSITIVE": "관련 기업에 긍정적인 신호로 해석될 수 있지만, 실제 주가가 오를지는 추가 확인이 필요해요.",
+        "NEGATIVE": "관련 기업에 부담이 될 수 있지만, 실제 주가가 내릴지는 추가 확인이 필요해요.",
+        "NEUTRAL": "기사 내용만으로 주가가 오를지 내릴지를 한쪽으로 단정하기는 어려워요.",
+    }[direction]
+
+
 def _mock_rewrite_news(title: str, raw_content: str) -> dict:
-    sentences = _article_sentences(title, raw_content)
-    source = " ".join(sentences)
+    cleaned_content = _clean_article_text(title, raw_content)
+    sentences = _split_sentences(cleaned_content)
     facts = sentences[:3] or [title.strip()]
     fact_text = " ".join(facts)
-    terms = _detected_terms(source) or ["시장 영향"]
-    direction = _mock_market_impact(title, raw_content, None)["direction"]
-    beginner_facts = " ".join(facts[:2])
-    normal_facts = " ".join(facts[:3])
-    analyst_caveat = "다만 실제 가격 반응은 기대치와 수급 등 추가 변수에 따라 달라질 수 있습니다."
+    title_text = title.strip().strip("\"“”'‘’")
+    if not fact_text or fact_text == title_text:
+        fact_text = f"‘{title_text}’라는 소식이 전해졌어요"
+    terms = _detected_terms(f"{title} {cleaned_content}") or ["시장 영향"]
+    direction = _mock_market_impact(title, cleaned_content, None)["direction"]
+    topic_hint = _beginner_topic_hint(terms)
+    direction_hint = _beginner_direction_hint(direction)
     return {
-        "beginner": f"쉽게 말하면, {beginner_facts} 기사에 나온 사실만 보면 {direction} 방향의 신호가 보이지만, 실제 결과는 달라질 수 있어요.",
-        "normal": f"{normal_facts} 따라서 관련 지표와 후속 발표를 함께 확인할 필요가 있습니다.",
-        "analyst": f"{fact_text} 이 내용은 {', '.join(terms[:3])}와 연결된 이벤트로 해석할 수 있습니다. {analyst_caveat}",
-        "importanceReason": f"기사에서 확인되는 핵심 변수({', '.join(terms[:3])})가 관련 시장·업종의 기대와 비용에 영향을 줄 수 있기 때문입니다.",
+        "beginner": f"기사에서는 {fact_text} 쉽게 말하면, {topic_hint} {direction_hint}",
+        "normal": f"{fact_text} 따라서 {', '.join(terms[:3])} 관련 지표와 후속 발표를 함께 확인할 필요가 있습니다.",
+        "analyst": f"{fact_text} 이 내용은 {', '.join(terms[:3])}와 연결된 이벤트로 해석할 수 있습니다. 다만 실제 가격 반응은 기대치와 수급 등 추가 변수에 따라 달라질 수 있습니다.",
+        "importanceReason": f"기사에서 확인되는 핵심 변수({', '.join(terms[:3])})가 관련 시장·업종의 매출, 비용 또는 실적 기대에 영향을 줄 수 있기 때문입니다.",
         "detectedTerms": terms,
     }
 
@@ -340,17 +407,18 @@ def rewrite_news(title: str, raw_content: str) -> dict:
     Returns a dict with keys: beginner, normal, analyst, importanceReason,
     detectedTerms.
     """
-    mock = _mock_rewrite_news(title, raw_content)
+    cleaned_content = _clean_article_text(title, raw_content)
+    mock = _mock_rewrite_news(title, cleaned_content)
     if not config.USE_REAL_LLM:
         return mock
 
-    cache_key = f"{title}::{hash(raw_content)}"
+    cache_key = f"{title}::{hash(cleaned_content)}"
     cached = _rewrite_cache.get(cache_key)
     if cached is not None:
         return cached
 
     try:
-        raw = _call_llm(_build_rewrite_prompt(title, raw_content), max_tokens=1500)
+        raw = _call_llm(_build_rewrite_prompt(title, cleaned_content), max_tokens=1500)
         data = _extract_json(raw)
         result = {
             "beginner": data.get("beginner", mock["beginner"]),

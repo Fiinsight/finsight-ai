@@ -60,6 +60,17 @@ class CostSafetyTest(unittest.TestCase):
         self.assertEqual(result["llmProvider"], "disabled")
         self.assertNotIn("configured-secret", str(result))
 
+    def test_real_llm_process_cap_stops_unbounded_calls(self):
+        with (
+            patch.object(config, "MAX_REAL_LLM_CALLS_PER_PROCESS", 1),
+            patch.object(config, "LLM_PROVIDER", "gemini"),
+            patch.object(llm_client, "_real_llm_calls", 0),
+            patch.object(llm_client, "_call_gemini", return_value="ok"),
+        ):
+            self.assertEqual(llm_client._call_llm("first"), "ok")
+            with self.assertRaises(RuntimeError):
+                llm_client._call_llm("second")
+
 
 if __name__ == "__main__":
     unittest.main()
