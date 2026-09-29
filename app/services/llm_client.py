@@ -152,7 +152,12 @@ _IMPACT_TARGET_KEYWORDS = {
 
 
 def _split_sentences(text: str) -> list[str]:
-    return [part.strip() for part in re.split(r"(?<=[.!?。！？])\s*", text.strip()) if part.strip()]
+    # A period between digits is part of a decimal/number, not a sentence end.
+    return [
+        part.strip()
+        for part in re.split(r"(?<=[!?。！？])\s+|(?<=\.)\s+(?<!\d\.)", text.strip())
+        if part.strip()
+    ]
 
 
 def _article_sentences(title: str, body: str) -> list[str]:

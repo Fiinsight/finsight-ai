@@ -1,9 +1,28 @@
 import unittest
 
-from app.services.llm_client import _mock_market_impact, _mock_rewrite_news, _mock_explain_term, _mock_generate_feedback
+from app.services.llm_client import (
+    _mock_explain_term,
+    _mock_generate_feedback,
+    _mock_market_impact,
+    _mock_rewrite_news,
+    _split_sentences,
+)
 
 
 class MarketImpactFallbackTest(unittest.TestCase):
+    def test_sentence_split_keeps_decimal_values_intact(self):
+        sentences = _split_sentences("해외직접투자가 32.3% 증가했다. 수출액은 4.48% 늘었다.")
+
+        self.assertEqual(
+            sentences,
+            ["해외직접투자가 32.3% 증가했다.", "수출액은 4.48% 늘었다."],
+        )
+
+    def test_detected_terms_does_not_invent_market_impact(self):
+        result = _mock_rewrite_news("정책 발표", "새로운 정책 세부안이 공개됐다.")
+
+        self.assertNotIn("시장 영향", result["detectedTerms"])
+
     def test_positive_result_has_target_and_evidence(self):
         result = _mock_market_impact(
             "반도체 수출 회복세, 실적 기대감 확대",
