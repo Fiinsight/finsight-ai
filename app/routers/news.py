@@ -18,6 +18,7 @@ class RewriteResponse(BaseModel):
     title: str
     summary: str
     importance_reason: str
+    importance_reasons: dict[str, str]
     detected_terms: list[str]
 
 
@@ -49,6 +50,7 @@ def rewrite_news(request: RewriteRequest) -> RewriteResponse:
         title=request.title,
         summary=result[request.level],
         importance_reason=result["importanceReason"],
+        importance_reasons=result["importanceReasons"],
         detected_terms=result.get("detectedTerms", []),
     )
 

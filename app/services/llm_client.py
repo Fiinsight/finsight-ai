@@ -164,13 +164,28 @@ def _matching_sentences(sentences: list[str], keywords: tuple[str, ...], limit: 
     return [sentence for sentence in sentences if any(keyword in sentence for keyword in keywords)][:limit]
 
 
+_TERM_STOPWORDS = {
+    "기사", "내용", "관련", "이번", "이후", "대한", "대해", "통해", "있는", "있다", "했다", "한다",
+    "으로", "에서", "에게", "그리고", "하지만", "때문", "확인", "필요", "발표", "소식", "전했다",
+}
+
+
 def _detected_terms(text: str) -> list[str]:
-    terms = (
-        "기준금리", "금리", "환율", "원달러", "수출", "수입", "반도체", "HBM", "PF",
-        "프로젝트파이낸싱", "연체율", "물가", "인플레이션", "영업이익", "매출", "수급",
-        "변동성", "밸류에이션", "설비투자", "재고 조정", "공모주", "수요예측", "국채금리", "AI", "원화",
-    )
-    return list(dict.fromkeys(term for term in terms if term in text))[:6]
+    """Extract present economic terms from article text, not a closed vocabulary."""
+    tokens = re.findall(r"[가-힣A-Za-z][가-힣A-Za-z0-9·-]{1,}", text)
+    terms: list[str] = []
+    for token in tokens:
+        normalized = token.rstrip("은는이가을를에의와과도만으로서")
+        if normalized.endswith("하기"):
+            normalized = normalized[:-2]
+        if len(normalized) < 2 or normalized in _TERM_STOPWORDS or normalized in terms:
+            continue
+        if any(mark in normalized for mark in (
+            "금리", "환율", "수출", "수입", "투자", "매출", "이익", "실적", "수요", "가격",
+            "기업", "인프라", "데이터센터", "반도체", "AI", "HBM", "PF",
+        )) or token.isascii():
+            terms.append(normalized)
+    return terms[:12]
 
 
 def _mock_market_impact(title: str, body: str, related_symbol: str | None) -> dict:
@@ -301,6 +316,13 @@ _ARTICLE_NOISE_MARKERS = (
     "개인정보처리방침",
     "쿠키 설정",
 )
+_ARTICLE_NOISE_PATTERNS = (
+    r"^(?:사진|이미지|자료사진|그래픽)(?:\s*제공)?\s*[:：=].*$",
+    r"^(?:사진|이미지|자료사진|그래픽)\s+제공(?:\s|$)",
+    r"^[가-힣]{2,4}\s*(?:기자|특파원)(?:[\s.!?。！？]|$)",
+    r"(?:/|·)\s*[가-힣]{2,4}\s*(?:기자|특파원)\s*[.!?。！？]*$",
+    r"^(?:무단|저작권|copyright|ⓒ)",
+)
 
 
 def _clean_article_text(title: str, raw_content: str) -> str:
@@ -314,6 +336,8 @@ def _clean_article_text(title: str, raw_content: str) -> str:
     for sentence in sentences:
         item = " ".join(sentence.split()).strip()
         if not item or any(marker in item for marker in _ARTICLE_NOISE_MARKERS):
+            continue
+        if any(re.search(pattern, item, re.IGNORECASE) for pattern in _ARTICLE_NOISE_PATTERNS):
             continue
         item_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", item).lower()
         if title_key and item_key == title_key:
@@ -333,6 +357,9 @@ def _beginner_topic_hint(terms: list[str]) -> str:
         "AI": "AI 관련 투자가 늘면 관련 부품과 장비를 만드는 기업의 수요가 달라질 수 있어요.",
         "금리": "금리는 기업의 이자 비용과 투자자들이 주식을 평가하는 방식에 영향을 줘요.",
         "실적": "실적은 기업이 실제로 얼마나 벌었는지 보여주는 중요한 자료예요.",
+        "인공지능 인프라": "인공지능 인프라는 AI를 돌리는 데 필요한 데이터센터 같은 기반 시설이에요.",
+        "데이터센터": "데이터센터는 컴퓨터와 서버를 모아 AI 같은 서비스를 실행하는 시설이에요.",
+        "투자": "투자는 회사가 다른 사업이나 시설에 돈을 넣는 일이에요.",
     }
     for term in terms:
         if term in hints:
@@ -373,23 +400,71 @@ def _importance_reason(title: str, content: str, terms: list[str]) -> str:
     return f"기사에서 확인되는 사실은 ‘{evidence}’입니다. 이 내용이 실제 실적으로 이어지는지는 {check}{particle} 확인해야 합니다."
 
 
+def _follow_up_checks(text: str) -> str:
+    checks = []
+    if any(term in text for term in ("투자", "지분", "인수")):
+        checks.append("투자 금액·지분율과 실제 사업 협력 여부")
+    if any(term in text for term in ("수출", "수입", "환율")):
+        checks.append("수출입 금액과 관련 기업 매출")
+    if any(term in text for term in ("반도체", "HBM", "AI", "데이터센터")):
+        checks.append("수요·가격과 후속 실적 발표")
+    return " 및 ".join(checks[:2]) if checks else "관련 기업의 매출·비용·실적 자료"
+
+
+def _importance_reasons(title: str, content: str, terms: list[str]) -> dict[str, str]:
+    base = _importance_reason(title, content, terms)
+    checks = _follow_up_checks(f"{title} {content}")
+    evidence = next(
+        (sentence for sentence in _split_sentences(content) if any(term in sentence for term in terms)),
+        None,
+    )
+    beginner = (
+        f"기사에서 확인된 내용은 ‘{evidence}’예요. 실제 영향은 {checks}를 더 확인해야 해요."
+        if evidence
+        else "기사 본문에서 기업 실적에 연결할 구체적인 근거를 확인하지 못했어요."
+    )
+    return {
+        "beginner": beginner,
+        "normal": base,
+        "analyst": f"수혜 경로: {base} 확인할 변수: {checks}.",
+    }
+
+
+def _mock_beginner_summary(title: str, content: str, terms: list[str], direction: str) -> str:
+    fact = _split_sentences(content)[:1] or [f"‘{title.strip()}’라는 소식이 전해졌어요"]
+    return f"{fact[0]} 쉽게 말하면, {_beginner_topic_hint(terms)} {_beginner_direction_hint(direction)}"
+
+
+def _mock_normal_summary(title: str, content: str) -> str:
+    facts = " ".join(_split_sentences(content)[:2] or [title.strip()])
+    checks = _follow_up_checks(f"{title} {content}")
+    return f"{facts} 이 뉴스에서 확인할 점은 {checks}입니다. 기사만으로 실제 주가 방향이나 사업 성과를 단정할 수는 없습니다."
+
+
+def _mock_analyst_summary(title: str, content: str, terms: list[str]) -> str:
+    facts = _split_sentences(content)
+    structure = facts[0] if facts else title.strip()
+    link = facts[1] if len(facts) > 1 else "기사에 사업 실행 내용이 충분히 제시되지 않았습니다."
+    checks = _follow_up_checks(f"{title} {content}")
+    return (
+        f"투자·이벤트 구조: {structure}\n"
+        f"전략적 의미·수혜 경로: {link} {_beginner_topic_hint(terms)}\n"
+        f"확인할 점: {checks}.\n"
+        "위험 요인: 투자 규모, 실행 여부와 시장 환경에 따라 결과가 달라질 수 있으며 기사만으로 수익을 예측할 수 없습니다."
+    )
+
+
 def _mock_rewrite_news(title: str, raw_content: str) -> dict:
     cleaned_content = _clean_article_text(title, raw_content)
-    sentences = _split_sentences(cleaned_content)
-    facts = sentences[:3] or [title.strip()]
-    fact_text = " ".join(facts)
-    title_text = title.strip().strip("\"“”'‘’")
-    if not fact_text or fact_text == title_text:
-        fact_text = f"‘{title_text}’라는 소식이 전해졌어요"
-    terms = _detected_terms(f"{title} {cleaned_content}") or ["시장 영향"]
+    terms = _detected_terms(f"{title} {cleaned_content}")
     direction = _mock_market_impact(title, cleaned_content, None)["direction"]
-    topic_hint = _beginner_topic_hint(terms)
-    direction_hint = _beginner_direction_hint(direction)
+    importance_reasons = _importance_reasons(title, cleaned_content, terms)
     return {
-        "beginner": f"기사에서는 {fact_text} 쉽게 말하면, {topic_hint} {direction_hint}",
-        "normal": f"{fact_text} 따라서 {', '.join(terms[:3])} 관련 지표와 후속 발표를 함께 확인할 필요가 있습니다.",
-        "analyst": f"{fact_text} 이 내용은 {', '.join(terms[:3])}와 연결된 이벤트로 해석할 수 있습니다. 다만 실제 가격 반응은 기대치와 수급 등 추가 변수에 따라 달라질 수 있습니다.",
-        "importanceReason": _importance_reason(title, cleaned_content, terms),
+        "beginner": _mock_beginner_summary(title, cleaned_content, terms, direction),
+        "normal": _mock_normal_summary(title, cleaned_content),
+        "analyst": _mock_analyst_summary(title, cleaned_content, terms),
+        "importanceReason": importance_reasons["normal"],
+        "importanceReasons": importance_reasons,
         "detectedTerms": terms,
     }
 
@@ -399,7 +474,12 @@ def _build_rewrite_prompt(title: str, raw_content: str) -> str:
 아래 뉴스를 세 가지 눈높이로 다시 작성하고, 이 뉴스가 왜 중요한지, 그리고 기사에 등장하는
 핵심 금융 용어를 함께 알려주세요.
 원문에 없는 숫자·기업명·원인·전망을 추가하지 말고, 불확실한 내용은 불확실하다고 표현하세요.
-beginner는 쉬운 말과 짧은 문장을 우선하고, analyst도 원문 근거가 없는 투자 의견을 만들지 마세요.
+원문 문장을 그대로 길게 재사용하지 말고, 원문에 있는 사실만 자기 말로 다시 쓰세요.
+초보자용·일반용·분석용은 아래 지침을 서로 섞지 말고 각각 독립적으로 작성하세요.
+초보자용: 어려운 용어를 처음 나올 때 풀어 쓰고, 해요체의 짧은 문장 3~5개로 설명하세요.
+일반용: 확인할 지표와 후속 발표를 구체적으로 2~4문장으로 제시하세요.
+분석용: 투자 구조·수혜 경로·확인할 점·위험 요인을 각각 표시하세요.
+원문 근거가 없는 투자 의견·숫자·기업명·인과관계는 만들지 마세요.
 importanceReason는 반드시 기사에서 직접 확인되는 사실, 실적·사업과 연결될 수 있는 경로,
 추가로 확인할 지표나 기업 발표를 포함하세요. 그런 근거가 없으면 구체적인 투자 포인트를 만들지 말고
 "기사 본문에서 기업의 매출·비용·실적에 연결할 구체적인 근거를 확인하지 못했습니다."라고 답하세요.
@@ -412,10 +492,11 @@ importanceReason는 반드시 기사에서 직접 확인되는 사실, 실적·�
 
 다음 JSON 형식으로만 응답하세요. 코드블록이나 다른 설명 없이 순수 JSON만 출력하세요.
 {{
-  "beginner": "초보자를 위한 쉬운 비유와 용어 설명을 포함한 재구성 (3~5문장)",
-  "normal": "일반 투자자를 위한 표준 요약 (2~4문장)",
-  "analyst": "투자 관점의 분석을 포함한 심화 해설 (3~5문장)",
-  "importanceReason": "기사 사실 → 실적·사업 연결 → 확인할 지표의 순서로 쓴 한두 문장. 근거가 없으면 부족하다고 명시",
+  "beginner": "어려운 용어를 풀어 쓴 해요체 3~5문장. 원문에 없는 사실 금지",
+  "normal": "확인할 지표·후속 발표를 구체화한 2~4문장. 원문에 없는 사실 금지",
+  "analyst": "투자 구조·수혜 경로·확인할 점·위험 요인을 표시한 분석. 원문에 없는 사실 금지",
+  "importanceReason": "기존 호환용 일반 수준 투자 포인트",
+  "importanceReasons": {{"beginner": "쉬운 한 문장", "normal": "구체적인 확인 포인트", "analyst": "수혜 경로와 위험 요인을 포함한 문장"}},
   "detectedTerms": ["기사에 등장한 핵심 금융 용어", "..."]
 }}"""
 
@@ -432,8 +513,7 @@ _rewrite_cache: dict[str, dict] = {}
 def rewrite_news(title: str, raw_content: str) -> dict:
     """Rewrite a news article at 3 reading levels plus an importance reason.
 
-    Returns a dict with keys: beginner, normal, analyst, importanceReason,
-    detectedTerms.
+    Returns a dict with level-specific summaries and investment points.
     """
     cleaned_content = _clean_article_text(title, raw_content)
     mock = _mock_rewrite_news(title, cleaned_content)
@@ -453,6 +533,7 @@ def rewrite_news(title: str, raw_content: str) -> dict:
             "normal": data.get("normal", mock["normal"]),
             "analyst": data.get("analyst", mock["analyst"]),
             "importanceReason": data.get("importanceReason", mock["importanceReason"]),
+            "importanceReasons": data.get("importanceReasons", mock["importanceReasons"]),
             "detectedTerms": data.get("detectedTerms", mock["detectedTerms"]),
         }
         _rewrite_cache[cache_key] = result

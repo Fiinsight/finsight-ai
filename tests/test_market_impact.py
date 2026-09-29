@@ -65,6 +65,26 @@ class MarketImpactFallbackTest(unittest.TestCase):
         self.assertIn("AI", result["detectedTerms"])
         self.assertIn("수요가 늘었습니다", result["beginner"])
 
+    def test_rewrite_fallback_removes_byline_caption_and_copyright(self):
+        result = _mock_rewrite_news(
+            "헬릭스 데이터센터 투자",
+            "홍길동 기자. 사진=연합뉴스. 삼성 계열사가 헬릭스에 투자했다. Copyright FinSight.",
+        )
+        for level in ("beginner", "normal", "analyst"):
+            self.assertNotIn("기자", result[level])
+            self.assertNotIn("연합뉴스", result[level])
+            self.assertNotIn("Copyright", result[level])
+
+    def test_rewrite_fallback_has_distinct_level_structures(self):
+        result = _mock_rewrite_news(
+            "헬릭스 데이터센터 투자",
+            "삼성 계열사가 헬릭스에 투자했다. 데이터센터 사업 협력을 검토한다.",
+        )
+        self.assertIn("쉽게 말하면", result["beginner"])
+        self.assertIn("확인할 점은", result["normal"])
+        self.assertIn("투자·이벤트 구조", result["analyst"])
+        self.assertIn("위험 요인", result["analyst"])
+
     def test_importance_reason_uses_article_evidence_and_check_variable(self):
         result = _mock_rewrite_news(
             "반도체 수출 증가",
