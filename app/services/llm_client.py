@@ -325,14 +325,51 @@ _ARTICLE_NOISE_MARKERS = (
     "관련기사",
     "개인정보처리방침",
     "쿠키 설정",
+    "재판매 및 DB 금지",
+    "무단전재",
+    "재배포 금지",
+    "저작권자",
+    "copyright",
 )
 _ARTICLE_NOISE_PATTERNS = (
+    r"^\s*\[\s*촬영\b[^\]]*(?:기자|특파원)[^\]]*\]\s*$",
+    r"^\s*\[\s*(?:사진|사진\s*제공|자료사진|그래픽)\s*(?:제공|=|:|：)[^\]]*\]\s*$",
     r"^(?:사진|이미지|자료사진|그래픽)(?:\s*제공)?\s*[:：=].*$",
     r"^(?:사진|이미지|자료사진|그래픽)\s+제공(?:\s|$)",
     r"^[가-힣]{2,4}\s*(?:기자|특파원)(?:[\s.!?。！？]|$)",
     r"(?:/|·)\s*[가-힣]{2,4}\s*(?:기자|특파원)\s*[.!?。！？]*$",
+    r"^(?:재판매\s*및\s*DB\s*금지|무단전재(?:\s*및)?\s*재배포\s*금지|재배포\s*금지)\s*[\].。.!?]*$",
+    r"^(?:저작권자\s*(?:\(c\)|ⓒ|©)?|copyright)\b.*$",
     r"^(?:무단|저작권|copyright|ⓒ)",
 )
+
+
+def _strip_inline_article_noise(text: str) -> str:
+    """Remove caption fragments while preserving following article text."""
+    text = re.sub(
+        r"\[\s*촬영\b[^\]]*(?:기자|특파원)[^\]]*\]",
+        " ",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        r"\[\s*(?:사진|사진\s*제공|자료사진|그래픽)\s*(?:제공|=|:|：)[^\]]*\]",
+        " ",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        r"(?:재판매\s*및\s*DB\s*금지|무단전재(?:\s*및)?\s*재배포\s*금지|재배포\s*금지)\s*[\].。.!?]*",
+        " ",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        r"^\s*(?:\([^)]*\)\s*)?[가-힣]{2,4}\s*(?:기자|특파원)\s*=\s*",
+        "",
+        text,
+    )
+    return " ".join(text.split()).strip()
 
 
 def _clean_article_text(title: str, raw_content: str) -> str:
@@ -344,10 +381,13 @@ def _clean_article_text(title: str, raw_content: str) -> str:
     sentences = _split_sentences(raw_content.replace("\r", "\n"))
     cleaned: list[str] = []
     for sentence in sentences:
-        item = " ".join(sentence.split()).strip()
-        if not item or any(marker in item for marker in _ARTICLE_NOISE_MARKERS):
+        item = _strip_inline_article_noise(sentence)
+        if not item:
             continue
         if any(re.search(pattern, item, re.IGNORECASE) for pattern in _ARTICLE_NOISE_PATTERNS):
+            continue
+        item_folded = item.casefold()
+        if any(marker.casefold() in item_folded for marker in _ARTICLE_NOISE_MARKERS):
             continue
         item_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", item).lower()
         if title_key and item_key == title_key:

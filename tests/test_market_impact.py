@@ -5,6 +5,7 @@ from app.services.llm_client import (
     _mock_generate_feedback,
     _mock_market_impact,
     _mock_rewrite_news,
+    _clean_article_text,
     _split_sentences,
 )
 
@@ -94,6 +95,21 @@ class MarketImpactFallbackTest(unittest.TestCase):
             self.assertNotIn("연합뉴스", result[level])
             self.assertNotIn("Copyright", result[level])
         self.assertNotIn("삼성 계열사가 헬릭스에 투자했다.", result["beginner"])
+
+    def test_rewrite_fallback_removes_bracketed_photo_caption_and_preserves_article(self):
+        raw = "[촬영 정회인 기자.] 재판매 및 DB 금지.] (서울=연합뉴스) 정회인 기자 = 한국 증시의 추가 상승을 위해 제도 개선이 필요하다."
+        result = _mock_rewrite_news("AI 투자 늘어난다", raw)
+
+        for level in ("beginner", "normal", "analyst"):
+            self.assertNotIn("촬영", result[level])
+            self.assertNotIn("정회인 기자", result[level])
+            self.assertNotIn("재판매 및 DB 금지", result[level])
+        self.assertIn("한국 증시의 추가 상승", result["normal"])
+
+    def test_title_tags_are_not_article_noise(self):
+        cleaned = _clean_article_text("[단독] 수출 전망", "[단독] 수출이 증가했다.")
+
+        self.assertIn("[단독] 수출이 증가했다.", cleaned)
 
     def test_rewrite_fallback_has_distinct_level_structures(self):
         result = _mock_rewrite_news(
