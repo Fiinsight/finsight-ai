@@ -348,6 +348,31 @@ def _beginner_direction_hint(direction: str) -> str:
     }[direction]
 
 
+def _importance_reason(title: str, content: str, terms: list[str]) -> str:
+    """Build an article-grounded reason without inventing a company or forecast."""
+    sentences = _split_sentences(content) + _split_sentences(title)
+    evidence = next(
+        (sentence for sentence in sentences if any(term in sentence for term in terms)),
+        None,
+    )
+    if not evidence:
+        return "기사 본문에서 기업의 매출·비용·실적에 연결할 구체적인 근거를 확인하지 못했습니다."
+
+    text = f"{title} {content}"
+    if any(term in text for term in ("금리", "국채금리", "수익률")):
+        check = "금리 수준과 기업의 이자비용·투자계획"
+    elif any(term in text for term in ("수출", "수입", "환율", "원달러", "원화")):
+        check = "수출입 금액과 관련 기업의 매출"
+    elif any(term in text for term in ("반도체", "HBM", "AI")):
+        check = "제품 수요·가격과 관련 기업의 실적"
+    elif any(term in text for term in ("매출", "영업이익", "실적")):
+        check = "후속 실적 발표의 매출과 영업이익"
+    else:
+        check = "관련 기업의 매출·비용·실적 자료"
+    particle = "을" if check.endswith("출") else "를"
+    return f"기사에서 확인되는 사실은 ‘{evidence}’입니다. 이 내용이 실제 실적으로 이어지는지는 {check}{particle} 확인해야 합니다."
+
+
 def _mock_rewrite_news(title: str, raw_content: str) -> dict:
     cleaned_content = _clean_article_text(title, raw_content)
     sentences = _split_sentences(cleaned_content)
@@ -364,7 +389,7 @@ def _mock_rewrite_news(title: str, raw_content: str) -> dict:
         "beginner": f"기사에서는 {fact_text} 쉽게 말하면, {topic_hint} {direction_hint}",
         "normal": f"{fact_text} 따라서 {', '.join(terms[:3])} 관련 지표와 후속 발표를 함께 확인할 필요가 있습니다.",
         "analyst": f"{fact_text} 이 내용은 {', '.join(terms[:3])}와 연결된 이벤트로 해석할 수 있습니다. 다만 실제 가격 반응은 기대치와 수급 등 추가 변수에 따라 달라질 수 있습니다.",
-        "importanceReason": f"기사에서 확인되는 핵심 변수({', '.join(terms[:3])})가 관련 시장·업종의 매출, 비용 또는 실적 기대에 영향을 줄 수 있기 때문입니다.",
+        "importanceReason": _importance_reason(title, cleaned_content, terms),
         "detectedTerms": terms,
     }
 
@@ -375,6 +400,9 @@ def _build_rewrite_prompt(title: str, raw_content: str) -> str:
 핵심 금융 용어를 함께 알려주세요.
 원문에 없는 숫자·기업명·원인·전망을 추가하지 말고, 불확실한 내용은 불확실하다고 표현하세요.
 beginner는 쉬운 말과 짧은 문장을 우선하고, analyst도 원문 근거가 없는 투자 의견을 만들지 마세요.
+importanceReason는 반드시 기사에서 직접 확인되는 사실, 실적·사업과 연결될 수 있는 경로,
+추가로 확인할 지표나 기업 발표를 포함하세요. 그런 근거가 없으면 구체적인 투자 포인트를 만들지 말고
+"기사 본문에서 기업의 매출·비용·실적에 연결할 구체적인 근거를 확인하지 못했습니다."라고 답하세요.
 
 [뉴스 제목]
 {title}
@@ -387,7 +415,7 @@ beginner는 쉬운 말과 짧은 문장을 우선하고, analyst도 원문 근�
   "beginner": "초보자를 위한 쉬운 비유와 용어 설명을 포함한 재구성 (3~5문장)",
   "normal": "일반 투자자를 위한 표준 요약 (2~4문장)",
   "analyst": "투자 관점의 분석을 포함한 심화 해설 (3~5문장)",
-  "importanceReason": "이 뉴스가 왜 중요한지에 대한 한두 문장 설명",
+  "importanceReason": "기사 사실 → 실적·사업 연결 → 확인할 지표의 순서로 쓴 한두 문장. 근거가 없으면 부족하다고 명시",
   "detectedTerms": ["기사에 등장한 핵심 금융 용어", "..."]
 }}"""
 

@@ -65,6 +65,18 @@ class MarketImpactFallbackTest(unittest.TestCase):
         self.assertIn("AI", result["detectedTerms"])
         self.assertIn("수요가 늘었습니다", result["beginner"])
 
+    def test_importance_reason_uses_article_evidence_and_check_variable(self):
+        result = _mock_rewrite_news(
+            "반도체 수출 증가",
+            "반도체 수출액이 증가했다. HBM 수요가 확대됐다.",
+        )
+        self.assertIn("반도체 수출액이 증가했다", result["importanceReason"])
+        self.assertIn("수출입 금액과 관련 기업의 매출을", result["importanceReason"])
+
+    def test_importance_reason_admits_insufficient_evidence(self):
+        result = _mock_rewrite_news("정책 발표", "새로운 정책 세부안이 공개됐다.")
+        self.assertIn("구체적인 근거를 확인하지 못했습니다", result["importanceReason"])
+
     def test_term_fallback_is_grounded_in_context(self):
         result = _mock_explain_term("기준금리", "한국은행이 기준금리를 동결했다.")
         self.assertIn("한국은행이 기준금리를 동결했다", result["contextExplanation"])
