@@ -74,6 +74,7 @@ class MarketImpactFallbackTest(unittest.TestCase):
             self.assertNotIn("기자", result[level])
             self.assertNotIn("연합뉴스", result[level])
             self.assertNotIn("Copyright", result[level])
+        self.assertNotIn("삼성 계열사가 헬릭스에 투자했다.", result["beginner"])
 
     def test_rewrite_fallback_has_distinct_level_structures(self):
         result = _mock_rewrite_news(
@@ -84,6 +85,15 @@ class MarketImpactFallbackTest(unittest.TestCase):
         self.assertIn("확인할 점은", result["normal"])
         self.assertIn("투자·이벤트 구조", result["analyst"])
         self.assertIn("위험 요인", result["analyst"])
+
+    def test_beginner_uses_haeyo_and_explains_ai_infrastructure(self):
+        result = _mock_rewrite_news(
+            "헬릭스 데이터센터 투자",
+            "삼성 계열사가 헬릭스에 투자했다. 헬릭스는 인공지능 인프라를 만든다.",
+        )
+        self.assertIn("했어요", result["beginner"])
+        self.assertIn("인공지능 인프라는", result["beginner"])
+        self.assertNotIn("투자했다.", result["beginner"])
 
     def test_importance_reason_uses_article_evidence_and_check_variable(self):
         result = _mock_rewrite_news(

@@ -178,6 +178,8 @@ def _detected_terms(text: str) -> list[str]:
         normalized = token.rstrip("은는이가을를에의와과도만으로서")
         if normalized.endswith("하기"):
             normalized = normalized[:-2]
+        if normalized.endswith("했다"):
+            normalized = normalized[:-2]
         if len(normalized) < 2 or normalized in _TERM_STOPWORDS or normalized in terms:
             continue
         if any(mark in normalized for mark in (
@@ -185,6 +187,9 @@ def _detected_terms(text: str) -> list[str]:
             "기업", "인프라", "데이터센터", "반도체", "AI", "HBM", "PF",
         )) or token.isascii():
             terms.append(normalized)
+    for phrase in ("인공지능 인프라", "프로젝트 파이낸싱", "원달러 환율"):
+        if phrase in text and phrase not in terms:
+            terms.insert(0, phrase)
     return terms[:12]
 
 
@@ -375,6 +380,17 @@ def _beginner_direction_hint(direction: str) -> str:
     }[direction]
 
 
+def _to_haeyo(sentence: str) -> str:
+    for source, target in (
+        ("했습니다", "했어요"), ("합니다", "해요"), ("있습니다", "있어요"),
+        ("됩니다", "돼요"), ("하기로 했다", "하기로 했어요"), ("했다", "했어요"),
+        ("한다", "해요"), ("이다", "이에요"), ("이다.", "이에요."),
+        ("있다", "있어요"), ("된다", "돼요"),
+    ):
+        sentence = sentence.replace(source, target)
+    return sentence
+
+
 def _importance_reason(title: str, content: str, terms: list[str]) -> str:
     """Build an article-grounded reason without inventing a company or forecast."""
     sentences = _split_sentences(content) + _split_sentences(title)
@@ -419,7 +435,7 @@ def _importance_reasons(title: str, content: str, terms: list[str]) -> dict[str,
         None,
     )
     beginner = (
-        f"기사에서 확인된 내용은 ‘{evidence}’예요. 실제 영향은 {checks}를 더 확인해야 해요."
+        f"기사에서 확인된 내용은 ‘{_to_haeyo(evidence)}’예요. 실제 영향은 {checks}를 더 확인해야 해요."
         if evidence
         else "기사 본문에서 기업 실적에 연결할 구체적인 근거를 확인하지 못했어요."
     )
@@ -432,7 +448,7 @@ def _importance_reasons(title: str, content: str, terms: list[str]) -> dict[str,
 
 def _mock_beginner_summary(title: str, content: str, terms: list[str], direction: str) -> str:
     fact = _split_sentences(content)[:1] or [f"‘{title.strip()}’라는 소식이 전해졌어요"]
-    return f"{fact[0]} 쉽게 말하면, {_beginner_topic_hint(terms)} {_beginner_direction_hint(direction)}"
+    return f"{_to_haeyo(fact[0])} 쉽게 말하면, {_beginner_topic_hint(terms)} {_beginner_direction_hint(direction)}"
 
 
 def _mock_normal_summary(title: str, content: str) -> str:
