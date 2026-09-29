@@ -97,14 +97,20 @@ class MarketImpactFallbackTest(unittest.TestCase):
         self.assertNotIn("삼성 계열사가 헬릭스에 투자했다.", result["beginner"])
 
     def test_rewrite_fallback_removes_bracketed_photo_caption_and_preserves_article(self):
-        raw = "[촬영 정회인 기자.] 재판매 및 DB 금지.] (서울=연합뉴스) 정회인 기자 = 한국 증시의 추가 상승을 위해 제도 개선이 필요하다."
+        raw = """(서울=연합뉴스) 정회인 기자 = 29일 더그랜드롯데 서울에서 열린 코리아 프리미엄 위크에서 '한국 증시 선진화를 위한 핵심과제'를 주제로 패널토론이 진행 중이다.
+
+[촬영 정회인 기자.
+
+재판매 및 DB 금지.]
+
+(서울=연합뉴스) 정회인 기자 = 한국 증시의 추가 도약을 논의하는 자리에서 인공지능(AI) 투자 확대에 대한 기대와 함께 글로벌 자금이 원활하게 흐르도록 시장의 '배관'부터 정비해야 한다는 제언이 나왔다."""
         result = _mock_rewrite_news("AI 투자 늘어난다", raw)
 
         for level in ("beginner", "normal", "analyst"):
             self.assertNotIn("촬영", result[level])
             self.assertNotIn("정회인 기자", result[level])
             self.assertNotIn("재판매 및 DB 금지", result[level])
-        self.assertIn("한국 증시의 추가 상승", result["normal"])
+        self.assertIn("한국 증시의 추가 도약", result["normal"])
 
     def test_title_tags_are_not_article_noise(self):
         cleaned = _clean_article_text("[단독] 수출 전망", "[단독] 수출이 증가했다.")

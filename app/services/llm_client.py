@@ -343,6 +343,10 @@ _ARTICLE_NOISE_PATTERNS = (
     r"^(?:무단|저작권|copyright|ⓒ)",
 )
 
+_ARTICLE_NOISE_BLOCK_PATTERNS = (
+    r"\[\s*(?:촬영|사진|사진\s*제공|자료사진|그래픽)\b[^\]]*(?:기자|특파원|제공)[^\]]*\]",
+)
+
 
 def _strip_inline_article_noise(text: str) -> str:
     """Remove caption fragments while preserving following article text."""
@@ -372,13 +376,21 @@ def _strip_inline_article_noise(text: str) -> str:
     return " ".join(text.split()).strip()
 
 
+def _remove_article_noise_blocks(text: str) -> str:
+    """Remove multiline caption blocks before sentence splitting."""
+    for pattern in _ARTICLE_NOISE_BLOCK_PATTERNS:
+        text = re.sub(pattern, " ", text, flags=re.IGNORECASE | re.DOTALL)
+    return text
+
+
 def _clean_article_text(title: str, raw_content: str) -> str:
     """Remove publisher chrome and title duplication before any rewrite."""
     title_text = " ".join(title.split()).strip(" \t\n\r\"“”'‘’")
     title_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", title_text).lower()
     title_prefix = re.split(r"[…,:：]", title_text, maxsplit=1)[0].strip()
     title_prefix_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", title_prefix).lower()
-    sentences = _split_sentences(raw_content.replace("\r", "\n"))
+    normalized_content = _remove_article_noise_blocks(raw_content.replace("\r", "\n"))
+    sentences = _split_sentences(normalized_content)
     cleaned: list[str] = []
     for sentence in sentences:
         item = _strip_inline_article_noise(sentence)
