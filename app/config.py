@@ -10,7 +10,7 @@ import os
 
 from dotenv import load_dotenv
 
-load_dotenv(override=True)
+load_dotenv(override=False)
 
 
 def _get_bool(name: str, default: bool) -> bool:
