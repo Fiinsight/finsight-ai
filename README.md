@@ -93,3 +93,24 @@ tests/                API와 서비스 테스트
 - 감성 분류 결과를 백엔드 뉴스 도메인과 연결
 - 유사 뉴스 근거를 피드백 화면에 노출
 - 학교 GPU 학습 모델을 CPU 추론 가능한 artifact로 export
+
+### Backend local retrieval adapter (free fallback)
+
+`POST /v1/search` accepts the backend's authorized `documents`, `kind`,
+`query`, `topK`, time window and case owner. It preserves document IDs,
+source URLs and actual publication times, returns at most 600-character
+excerpts and sorts by lexical score. This is explicitly `RULE_FALLBACK`,
+not a semantic-model result. No provider calls, model downloads or persistent
+user-record index are involved. Missing publication times exclude news/case
+candidates; case search requires matching owners.
+
+Run the adapter on the backend's existing local port:
+
+```sh
+USE_REAL_LLM=false USE_REAL_EMBEDDINGS=false .venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8002
+```
+
+Set `FINSIGHT_LOCAL_ML_ENABLED=true` and
+`FINSIGHT_LOCAL_ML_BASE_URL=http://127.0.0.1:8002` in the backend environment
+when using this free adapter. Explicit process variables override `.env`,
+so setting both cost flags to false cannot be undone by `.env` loading.
