@@ -404,11 +404,20 @@ def _select_article_facts(title: str, content: str, limit: int) -> list[str]:
 def _reading_summary(title: str, body: str, level: str) -> str:
     sentences = _select_article_facts(title, body, {'beginner': 2, 'normal': 3, 'analyst': 4}[level])
     if level == 'beginner':
-        replacements = [('전년 동기', '지난해 같은 기간'), ('전 거래일', '직전 거래일'), ('전장 대비', '직전 거래일과 비교해'),
+        replacements = [('컨센서스', '시장 전문가들의 예상'), ('유동성', '시장에 돌고 있는 돈'), ('매크로 불확실성', '경제 전반을 예측하기 어려운 상황'), ('상방 압력', '오를 가능성을 높이는 힘'), ('하방 압력', '내릴 가능성을 높이는 힘'), ('전년 동기', '지난해 같은 기간'), ('전 거래일', '직전 거래일'), ('전장 대비', '직전 거래일과 비교해'),
                         ('상승했다', '올랐어요'), ('하락했다', '내렸어요'), ('밝혔다', '밝혔어요'), ('설명했다', '설명했어요'), ('전망했다', '전망했어요'), ('증가했다', '늘었어요'), ('감소했다', '줄었어요'), ('기록했다', '기록했어요')]
         for original, plain in replacements:
             sentences = [sentence.replace(original, plain) for sentence in sentences]
-    result = '\n\n'.join(sentences)
+    if level == 'analyst' and sentences:
+        numeric = [sentence for sentence in sentences if re.search(r'\d', sentence)]
+        risks = [sentence for sentence in _split_sentences(body) if re.search(r'위험|리스크|불확실|우려|제약|변수', sentence)]
+        clip = lambda text, size: text if len(text) <= size else text[:size].rstrip() + '…'
+        evidence = clip(' '.join(sentences[:2]), 210)
+        figures = clip(' '.join(numeric[:2]), 170) if numeric else '기사에 비교할 수치가 명시되지 않았습니다.'
+        risk = clip(' '.join(risks[:1]), 130) if risks else '기사에 구체적인 위험 요인이 명시되지 않았습니다. 전망의 가정은 추가 확인이 필요합니다.'
+        result = f'근거\n{evidence}\n\n수치·비교 기준\n{figures}\n\n리스크·확인할 점\n{risk}'
+    else:
+        result = '\n\n'.join(sentences)
     return result if len(result) <= 600 else result[:600].rstrip() + '…'
 
 
