@@ -114,3 +114,10 @@ Set `FINSIGHT_LOCAL_ML_ENABLED=true` and
 `FINSIGHT_LOCAL_ML_BASE_URL=http://127.0.0.1:8002` in the backend environment
 when using this free adapter. Explicit process variables override `.env`,
 so setting both cost flags to false cannot be undone by `.env` loading.
+
+### 무료 수준별 학습 설명
+
+`POST /ai/news/learning` (`title`, `body`, `level`)은 기사 발췌의 문장 수와
+초급 표현을 조정하고 별도 읽기 가이드를 반환합니다. `mode=RULE_FALLBACK`이며
+딥러닝 생성 결과가 아닙니다. 수치·출처를 만들어내지 않고 발췌는 600자로 제한합니다.
+사용자 답변과 복습 상태는 백엔드가 계정별로 저장하며 AI 서비스에는 전송하지 않습니다.
