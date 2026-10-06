@@ -330,7 +330,14 @@ def _clean_article_text(title: str, raw_content: str) -> str:
     title_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", title_text).lower()
     title_prefix = re.split(r"[…,:：]", title_text, maxsplit=1)[0].strip()
     title_prefix_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", title_prefix).lower()
-    sentences = _split_sentences(raw_content.replace("\r", "\n"))
+    content = raw_content.replace("\r", "\n")
+    content = re.sub(r"\[[^\]]{0,500}(?:자료사진|사진 제공|재판매|DB 금지)[^\]]{0,500}\]", " ", content)
+    photo_credit = re.match(r"^(.{0,700}?)20\d{2}\.\d{1,2}\.\d{1,2}\s+[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}\s*", content, re.S)
+    if photo_credit and any(marker in photo_credit[1] for marker in ("사진", "딜링룸", "촬영")) and content[photo_credit.end():].strip():
+        content = content[photo_credit.end():]
+    content = re.sub(r"\([^()\n]{1,40}=연합뉴스\)\s*[가-힣·]{2,12}\s*기자\s*=\s*", "", content)
+    content = re.sub(r"사진\s*=\s*(?:AFP|AP|EPA|로이터|연합뉴스)(?:/[^\s]+)?\s*", "", content)
+    sentences = _split_sentences(content)
     cleaned: list[str] = []
     for sentence in sentences:
         item = " ".join(sentence.split()).strip()
