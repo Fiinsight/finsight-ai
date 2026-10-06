@@ -187,7 +187,15 @@ def _detected_terms(text: str) -> list[str]:
         "프로젝트파이낸싱", "연체율", "물가", "인플레이션", "영업이익", "매출", "수급",
         "변동성", "밸류에이션", "설비투자", "재고 조정", "공모주", "수요예측", "국채금리", "AI", "원화",
     )
-    return list(dict.fromkeys(term for term in terms if term in text))[:6]
+    matches: list[tuple[int, str]] = []
+    occupied: set[int] = set()
+    for term in sorted(terms, key=len, reverse=True):
+        for match in re.finditer(re.escape(term), text):
+            positions = set(range(match.start(), match.end()))
+            if not positions & occupied:
+                occupied.update(positions)
+                matches.append((match.start(), term))
+    return list(dict.fromkeys(term for _, term in sorted(matches)))[:6]
 
 
 def _mock_market_impact(title: str, body: str, related_symbol: str | None) -> dict:
@@ -335,8 +343,9 @@ def _clean_article_text(title: str, raw_content: str) -> str:
     photo_credit = re.match(r"^(.{0,700}?)20\d{2}\.\d{1,2}\.\d{1,2}\s+[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}\s*", content, re.S)
     if photo_credit and any(marker in photo_credit[1] for marker in ("사진", "딜링룸", "촬영")) and content[photo_credit.end():].strip():
         content = content[photo_credit.end():]
-    content = re.sub(r"\([^()\n]{1,40}=연합뉴스\)\s*[가-힣·]{2,12}\s*기자\s*=\s*", "", content)
+    content = re.sub(r"\([^()\n]{1,40}=연합뉴스\)\s*[가-힣·]{1,12}\s*기자\s*=\s*", "", content)
     content = re.sub(r"사진\s*=\s*(?:AFP|AP|EPA|로이터|연합뉴스)(?:/[^\s]+)?\s*", "", content)
+    content = re.sub(r"[\w.+-]+@[\w.-]+", "", content)
     sentences = _split_sentences(content)
     cleaned: list[str] = []
     for sentence in sentences:
@@ -376,24 +385,47 @@ def _beginner_direction_hint(direction: str) -> str:
     }[direction]
 
 
+def _with_particle(word: str, pair: str) -> str:
+    """Use the consonant/vowel particle for a Hangul ending; neutral slash for other scripts."""
+    code = ord(word[-1]) if word else 0
+    if 0xAC00 <= code <= 0xD7A3:
+        return word + (pair.split('/')[0] if (code - 0xAC00) % 28 else pair.split('/')[1])
+    return word + '(' + pair + ')'
+
+
+def _select_article_facts(title: str, content: str, limit: int) -> list[str]:
+    sentences = _split_sentences(content)
+    keywords = _detected_terms(title) + re.findall(r'[가-힣A-Za-z]{3,}', title)
+    ranked = sorted(enumerate(sentences), key=lambda item: (
+        -(3 * sum(keyword in item[1] for keyword in keywords) + bool(re.search(r'\d', item[1]))), item[0]))
+    return [sentence for _, sentence in sorted(ranked[:limit])]
+
+
+def _reading_summary(title: str, body: str, level: str) -> str:
+    sentences = _select_article_facts(title, body, {'beginner': 2, 'normal': 3, 'analyst': 4}[level])
+    if level == 'beginner':
+        replacements = [('전년 동기', '지난해 같은 기간'), ('전 거래일', '직전 거래일'), ('전장 대비', '직전 거래일과 비교해'),
+                        ('상승했다', '올랐어요'), ('하락했다', '내렸어요'), ('밝혔다', '밝혔어요'), ('설명했다', '설명했어요'), ('전망했다', '전망했어요'), ('증가했다', '늘었어요'), ('감소했다', '줄었어요'), ('기록했다', '기록했어요')]
+        for original, plain in replacements:
+            sentences = [sentence.replace(original, plain) for sentence in sentences]
+    result = '\n\n'.join(sentences)
+    return result if len(result) <= 600 else result[:600].rstrip() + '…'
+
+
 def _mock_rewrite_news(title: str, raw_content: str) -> dict:
-    cleaned_content = _clean_article_text(title, raw_content)
-    sentences = _split_sentences(cleaned_content)
-    facts = sentences[:3] or [title.strip()]
-    fact_text = " ".join(facts)
-    title_text = title.strip().strip("\"“”'‘’")
-    if not fact_text or fact_text == title_text:
-        fact_text = f"‘{title_text}’라는 소식이 전해졌어요"
-    terms = _detected_terms(f"{title} {cleaned_content}") or ["시장 영향"]
-    direction = _mock_market_impact(title, cleaned_content, None)["direction"]
-    topic_hint = _beginner_topic_hint(terms)
-    direction_hint = _beginner_direction_hint(direction)
+    cleaned = _clean_article_text(title, raw_content)
+    terms = _detected_terms(f"{title} {cleaned}")
+    subject = ', '.join(terms[:3]) or '기사의 핵심 지표'
+    reasons = {
+        'beginner': _beginner_topic_hint(terms) + ' 실제 영향은 다음 발표와 비교해 확인해요.',
+        'normal': f"{subject}의 변화가 관련 매출·비용에 어떻게 연결되는지 후속 지표를 확인하세요.",
+        'analyst': f"확인할 변수: {subject}. 기사 수치의 기준 시점과 전망의 가정을 비교하고, 전망이 실현되지 않을 가능성도 확인하세요."
+    }
     return {
-        "beginner": f"기사에서는 {fact_text} 쉽게 말하면, {topic_hint} {direction_hint}",
-        "normal": f"{fact_text} 따라서 {', '.join(terms[:3])} 관련 지표와 후속 발표를 함께 확인할 필요가 있습니다.",
-        "analyst": f"{fact_text} 이 내용은 {', '.join(terms[:3])}와 연결된 이벤트로 해석할 수 있습니다. 다만 실제 가격 반응은 기대치와 수급 등 추가 변수에 따라 달라질 수 있습니다.",
-        "importanceReason": f"기사에서 확인되는 핵심 변수({', '.join(terms[:3])})가 관련 시장·업종의 매출, 비용 또는 실적 기대에 영향을 줄 수 있기 때문입니다.",
-        "detectedTerms": terms,
+        'beginner': _reading_summary(title, cleaned, 'beginner') + '\n\n' + _beginner_topic_hint(terms),
+        'normal': _reading_summary(title, cleaned, 'normal') + f"\n\n확인할 지표: {subject}. 발표된 사실과 전망을 구분하세요.",
+        'analyst': _reading_summary(title, cleaned, 'analyst') + f"\n\n{_with_particle(subject, '과/와')} 연결된 수치의 비교 기준과 전망 근거를 확인하세요. 실제 가격 반응과 기사 전망은 다를 수 있습니다.",
+        'importanceReason': reasons['normal'], 'importanceReasons': reasons, 'detectedTerms': terms,
     }
 
 
@@ -467,32 +499,62 @@ def rewrite_news(title: str, raw_content: str) -> dict:
 # ---------------------------------------------------------------------------
 
 
+TERM_DEFINITIONS = {
+    '기준금리': '중앙은행이 정하는 정책금리로 대출·예금 등 시중금리의 기준입니다.',
+    '금리': '돈을 빌리거나 맡길 때 원금에 대해 적용되는 이자의 비율입니다.',
+    '국채금리': '정부가 발행한 채권을 보유할 때 기대하는 수익률입니다. 채권 가격과 반대로 움직입니다.',
+    '환율': '한 나라의 통화와 다른 나라 통화를 바꾸는 비율입니다.',
+    '원달러': '1달러를 사기 위해 필요한 원화의 금액입니다.',
+    '원달러 환율': '1달러를 사기 위해 필요한 원화의 금액입니다.',
+    '원화': '대한민국에서 사용하는 통화입니다.',
+    '수출': '국내에서 만든 상품이나 서비스를 해외에 판매하는 활동입니다.',
+    '수입': '해외에서 만든 상품이나 서비스를 국내로 들여오는 활동입니다.',
+    '반도체': '전기 흐름을 제어해 연산·기억 등의 기능을 수행하는 전자 부품의 핵심 재료입니다.',
+    'HBM': '여러 메모리 칩을 쌓아 빠르게 데이터를 처리하는 고대역폭 메모리입니다.',
+    'AI': '데이터를 바탕으로 인식·예측·생성 등의 작업을 수행하는 인공지능 기술입니다.',
+    'PF': '사업에서 나올 미래 수익을 바탕으로 자금을 조달하는 방식입니다.',
+    '프로젝트파이낸싱': '사업에서 나올 미래 수익을 바탕으로 자금을 조달하는 방식입니다.',
+    'PF(프로젝트파이낸싱)': '사업에서 나올 미래 수익을 바탕으로 자금을 조달하는 방식입니다.',
+    '연체율': '대출 잔액 중 약속한 기한까지 갚지 못한 대출이 차지하는 비율입니다.',
+    '물가': '여러 상품과 서비스의 가격을 종합한 수준입니다.',
+    '인플레이션': '물가가 지속적으로 올라 화폐의 구매력이 떨어지는 현상입니다.',
+    '영업이익': '매출에서 매출원가와 판매관리비 등 본업의 비용을 뺀 이익입니다.',
+    '매출': '상품이나 서비스를 판매해 얻은 금액입니다. 비용을 뺀 이익과는 다릅니다.',
+    '수급': '시장에 들어오는 매수 수요와 매도 공급의 흐름입니다.',
+    '변동성': '자산 가격이 얼마나 크고 빠르게 오르내리는지를 나타냅니다.',
+    '밸류에이션': '기업의 현재 주가를 실적이나 자산 등 가치 기준과 비교하는 평가입니다.',
+    '설비투자': '생산 능력을 유지하거나 늘리기 위해 공장·기계 등에 자금을 쓰는 활동입니다.',
+    '재고 조정': '판매 상황에 맞춰 보유 재고와 생산량을 조절하는 과정입니다.',
+    '공모주': '기업이 상장 등의 과정에서 일반 투자자에게 공개적으로 모집하는 주식입니다.',
+    '수요예측': '기관투자자가 공모주 가격과 청약 수요를 제시하는 절차입니다.',
+}
+
+
 def _mock_explain_term(term: str, context: str | None) -> dict:
-    definitions = {
-        "기준금리": "중앙은행이 정하는 대표 금리로, 대출·예금 등 시중금리의 기준이 됩니다.",
-        "환율": "한 나라의 통화와 다른 나라 통화를 바꾸는 비율입니다.",
-        "원달러 환율": "1달러를 사기 위해 필요한 원화의 금액입니다.",
-        "HBM": "여러 메모리 칩을 쌓아 데이터 처리 속도와 용량을 높인 고성능 메모리입니다.",
-        "PF(프로젝트파이낸싱)": "사업에서 나올 미래 수익을 바탕으로 자금을 조달하는 방식입니다.",
-        "수요예측": "기관투자자가 공모주 가격과 청약 수요를 제시하는 절차입니다.",
-        "밸류에이션": "기업의 가치가 현재 주가에 비해 어느 정도인지 평가하는 기준입니다.",
-    }
-    definition = definitions.get(term, f"'{term}'은(는) 기사에서 설명이 필요한 금융 용어입니다.")
-    result: dict = {
-        "definition": definition,
-        "contextExplanation": None,
-        "marketImpact": None,
-    }
-    if context:
-        sentences = _split_sentences(context)
-        related = [sentence for sentence in sentences if term in sentence]
-        context_sentence = related[0] if related else sentences[0] if sentences else ""
-        result["contextExplanation"] = f"이 기사에서는 {context_sentence}"
-        impact = _mock_market_impact("", context, None)
-        result["marketImpact"] = (
-            f"기사에 나온 {', '.join(impact['targets'][:2])}의 {impact['direction']} 신호와 연결될 수 있습니다. "
-            "다만 실제 가격 반응은 추가 정보에 따라 달라질 수 있습니다."
-        )
+    definition = TERM_DEFINITIONS.get(term, '등록된 기본 설명이 없는 용어입니다.')
+    result = {'definition': definition, 'contextExplanation': None, 'marketImpact': None}
+    if not context:
+        return result
+    title, separator, body = context.partition('\n')
+    cleaned = _clean_article_text(title if separator else '', body if separator else context)
+    related = [sentence for sentence in _split_sentences(cleaned) if term in sentence and sentence != title]
+    result['contextExplanation'] = (f"이 기사에서는 {_with_particle(term, '을/를')} 이해할 때 다음 사실을 함께 확인해요: “{related[0][:100]}” {definition}"
+                                    if related else '본문에서 이 용어의 구체적인 쓰임을 확인할 수 없습니다.')
+    if term in ('금리', '기준금리', '국채금리'):
+        impact = '금리가 변하면 기업의 이자 비용과 채권·주식의 가치 평가 기준이 달라질 수 있어요.'
+    elif term in ('환율', '원달러', '원달러 환율', '원화', '수출', '수입'):
+        impact = '환율과 교역 변화는 수출 매출이나 수입 비용에 영향을 줄 수 있어요. 기업별 영향은 다릅니다.'
+    elif term in ('매출', '영업이익', '설비투자', '재고 조정'):
+        impact = '매출·비용·투자의 변화는 기업의 이익 전망을 바꿀 수 있어요. 실제 실적과 예상치를 비교하세요.'
+    elif term in ('수급', '변동성', '밸류에이션', '공모주', '수요예측'):
+        impact = '매수·매도 수요와 가치 평가가 달라지면 가격 변동 폭도 달라질 수 있어요.'
+    elif term in ('물가', '인플레이션'):
+        impact = '물가 변화는 소비자의 구매력과 기업 비용, 금리 정책에 영향을 줄 수 있어요.'
+    elif term in ('PF', '프로젝트파이낸싱', 'PF(프로젝트파이낸싱)', '연체율'):
+        impact = '사업의 상환 가능성이 낮아지면 자금 조달과 금융기관의 손실 위험에 영향을 줄 수 있어요.'
+    else:
+        impact = f"{term} 관련 수요와 공급의 변화가 실제 매출·비용에 연결되는지 추가 확인이 필요해요."
+    result['marketImpact'] = impact + ' 기사만으로 주가 방향을 단정하지 않습니다.'
     return result
 
 
