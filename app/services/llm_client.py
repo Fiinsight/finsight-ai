@@ -169,7 +169,7 @@ def _topic_direction(text: str) -> str | None:
 
 
 def _split_sentences(text: str) -> list[str]:
-    return [part.strip() for part in re.split(r"(?<=[.!?。！？])\s*", text.strip()) if part.strip()]
+    return [part.strip() for part in re.split(r"(?<=[.!?。！？])(?!\d)\s*", text.strip()) if part.strip()]
 
 
 def _article_sentences(title: str, body: str) -> list[str]:
