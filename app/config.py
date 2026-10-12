@@ -41,8 +41,13 @@ def _get_float(name: str, default: float) -> float:
         return default
 
 
-# 실제 LLM 호출 여부. False면 어떤 요청도 비용을 발생시키지 않습니다.
+# Rewrite 외 기능의 LLM 호출 여부. 수집 리라이팅은 별도 opt-in입니다.
 USE_REAL_LLM: bool = _get_bool("USE_REAL_LLM", False)
+
+# Collection-only rewrite opt-in; independent of every other LLM feature.
+REWRITE_WITH_LLM: bool = _get_bool("REWRITE_WITH_LLM", False)
+MAX_DAILY_REWRITE_CALLS: int = max(0, _get_int("MAX_DAILY_REWRITE_CALLS", 50))
+REWRITE_LEDGER_PATH: str = os.getenv("REWRITE_LEDGER_PATH", "data/rewrite_calls.sqlite3")
 
 # USE_REAL_LLM=true일 때 어떤 제공자를 쓸지. 제공자에 따라 비용이 발생할 수 있습니다.
 LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "claude").strip().lower()

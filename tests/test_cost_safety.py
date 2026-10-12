@@ -1,3 +1,4 @@
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -22,8 +23,9 @@ class CostSafetyTest(unittest.TestCase):
 
     def test_provider_timeout_returns_fallback(self):
         with (
-            patch.object(config, "USE_REAL_LLM", True),
-            patch.object(llm_client, "_rewrite_cache", {}),
+            tempfile.TemporaryDirectory() as directory,
+            patch.object(config, "REWRITE_WITH_LLM", True),
+            patch.object(config, "REWRITE_LEDGER_PATH", directory + "/budget.sqlite3"),
             patch.object(
                 llm_client, "_call_llm", side_effect=TimeoutError("request timeout")
             ) as provider_call,

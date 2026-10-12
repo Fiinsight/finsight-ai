@@ -71,7 +71,7 @@ class MarketImpactFallbackTest(unittest.TestCase):
         self.assertNotIn("NEUTRAL", result["beginner"])
         self.assertNotIn("원화값 강세에도 순항", result["beginner"])
         self.assertIn("AI", result["detectedTerms"])
-        self.assertIn("수요가 늘었습니다", result["beginner"])
+        self.assertIn("수요가 늘었어요", result["beginner"])
 
     def test_term_fallback_is_grounded_in_context(self):
         result = _mock_explain_term("기준금리", "금리 동결\n한국은행이 기준금리를 동결했다.")

@@ -15,7 +15,7 @@ class LearningResponse(BaseModel):
     level: str
     summary: str
     readingGuide: str
-    mode: str = 'RULE_FALLBACK'
+    mode: str = 'EXCERPT'
 
 def reading_aid(request: LearningRequest) -> LearningResponse:
     content = _clean_article_text(request.title, request.body)
