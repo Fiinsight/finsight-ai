@@ -128,3 +128,10 @@ so setting both cost flags to false cannot be undone by `.env` loading.
 지점별 DIRECT/MARKET/NONE 규칙 설명과 최대 3건 뉴스 근거를 반환합니다. 기본 `DOCENT_WITH_LLM=false`이며 다른 LLM 플래그와 독립적입니다. 켜더라도 KST 하루 `MAX_DAILY_DOCENT_CALLS=30`과 기존 공통 호출 상한을 함께 적용하고 분봉은 항상 RULE입니다. 숫자·인과 단정 검증 실패와 오류는 RULE로 저장하며 같은 키를 다시 호출하지 않습니다.
 
 `DOCENT_LEDGER_PATH` 기본값 `data/chart_docent.sqlite3`를 지속 볼륨에 보관해야 재시작 후에도 결과/일일 한도를 유지합니다. 키는 종목·시점·기간·대표 뉴스·수준입니다. RULE로 먼저 저장된 키는 플래그 변경만으로 업그레이드하지 않습니다. 실제 초기 LLM 생성에는 비용이 발생할 수 있습니다. 테스트는 mock만 사용합니다.
+
+
+### 구조화된 판단 피드백
+
+`POST /ai/feedback/judgement`는 `verdict`, `headline`, `summary`, `reasons:[{title,detail}]` 2~3개, `nextTip`을 반환합니다. 기사 리드·사용자 근거·실제 비교 데이터를 각각 사용하고, 무근거 칭찬/새 수치/인과 단정을 막습니다. 방향 일치라도 절대 변동률 1.0% 이하이면 PARTIAL입니다. UNKNOWN은 판정하지 않고 verdict=null입니다.
+
+기존 `feedback`, `is_aligned`, `next_learning_point` 별칭을 유지합니다. USE_REAL_LLM=false 기본 규칙 모드와 기존 상한은 그대로이며, 실제 LLM 테스트는 mock만 사용합니다. 선택적 지수 비교 수치가 없으면 생성하지 않습니다.

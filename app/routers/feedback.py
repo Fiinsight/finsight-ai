@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Literal
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
@@ -21,13 +22,24 @@ class FeedbackRequest(BaseModel):
     judgement_close: float | None = Field(default=None, gt=0, allow_inf_nan=False)
     comparison_close: float | None = Field(default=None, gt=0, allow_inf_nan=False)
     comparison_date: date | None = None
+    index_name: str | None = Field(default=None, max_length=100)
+    index_change_percent: float | None = Field(default=None, allow_inf_nan=False)
+
+
+class FeedbackReason(BaseModel):
+    title: str = Field(min_length=1, max_length=16)
+    detail: str
 
 
 class FeedbackResponse(BaseModel):
+    verdict: Literal['CORRECT', 'WRONG', 'PARTIAL'] | None
+    headline: str = Field(min_length=1, max_length=255)
+    summary: str
+    reasons: list[FeedbackReason] = Field(min_length=2, max_length=3)
+    nextTip: str
     is_aligned: bool
     feedback: str
     next_learning_point: str
-    reasons: list[str] | None = None
 
 
 @router.post("/judgement", response_model=FeedbackResponse)
@@ -41,12 +53,14 @@ def judgement_feedback(request: FeedbackRequest) -> FeedbackResponse:
         related_symbol=request.related_symbol, related_symbol_name=request.related_symbol_name,
         judgement_close=request.judgement_close, comparison_close=request.comparison_close,
         comparison_date=request.comparison_date.isoformat() if request.comparison_date else None,
+        index_name=request.index_name, index_change_percent=request.index_change_percent,
     )
 
-    reasons = result.get("reasons", [])
+    reasons = result["reasons"]
     return FeedbackResponse(
+        verdict=result["verdict"], headline=result["headline"], summary=result["summary"], nextTip=result["nextTip"],
         is_aligned=result["isAligned"],
         feedback=result["feedbackText"],
-        next_learning_point=reasons[-1] if reasons else "관련 종목의 거래량과 업종 지수를 함께 비교해보세요.",
+        next_learning_point=result["nextTip"],
         reasons=reasons,
     )
