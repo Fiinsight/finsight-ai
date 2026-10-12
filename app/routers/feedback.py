@@ -1,3 +1,4 @@
+from datetime import date
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
@@ -7,10 +8,19 @@ router = APIRouter()
 
 
 class FeedbackRequest(BaseModel):
+    level: str = Field(default="normal", pattern="^(beginner|normal|analyst)$")
     news_id: int
     user_choice: str = Field(pattern="^(UP|NEUTRAL|DOWN)$")
     user_reason: str | None = Field(default=None, max_length=2000)
-    market_result: str | None = Field(default=None, max_length=20)
+    market_result: str = Field(pattern="^(UP|NEUTRAL|DOWN|UNKNOWN)$")
+    news_title: str = Field(default="", max_length=300)
+    news_summary: str = Field(default="", max_length=600)
+    related_symbol: str | None = None
+    related_symbol_name: str | None = None
+    actual_change_percent: float | None = Field(default=None, allow_inf_nan=False)
+    judgement_close: float | None = Field(default=None, gt=0, allow_inf_nan=False)
+    comparison_close: float | None = Field(default=None, gt=0, allow_inf_nan=False)
+    comparison_date: date | None = None
 
 
 class FeedbackResponse(BaseModel):
@@ -22,16 +32,15 @@ class FeedbackResponse(BaseModel):
 
 @router.post("/judgement", response_model=FeedbackResponse)
 def judgement_feedback(request: FeedbackRequest) -> FeedbackResponse:
-    # 이 서비스는 뉴스 본문을 직접 저장하지 않으므로, 백엔드가 넘겨준 사용자 설명(있다면)을
-    # 요약 대용으로 사용하고, 없으면 news_id 기반의 최소 문맥을 만들어 사용합니다.
-    news_summary = request.user_reason or f"뉴스 ID {request.news_id}에 대한 사용자 판단"
-    actual_direction = request.market_result or "NEUTRAL"
-
     result = llm_client.generate_feedback(
-        news_summary=news_summary,
+        news_summary=request.news_summary,
         user_choice=request.user_choice,
-        actual_direction=actual_direction,
-        actual_change_percent=None,
+        actual_direction=request.market_result,
+        actual_change_percent=request.actual_change_percent,
+        level=request.level, user_reason=request.user_reason, news_title=request.news_title,
+        related_symbol=request.related_symbol, related_symbol_name=request.related_symbol_name,
+        judgement_close=request.judgement_close, comparison_close=request.comparison_close,
+        comparison_date=request.comparison_date.isoformat() if request.comparison_date else None,
     )
 
     reasons = result.get("reasons", [])
