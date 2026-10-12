@@ -121,3 +121,10 @@ so setting both cost flags to false cannot be undone by `.env` loading.
 초급 표현을 조정하고 별도 읽기 가이드를 반환합니다. `mode=RULE_FALLBACK`이며
 딥러닝 생성 결과가 아닙니다. 수치·출처를 만들어내지 않고 발췌는 600자로 제한합니다.
 사용자 답변과 복습 상태는 백엔드가 계정별로 저장하며 AI 서비스에는 전송하지 않습니다.
+
+
+### 차트 도슨트 (`POST /ai/chart/docent`)
+
+지점별 DIRECT/MARKET/NONE 규칙 설명과 최대 3건 뉴스 근거를 반환합니다. 기본 `DOCENT_WITH_LLM=false`이며 다른 LLM 플래그와 독립적입니다. 켜더라도 KST 하루 `MAX_DAILY_DOCENT_CALLS=30`과 기존 공통 호출 상한을 함께 적용하고 분봉은 항상 RULE입니다. 숫자·인과 단정 검증 실패와 오류는 RULE로 저장하며 같은 키를 다시 호출하지 않습니다.
+
+`DOCENT_LEDGER_PATH` 기본값 `data/chart_docent.sqlite3`를 지속 볼륨에 보관해야 재시작 후에도 결과/일일 한도를 유지합니다. 키는 종목·시점·기간·대표 뉴스·수준입니다. RULE로 먼저 저장된 키는 플래그 변경만으로 업그레이드하지 않습니다. 실제 초기 LLM 생성에는 비용이 발생할 수 있습니다. 테스트는 mock만 사용합니다.

@@ -7,3 +7,5 @@ __pycache__/
 .pytest_cache/
 
 data/rewrite_calls.sqlite3*
+
+data/chart_docent.sqlite3*
