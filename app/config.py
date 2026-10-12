@@ -75,3 +75,7 @@ ML_SENTIMENT_MODEL_PATH: str = os.getenv("ML_SENTIMENT_MODEL_PATH", "").strip()
 
 # Optional local semantic-news index. Empty means the retrieval endpoint is unavailable.
 ML_NEWS_INDEX_PATH: str = os.getenv("ML_NEWS_INDEX_PATH", "").strip()
+
+DOCENT_WITH_LLM: bool = _get_bool("DOCENT_WITH_LLM", False)
+MAX_DAILY_DOCENT_CALLS: int = max(0, _get_int("MAX_DAILY_DOCENT_CALLS", 30))
+DOCENT_LEDGER_PATH: str = os.getenv("DOCENT_LEDGER_PATH", "data/chart_docent.sqlite3")

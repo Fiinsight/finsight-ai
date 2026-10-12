@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 
 from app import config
-from app.routers import feedback, impact, news, terms, local_retrieval, learning
+from app.routers import feedback, impact, news, terms, local_retrieval, learning, chart
 
 app = FastAPI(title="FinSight AI Service", version="0.1.0")
+
+app.include_router(chart.router, prefix="/ai/chart", tags=["chart-docent"])
 
 app.include_router(local_retrieval.router, tags=["local-retrieval"])
 
