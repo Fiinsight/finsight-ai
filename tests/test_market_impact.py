@@ -74,7 +74,7 @@ class MarketImpactFallbackTest(unittest.TestCase):
         self.assertIn("수요가 늘었습니다", result["beginner"])
 
     def test_term_fallback_is_grounded_in_context(self):
-        result = _mock_explain_term("기준금리", "한국은행이 기준금리를 동결했다.")
+        result = _mock_explain_term("기준금리", "금리 동결\n한국은행이 기준금리를 동결했다.")
         self.assertIn("한국은행이 기준금리를 동결했다", result["contextExplanation"])
         self.assertIn("기준", result["definition"])
 
