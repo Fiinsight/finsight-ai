@@ -7,6 +7,7 @@ router = APIRouter()
 
 
 class TermExplainRequest(BaseModel):
+    level: str = Field(default="normal", pattern="^(beginner|normal|analyst)$")
     term: str = Field(min_length=1, max_length=100)
     known_definition: str | None = Field(default=None, max_length=2000)
     article_context: str = Field(default="", max_length=12000)
@@ -34,6 +35,7 @@ def explain_term(request: TermExplainRequest) -> TermExplainResponse:
     if request.known_definition:
         explanation = {**explanation, "definition": request.known_definition}
 
+    explanation = llm_client.personalize_term(explanation, request.term, request.article_context, request.level)
 
     return TermExplainResponse(
         term=request.term,
