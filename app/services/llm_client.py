@@ -669,7 +669,7 @@ def _mock_generate_feedback(news_summary: str, user_choice: str, actual_directio
                             level: str = "normal", index_name: str | None = None,
                             index_change_percent: float | None = None) -> dict:
     aligned = user_choice == actual_direction and actual_direction != 'UNKNOWN'
-    small = actual_change_percent is not None and abs(actual_change_percent) <= NEUTRAL_BAND_PERCENT + 0.5
+    small = actual_change_percent is not None and abs(actual_change_percent) <= NEUTRAL_BAND_PERCENT + 0.5 + 1e-9
     verdict = None if actual_direction == 'UNKNOWN' else 'PARTIAL' if aligned and small else 'CORRECT' if aligned else 'WRONG'
     labels = {'UP': '상승', 'DOWN': '하락', 'NEUTRAL': '중립', 'UNKNOWN': '확인 불가'}
     name = related_symbol_name or {'KOSPI': '코스피', 'KOSDAQ': '코스닥'}.get(related_symbol, related_symbol) or '판단 대상'

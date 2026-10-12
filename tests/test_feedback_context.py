@@ -30,7 +30,7 @@ def test_missing_market_result_is_not_invented_as_neutral():
 
 
 @pytest.mark.parametrize('choice,direction,percent,verdict',[
-    ('UP','UP',1.01,'CORRECT'),('UP','UP',1.0,'PARTIAL'),('DOWN','DOWN',-1.0,'PARTIAL'),
+    ('UP','UP',1.01,'CORRECT'),('UP','UP',1.0,'PARTIAL'),('UP','UP',1.0000000000000002,'PARTIAL'),('DOWN','DOWN',-1.0,'PARTIAL'),
     ('NEUTRAL','NEUTRAL',0,'PARTIAL'),('UP','DOWN',-1.76,'WRONG')])
 def test_structured_verdict_and_grounded_reasons(choice,direction,percent,verdict):
     from app.services.llm_client import generate_feedback, _feedback_sentence_count
