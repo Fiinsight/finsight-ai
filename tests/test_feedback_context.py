@@ -42,7 +42,7 @@ def test_structured_verdict_and_grounded_reasons(choice,direction,percent,verdic
     assert '코스피' in result['reasons'][2]['detail'] and '-0.30%' in result['reasons'][2]['detail']
     assert all(_feedback_sentence_count(item['detail'])==1 for item in result['reasons'])
 
-@pytest.mark.parametrize('case',['valid','number','praise','verdict','missing_reason'])
+@pytest.mark.parametrize('case',['valid','number','sign','praise','verdict','missing_reason'])
 def test_llm_structure_and_fallback_are_mocked(monkeypatch,case):
     from unittest.mock import patch
     from app.services import llm_client
@@ -51,6 +51,9 @@ def test_llm_structure_and_fallback_are_mocked(monkeypatch,case):
     candidate={key:fallback[key] for key in ['verdict','headline','summary','reasons','nextTip']}
     if case=='valid':candidate['headline']='예측 방향을 확인했어요'
     if case=='number':candidate['summary']+=' 매출이 999% 늘었어요.'
+    if case=='sign':
+        candidate['reasons']=[dict(item) for item in candidate['reasons']]
+        candidate['reasons'][2]['detail']=candidate['reasons'][2]['detail'].rstrip('.')+'이고 별도로 -1.76% 움직였어요.'
     if case=='praise':candidate['headline']='정확한 판단이에요!'
     if case=='verdict':candidate['verdict']='WRONG'
     if case=='missing_reason':candidate['reasons']=candidate['reasons'][:1]

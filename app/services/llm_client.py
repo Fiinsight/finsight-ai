@@ -745,6 +745,7 @@ def generate_feedback(news_summary: str, user_choice: str, actual_direction: str
         if len(data['headline']) > 255 or _feedback_sentence_count(data['nextTip']) != 1: return fallback
         text = ' '.join([data['headline'], data['summary'], data['nextTip'], *(item['detail'] for item in reasons)])
         source = json.dumps({'article': news_summary, **context}, ensure_ascii=False) + fallback['feedbackText']
+        if any(token not in _NUMBER.findall(source) for token in _NUMBER.findall(text) if token.startswith(('+', '-'))): return fallback
         if not _numbers_in_source(text, source) or re.search(r'때문에 (?:올랐|하락|상승)|원인입니다|확실히|보장|매수하세요|매도하세요', text): return fallback
         result_line = fallback['summary'].split('. ', 1)[0] + '.'
         if result_line not in data['summary']: return fallback
