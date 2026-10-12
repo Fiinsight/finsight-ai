@@ -8,6 +8,7 @@ router = APIRouter()
 
 class TermExplainRequest(BaseModel):
     term: str = Field(min_length=1, max_length=100)
+    known_definition: str | None = Field(default=None, max_length=2000)
     article_context: str = Field(default="", max_length=12000)
 
 
@@ -22,12 +23,17 @@ class TermExplainResponse(BaseModel):
 def explain_term(request: TermExplainRequest) -> TermExplainResponse:
     # RAG 캐시 조회: 같은 용어 + 맥락으로 이미 물어본 적이 있으면 LLM을 다시 호출하지 않고
     # 캐시된 설명을 그대로 반환합니다 (실제 LLM 모드에서 비용을 절약하는 지점).
-    cached = vector_store.query_similar(request.term, request.article_context)
+    cache_context = "term-v2\n" + (request.known_definition or "") + "\n" + request.article_context
+    cached = vector_store.query_similar(request.term, cache_context)
     if cached is not None:
         explanation = cached
     else:
-        explanation = llm_client.explain_term(request.term, request.article_context or None)
-        vector_store.upsert_term_context(request.term, request.article_context, explanation)
+        explanation = llm_client.explain_term(request.term, request.article_context or None, request.known_definition)
+        vector_store.upsert_term_context(request.term, cache_context, explanation)
+
+    if request.known_definition:
+        explanation = {**explanation, "definition": request.known_definition}
+
 
     return TermExplainResponse(
         term=request.term,

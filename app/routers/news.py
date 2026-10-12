@@ -11,14 +11,19 @@ router = APIRouter()
 class RewriteRequest(BaseModel):
     title: str = Field(min_length=1, max_length=300)
     body: str = Field(min_length=1, max_length=20000)
-    level: str = Field(pattern="^(beginner|normal|analyst)$")
+    article_key: str | None = Field(default=None, max_length=1000)
+    level: str | None = Field(default=None, pattern="^(beginner|normal|analyst)$")
 
 
 class RewriteResponse(BaseModel):
     title: str
     summary: str
-    importance_reason: str
-    importance_reasons: dict[str, str] = Field(default_factory=dict)
+    beginner: str
+    normal: str
+    analyst: str
+    mode: str
+    importance_reason: str | None
+    importance_reasons: dict[str, str | None] = Field(default_factory=dict)
     detected_terms: list[str]
 
 
@@ -45,10 +50,11 @@ class SimilarNewsResponse(BaseModel):
 
 @router.post("/rewrite", response_model=RewriteResponse)
 def rewrite_news(request: RewriteRequest) -> RewriteResponse:
-    result = llm_client.rewrite_news(title=request.title, raw_content=request.body)
+    result = llm_client.rewrite_news(title=request.title, raw_content=request.body, article_key=request.article_key)
     return RewriteResponse(
         title=request.title,
-        summary=result[request.level],
+        summary=result[request.level or "normal"],
+        beginner=result["beginner"], normal=result["normal"], analyst=result["analyst"], mode=result["mode"],
         importance_reason=result["importanceReason"],
         importance_reasons=result.get("importanceReasons", {}),
         detected_terms=result.get("detectedTerms", []),
