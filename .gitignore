@@ -9,3 +9,8 @@ __pycache__/
 data/rewrite_calls.sqlite3*
 
 data/chart_docent.sqlite3*
+
+artifacts/
+*.safetensors
+*.pt
+*.bin

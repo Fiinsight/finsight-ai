@@ -30,8 +30,8 @@ def _load_model():
     try:
         import torch
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
-        return AutoTokenizer.from_pretrained(model_path), AutoModelForSequenceClassification.from_pretrained(model_path), torch
-    except (ImportError, OSError):
+        return AutoTokenizer.from_pretrained(model_path, local_files_only=True), AutoModelForSequenceClassification.from_pretrained(model_path, local_files_only=True), torch
+    except (ImportError, OSError, ValueError, RuntimeError):
         return None
 
 
@@ -51,15 +51,27 @@ def predict_sentiment(title: str, body: str) -> dict[str, object]:
     loaded = _load_model()
     text = f"{title}\n{body}"
     if loaded is not None:
-        tokenizer, model, torch = loaded
-        model.eval()
-        with torch.no_grad():
-            inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=256)
-            probabilities = torch.softmax(model(**inputs).logits, dim=-1)[0]
-        label_id = int(probabilities.argmax())
-        label = model.config.id2label.get(label_id, str(label_id)).upper()
-        return {"label": label, "confidence": round(float(probabilities[label_id]), 4), "basis": "KLUE_ROBERTA_FINE_TUNED"}
+        try:
+            tokenizer, model, torch = loaded
+            model.eval()
+            with torch.no_grad():
+                inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=256)
+                probabilities = torch.softmax(model(**inputs).logits, dim=-1)[0]
+            label_id = int(probabilities.argmax())
+            label = str(model.config.id2label.get(label_id, model.config.id2label.get(str(label_id), "NEUTRAL"))).upper()
+            confidence = float(probabilities[label_id])
+            import math
+            if label not in {"POSITIVE", "NEGATIVE", "NEUTRAL"} or not math.isfinite(confidence) or not 0 <= confidence <= 1:
+                raise ValueError("Unsupported sentiment output")
+            return {"label": label if confidence >= 0.6 else "NEUTRAL", "confidence": round(confidence, 4), "basis": "LOCAL_FINANCIAL_TRANSFORMER"}
+        except (ValueError, RuntimeError, TypeError, AttributeError, IndexError):
+            pass  # Unavailable or incompatible local models retain the keyword fallback.
 
+    return predict_rule_sentiment(title, body)
+
+
+def predict_rule_sentiment(title: str, body: str) -> dict[str, object]:
+    text = f"{title}\n{body}"
     topic_label = _topic_direction(text)
     if topic_label is not None:
         return {"label": topic_label, "confidence": 0.7 if topic_label != "NEUTRAL" else 0.35, "basis": "RULE_BASED_FALLBACK"}
@@ -73,3 +85,12 @@ def predict_sentiment(title: str, body: str) -> dict[str, object]:
     else:
         label, confidence = "NEGATIVE", min(0.85, 0.5 + 0.1 * (negative - positive))
     return {"label": label, "confidence": round(confidence, 4), "basis": "RULE_BASED_FALLBACK"}
+
+
+def sentiment_note(label: str | None, confidence: float | None) -> str:
+    if label in {"POSITIVE", "NEGATIVE"} and confidence is not None and 0.6 <= confidence <= 1:
+        direction = "긍정적" if label == "POSITIVE" else "부정적"
+        return f"기사 표현은 {direction}으로 분류됐지만 주가 움직임의 원인으로 단정할 수는 없어요."
+    if confidence is not None:
+        return "기사 감성만으로 호재·악재를 판단하기 어려워요."
+    return ""

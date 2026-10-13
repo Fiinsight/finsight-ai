@@ -21,6 +21,8 @@ class RelatedNews(BaseModel):
     published_at: datetime
     relation: Literal['DIRECT', 'MARKET']
     source: str | None = Field(default=None, max_length=100)
+    sentiment_hint: Literal["POSITIVE", "NEGATIVE", "NEUTRAL"] | None = None
+    sentiment_confidence: float | None = Field(default=None, ge=0, le=1, allow_inf_nan=False)
 
 class DocentRequest(BaseModel):
     symbol: str = Field(min_length=1, max_length=20)
@@ -73,6 +75,9 @@ def rule_docent(request: DocentRequest) -> dict:
         positive = bool(re.search(r'급등|상향|호실적|수혜', title))
         negative = bool(re.search(r'급락|하향|부진|규제 강화', title))
         sentiment = '호재' if positive and not negative else '악재' if negative and not positive else None
+        if representative.sentiment_confidence is not None:
+            sentiment = ({'POSITIVE': '호재', 'NEGATIVE': '악재'}.get(representative.sentiment_hint)
+                         if representative.sentiment_confidence >= 0.6 else None)
         period = '이 주간에' if request.period == 'W' else '이 시점에' if request.period == 'MINUTE' else '이날'
         reason = f"{period} {request.symbol_name} 관련 ‘{title}’ 소식이 나왔고, 주가가 {request.change_percent:+.2f}% 움직였어요. "
         reason += f'이 소식이 {sentiment}로 받아들여졌을 가능성이 있어요.' if sentiment else '다른 요인과 함께 시장 반응에 영향을 줬을 수 있어요.'

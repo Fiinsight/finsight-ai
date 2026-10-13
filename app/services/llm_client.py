@@ -667,7 +667,8 @@ def _mock_generate_feedback(news_summary: str, user_choice: str, actual_directio
                             related_symbol_name: str | None = None, comparison_date: str | None = None,
                             judgement_close: float | None = None, comparison_close: float | None = None,
                             level: str = "normal", index_name: str | None = None,
-                            index_change_percent: float | None = None) -> dict:
+                            index_change_percent: float | None = None, sentiment_hint: str | None = None,
+                            sentiment_confidence: float | None = None) -> dict:
     aligned = user_choice == actual_direction and actual_direction != 'UNKNOWN'
     small = actual_change_percent is not None and abs(actual_change_percent) <= NEUTRAL_BAND_PERCENT + 0.5 + 1e-9
     verdict = None if actual_direction == 'UNKNOWN' else 'PARTIAL' if aligned and small else 'CORRECT' if aligned else 'WRONG'
@@ -694,8 +695,13 @@ def _mock_generate_feedback(news_summary: str, user_choice: str, actual_directio
     if level == 'beginner': market += ' (종가는 거래가 끝날 때의 가격이에요)'
     elif level == 'analyst': market += ' (중립 범위는 ±0.5%)'
     market += '.'
+    from app.services.ml_sentiment import sentiment_note
+    note = sentiment_note(sentiment_hint, sentiment_confidence)
+    article_detail = f'기사 핵심 “{core}”를 실제 가격 변화와 함께 확인해보세요.' if core else '저장된 기사 근거가 없어 뉴스와 가격의 관계를 확인하기 어려워요.'
+    if note and core:
+        article_detail = f'기사 핵심 “{core}”를 확인하되, ' + note
     reasons = [
-        {'title': '기사 근거', 'detail': f'기사 핵심 “{core}”를 실제 가격 변화와 함께 확인해보세요.' if core else '저장된 기사 근거가 없어 뉴스와 가격의 관계를 확인하기 어려워요.'},
+        {'title': '기사 근거', 'detail': article_detail},
         {'title': '판단 근거' if reason else '근거 남기기', 'detail': f'남긴 근거 “{reason}”의 기준 시점이 기사와 같은지 확인해보세요.' if reason else '다음엔 판단 근거를 한 줄 남겨보세요.'},
         {'title': '실제 시장', 'detail': market}
     ]
@@ -720,6 +726,7 @@ verdict는 {reference['verdict']}로 고정합니다. 방향 일치라도 변동
 근거가 없으면 '다음엔 판단 근거를 한 줄 남겨보세요'로 하나를 대체하고 headline을 포함해 칭찬 금지.
 summary에는 종목·비교일·종가 기준의 부호 있는 소수 둘째 자리 변동률을 반드시 표시하세요.
 지수 대상은 개별 종목이 아니라 시장 전체 움직임입니다. 지수 비교 수치가 없으면 만들어 쓰지 마세요.
+sentiment_confidence가 0.6 미만이면 감성 방향을 근거로 주장하지 마세요. 감성은 기사 표현 분류이며 relation이나 실제 결과를 바꾸지 않습니다.
 원문에 없는 사실·수치·전망 추가, 인과 단정·투자 권유 금지. 가능성/확인할 점으로 안내하세요.
 beginner는 쉬운 용어 풀이, analyst는 변동률·두 종가·비교 기준 중심으로 작성하세요.
 필수 근거와 숫자 표기 기준: {json.dumps(reference, ensure_ascii=False)}

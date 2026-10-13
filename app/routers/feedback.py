@@ -22,6 +22,8 @@ class FeedbackRequest(BaseModel):
     judgement_close: float | None = Field(default=None, gt=0, allow_inf_nan=False)
     comparison_close: float | None = Field(default=None, gt=0, allow_inf_nan=False)
     comparison_date: date | None = None
+    sentiment_hint: Literal["POSITIVE", "NEGATIVE", "NEUTRAL"] | None = None
+    sentiment_confidence: float | None = Field(default=None, ge=0, le=1, allow_inf_nan=False)
     index_name: str | None = Field(default=None, max_length=100)
     index_change_percent: float | None = Field(default=None, allow_inf_nan=False)
 
@@ -53,6 +55,7 @@ def judgement_feedback(request: FeedbackRequest) -> FeedbackResponse:
         related_symbol=request.related_symbol, related_symbol_name=request.related_symbol_name,
         judgement_close=request.judgement_close, comparison_close=request.comparison_close,
         comparison_date=request.comparison_date.isoformat() if request.comparison_date else None,
+        sentiment_hint=request.sentiment_hint, sentiment_confidence=request.sentiment_confidence,
         index_name=request.index_name, index_change_percent=request.index_change_percent,
     )
 
