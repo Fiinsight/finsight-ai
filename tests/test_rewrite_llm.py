@@ -12,7 +12,7 @@ def test_source_numbers_are_exact_tokens(summary, valid):
     assert llm_client._numbers_in_source(summary, SOURCE) is valid
 
 def test_rewrite_is_one_call_and_persists_daily_budget_and_article_identity(tmp_path):
-    with patch.object(config, 'REWRITE_WITH_LLM', True), patch.object(config, 'USE_REAL_LLM', False), patch.object(config, 'MAX_DAILY_REWRITE_CALLS', 1), patch.object(config, 'REWRITE_LEDGER_PATH', str(tmp_path / 'ledger.db')), patch.object(llm_client, '_call_llm', return_value=json.dumps(VALID, ensure_ascii=False)) as llm:
+    with patch.object(config, 'REWRITE_WITH_LLM', True), patch.object(config, 'USE_REAL_LLM', False), patch.object(config, 'MAX_DAILY_REWRITE_CALLS', 1), patch.object(config, 'REWRITE_LEDGER_PATH', str(tmp_path / 'ledger.db')), patch.object(llm_client, '_call_gemini', return_value=json.dumps(VALID, ensure_ascii=False)) as llm:
         first = llm_client.rewrite_news('수출 증가', SOURCE, 'article-1')
         assert first['mode'] == 'REWRITTEN'
         assert llm_client.rewrite_news('수출 증가', SOURCE, 'article-1') == first
@@ -25,7 +25,7 @@ def test_validation_and_failure_fall_back_without_retry(tmp_path, failure):
     if failure == 'numeric': data['beginner'] = data['beginner'].replace('261', '999')
     if failure == 'style': data['beginner'] = data['beginner'].replace('늘었어요', '늘었다')
     if failure == 'duplicate': data['analyst']['risk'] = data['analyst']['evidence']
-    with patch.object(config, 'REWRITE_WITH_LLM', True), patch.object(config, 'REWRITE_LEDGER_PATH', str(tmp_path / 'ledger.db')), patch.object(llm_client, '_call_llm', side_effect=TimeoutError() if failure == 'timeout' else None, return_value=json.dumps(data)) as llm:
+    with patch.object(config, 'REWRITE_WITH_LLM', True), patch.object(config, 'REWRITE_LEDGER_PATH', str(tmp_path / 'ledger.db')), patch.object(llm_client, '_call_gemini', side_effect=TimeoutError() if failure == 'timeout' else None, return_value=json.dumps(data)) as llm:
         assert llm_client.rewrite_news('수출 증가', SOURCE, 'same')['mode'] == 'EXCERPT'
         assert llm_client.rewrite_news('수출 증가', SOURCE, 'same')['mode'] == 'EXCERPT'
         llm.assert_called_once()

@@ -44,6 +44,7 @@ def health() -> dict[str, object]:
         "rewriteMinIntervalSeconds": config.REWRITE_MIN_INTERVAL_SECONDS,
         "processCallLimit": config.MAX_REAL_LLM_CALLS_PER_PROCESS,
         "processCalls": llm_client._real_llm_calls,
+        "rewriteProcessCalls": llm_client._rewrite_llm_calls,
         "status": "ok",
         "useRealLlm": llm_enabled,
         "llmEnabled": llm_enabled,

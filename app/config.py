@@ -46,7 +46,7 @@ USE_REAL_LLM: bool = _get_bool("USE_REAL_LLM", False)
 
 # Collection-only rewrite opt-in; independent of every other LLM feature.
 REWRITE_WITH_LLM: bool = _get_bool("REWRITE_WITH_LLM", False)
-MAX_DAILY_REWRITE_CALLS: int = max(0, _get_int("MAX_DAILY_REWRITE_CALLS", 30))
+MAX_DAILY_REWRITE_CALLS: int = max(0, _get_int("MAX_DAILY_REWRITE_CALLS", 400))
 REWRITE_MIN_INTERVAL_SECONDS: float = _get_float("REWRITE_MIN_INTERVAL_SECONDS", 6.0)
 REWRITE_LEDGER_PATH: str = os.getenv("REWRITE_LEDGER_PATH", "data/rewrite_calls.sqlite3")
 

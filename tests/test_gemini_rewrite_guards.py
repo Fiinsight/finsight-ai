@@ -18,7 +18,7 @@ from test_rewrite_llm import VALID, SOURCE
 @pytest.fixture
 def generation(monkeypatch):
     monkeypatch.setattr(config, 'REWRITE_WITH_LLM', True)
-    monkeypatch.setattr(config, 'MAX_DAILY_REWRITE_CALLS', 30)
+    monkeypatch.setattr(config, 'MAX_DAILY_REWRITE_CALLS', 400)
     monkeypatch.setattr(config, 'MAX_REAL_LLM_CALLS_PER_PROCESS', 20)
     monkeypatch.setattr(config, 'REWRITE_MIN_INTERVAL_SECONDS', 6)
     current = [0.0]
@@ -89,15 +89,18 @@ def test_collection_rejects_non_gemini_provider_without_call(generation,monkeypa
     call.assert_not_called()
 
 
-def test_daily_cap_and_process_cap_both_hold(generation,monkeypatch):
+def test_rewrite_daily_counter_is_separate_from_paid_process_cap(generation,monkeypatch):
     _, call = generation
-    for key in range(21):llm_client.rewrite_news('수출 증가',SOURCE,str(key))
-    assert call.call_count==20 and llm_client._real_llm_calls==20
-    assert rewrite_budget.status()['rewriteUsedCalls']<=30
-    monkeypatch.setattr(llm_client,'_real_llm_calls',0)
-    for key in range(21,41):llm_client.rewrite_news('수출 증가',SOURCE,str(key))
-    assert call.call_count<=30
-    assert rewrite_budget.status()['rewriteUsedCalls']==30
+    monkeypatch.setattr(config, 'MAX_DAILY_REWRITE_CALLS', 25)
+    monkeypatch.setattr(llm_client, '_real_llm_calls', 20)
+    for key in range(26):
+        llm_client.rewrite_news('수출 증가', SOURCE, str(key))
+    assert call.call_count == 25 and llm_client._rewrite_llm_calls == 25
+    assert llm_client._real_llm_calls == 20
+    assert rewrite_budget.status()['rewriteUsedCalls'] == 25
+    with pytest.raises(RuntimeError):
+        llm_client._call_llm('paid feature remains capped')
+    assert call.call_count == 25
 
 
 def test_invalid_numbers_and_non_eligible_article_stay_excerpt(generation):
@@ -107,7 +110,7 @@ def test_invalid_numbers_and_non_eligible_article_stay_excerpt(generation):
     result=llm_client.rewrite_news('수출 증가',SOURCE,'bad')
     assert result['mode']=='EXCERPT' and not result['retryable']
     assert rewrite_budget.status()['rewriteFailureCount']==1
-    llm_client.rewrite_news('수출 증가',SOURCE,'outside-top-ten',allow_llm=False)
+    llm_client.rewrite_news('수출 증가',SOURCE,'explicitly-disabled',allow_llm=False)
     assert call.call_count==1
     assert rewrite_budget.status()['rewriteUsedCalls']==1
 
@@ -124,7 +127,7 @@ def test_other_features_never_dispatch_and_health_has_no_secrets(generation,monk
     monkeypatch.setattr(config,'GEMINI_API_KEY','test-secret-not-a-real-key')
     health=client.get('/health').json()
     assert health['rewriteEnabled'] and health['provider']=='gemini'
-    assert health['rewriteDailyLimit']==30 and health['processCallLimit']==20
+    assert health['rewriteDailyLimit']==400 and health['processCallLimit']==20
     assert 'test-secret-not-a-real-key' not in json.dumps(health)
 
 

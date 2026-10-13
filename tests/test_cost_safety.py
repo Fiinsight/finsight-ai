@@ -27,7 +27,7 @@ class CostSafetyTest(unittest.TestCase):
             patch.object(config, "REWRITE_WITH_LLM", True),
             patch.object(config, "REWRITE_LEDGER_PATH", directory + "/budget.sqlite3"),
             patch.object(
-                llm_client, "_call_llm", side_effect=TimeoutError("request timeout")
+                llm_client, "_call_gemini", side_effect=TimeoutError("request timeout")
             ) as provider_call,
         ):
             result = llm_client.rewrite_news("수출 회복", "수출이 개선됐다.")

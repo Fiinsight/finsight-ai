@@ -13,6 +13,7 @@ def no_live_provider(monkeypatch, tmp_path):
     monkeypatch.setattr(config, 'LLM_PROVIDER', 'gemini')
     monkeypatch.setattr(config, 'REWRITE_LEDGER_PATH', str(tmp_path / 'rewrite.db'))
     monkeypatch.setattr(llm_client, '_real_llm_calls', 0)
+    monkeypatch.setattr(llm_client, '_rewrite_llm_calls', 0)
     monkeypatch.setattr(llm_client, '_last_rewrite_started', None)
     def blocked(*args, **kwargs):
         raise AssertionError('Live provider is forbidden in pytest; mock it explicitly')

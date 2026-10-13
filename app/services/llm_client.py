@@ -2,7 +2,7 @@
 
 Safe by default: USE_REAL_LLM and collection-only REWRITE_WITH_LLM each
 require explicit opt-in. Provider failures return rule/excerpt fallbacks,
-and both paths share the existing per-process provider-call ceiling.
+and Gemini rewriting uses its daily ledger separately from the paid-path ceiling.
 """
 
 from __future__ import annotations
@@ -22,6 +22,7 @@ _anthropic_init_warned = False
 _gemini_client = None
 _gemini_init_warned = False
 _real_llm_calls = 0
+_rewrite_llm_calls = 0
 _real_llm_calls_lock = threading.Lock()
 _rewrite_lock = threading.Lock()
 _last_rewrite_started = None
@@ -588,7 +589,7 @@ def _quota_error(exc: Exception) -> bool:
 
 
 def rewrite_news(title: str, raw_content: str, article_key: str | None = None, *, local_batch: bool = False, allow_llm: bool = True) -> dict:
-    global _last_rewrite_started
+    global _last_rewrite_started, _rewrite_llm_calls
     cleaned_content = _clean_article_text(title, raw_content)
     fallback = {**_mock_rewrite_news(title, cleaned_content), 'mode': 'EXCERPT', 'retryable': False}
     if not config.REWRITE_WITH_LLM or not allow_llm:
@@ -616,7 +617,8 @@ def rewrite_news(title: str, raw_content: str, article_key: str | None = None, *
                 if _last_rewrite_started is not None:
                     time.sleep(max(0, config.REWRITE_MIN_INTERVAL_SECONDS - (now - _last_rewrite_started)))
                 _last_rewrite_started = time.monotonic()
-                raw = _call_llm(_build_rewrite_prompt(title, cleaned_content), max_tokens=2200)
+                _rewrite_llm_calls += 1
+                raw = _call_gemini(_build_rewrite_prompt(title, cleaned_content), max_tokens=2200)
                 summaries = _validated_rewrite(_extract_json(raw), title + ' ' + cleaned_content)
             result = {**fallback, **summaries, 'mode': 'REWRITTEN'}
             rewrite_budget.finish(key, result)
