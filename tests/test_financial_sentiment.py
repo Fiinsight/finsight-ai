@@ -68,7 +68,7 @@ def test_feedback_uses_confidence_without_praise_or_new_market_facts(monkeypatch
     request=FeedbackRequest(news_id=1,user_choice='UP',market_result='UP',news_title='삼성전자 분기 실적',news_summary='삼성전자의 분기 매출은 전년 같은 기간보다 늘었다.',sentiment_hint='POSITIVE',sentiment_confidence=.8)
     result=judgement_feedback(request)
     assert '긍정적' in result.reasons[0].detail
-    assert '단정할 수는 없어요' in result.reasons[0].detail
+    assert '단정할 수는 없어요' in result.summary
     assert '정확한 판단' not in result.headline
     low=judgement_feedback(request.model_copy(update={'sentiment_confidence':.59}))
     assert '판단하기 어려워요' in low.reasons[0].detail
