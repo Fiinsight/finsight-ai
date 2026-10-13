@@ -1,4 +1,6 @@
 import json
+import sys
+from types import ModuleType, SimpleNamespace
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from threading import Event, Lock
@@ -127,6 +129,14 @@ def test_other_features_never_dispatch_and_health_has_no_secrets(generation,monk
 
 
 def test_gemini_rewrite_requests_json_without_changing_other_features(monkeypatch):
+    def configuration(**options):
+        return SimpleNamespace(**{'response_mime_type': None, 'temperature': None, **options})
+    google = ModuleType('google')
+    genai = ModuleType('google.genai')
+    genai.types = SimpleNamespace(GenerateContentConfig=configuration)
+    google.genai = genai
+    monkeypatch.setitem(sys.modules, 'google', google)
+    monkeypatch.setitem(sys.modules, 'google.genai', genai)
     client = Mock()
     client.models.generate_content.return_value.text = '{}'
     monkeypatch.setattr(llm_client, '_get_gemini_client', lambda: client)
