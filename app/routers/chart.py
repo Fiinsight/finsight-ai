@@ -13,6 +13,9 @@ from app import config
 from app.services import llm_client
 
 router = APIRouter()
+DOCENT_CACHE_VERSION = 'news-direction-v2'
+DOWN = r'급락|하락|약세|낙폭|내려|떨어|팔자|매도|하회|부진|우려'
+UP = r'급등|상승|강세|반등|올라|사자|매수|상회|호실적|수혜'
 
 class RelatedNews(BaseModel):
     news_id: int
@@ -54,22 +57,39 @@ class DocentResponse(BaseModel):
     mode: Literal['RULE', 'LLM'] = 'RULE'
 
 
+def event_lead(title: str, summary: str, day: str, change: float) -> str:
+    reference = datetime.fromisoformat(day).date()
+    safe = []
+    for sentence in llm_client._split_sentences(llm_client._clean_article_text(title, summary)):
+        if re.search(r'사진\s*=|\(사진\)|제공', sentence): continue
+        if re.search(r'(지난해|작년|\d{1,2}\s*월\s*\d{1,2}\s*일).*열린', sentence) and re.search(r'(되고|하고)\s*있(?:다|어요)', sentence): continue
+        dates = re.findall(r'(20\d{2})[./년-]\s*(\d{1,2})[./월-]\s*(\d{1,2})', sentence)
+        old = False
+        for year, month, date in dates:
+            try: old |= abs((reference - datetime(int(year), int(month), int(date)).date()).days) >= 365
+            except ValueError: pass
+        if not old: safe.append(sentence)
+    direction = DOWN if change < 0 else UP
+    return max(safe, key=lambda sentence: (bool(re.search(direction, sentence)), bool(re.search(r'\d', sentence))), default=title)
+
+
 def rule_docent(request: DocentRequest) -> dict:
-    representative = next((item for item in request.news if item.relation == 'DIRECT'), next(iter(request.news), None))
+    # The backend sends candidates in direction/evidence score order.
+    representative = next(iter(request.news), None)
     relation = representative.relation if representative else 'NONE'
     title = representative.title if representative else ''
-    clean = llm_client._clean_article_text(title, representative.summary) if representative else ''
-    lead = next(iter(llm_client._split_sentences(clean)), title)
+    lead = event_lead(title, representative.summary, request.date, request.change_percent) if representative else ''
     if lead and request.level != 'analyst':
         lead = llm_client._reading_summary(title, lead, 'beginner')
     if not representative:
-        what = '이날 수집된 관련 뉴스가 없어요.'
+        what = '이날 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.'
         reason = '수급이나 시장 전체 요인이 영향을 줬을 수 있어요.'
     elif relation == 'MARKET':
         what = lead or title
         index = request.index_name or '관련 지수'
         numeric = f' {request.index_change_percent:+.2f}%' if request.index_change_percent is not None and request.index_name else ''
-        reason = f'개별 소식보다 시장 전체 흐름({index}{numeric})이 영향을 줬을 수 있어요.'
+        direction = '하락' if request.index_change_percent is not None and request.index_change_percent < 0 else '상승' if request.index_change_percent is not None and request.index_change_percent > 0 else '흐름'
+        reason = f'시장 전체 {direction}({index}{numeric})과 함께 움직였을 수 있어요.'
     else:
         what = lead or title
         positive = bool(re.search(r'급등|상향|호실적|수혜', title))
@@ -81,11 +101,14 @@ def rule_docent(request: DocentRequest) -> dict:
         period = '이 주간에' if request.period == 'W' else '이 시점에' if request.period == 'MINUTE' else '이날'
         reason = f"{period} {request.symbol_name} 관련 ‘{title}’ 소식이 나왔고, 주가가 {request.change_percent:+.2f}% 움직였어요. "
         reason += f'이 소식이 {sentiment}로 받아들여졌을 가능성이 있어요.' if sentiment else '다른 요인과 함께 시장 반응에 영향을 줬을 수 있어요.'
-    templates = [('실적|매출|이익', '실적 변화는 기업 가치 평가에 영향을 줬을 수 있어요.'),
+    evidence = title + ' ' + (representative.summary if representative else '')
+    templates = [('외국인|순매도|순매수|팔자|수급|매도|매수', '외국인 매도 등 수급 흐름을 함께 확인해요.' if re.search(r'외국인.*(순매도|팔자|매도)', evidence) else '투자 주체별 매수·매도 수급 흐름을 함께 확인해요.'),
+                 ('실적|매출|이익', '실적 변화와 시장 기대치의 차이를 함께 확인해요.'),
                  ('규제|정책', '규제 변화는 기업의 비용과 사업 전망에 영향을 줬을 수 있어요.'),
                  ('금리', '금리 변화는 자금 조달 비용과 가치 평가 기준에 영향을 줬을 수 있어요.'),
-                 ('환율|원화', '환율 변화는 수출 매출과 수입 비용에 영향을 줬을 수 있어요.')]
-    impact = next((text for pattern, text in templates if re.search(pattern, title)), '매수·매도 수급과 시장 흐름도 함께 확인해야 해요.')
+                 ('환율|원화', '환율 변화는 수출 매출과 수입 비용에 영향을 줬을 수 있어요.'),
+                 ('반도체|메모리|업황|수요|공급', '업황과 제품 수요·공급 변화의 지속 여부를 함께 확인해요.')]
+    impact = next((text for pattern, text in templates if re.search(pattern, evidence)), '매수·매도 수급과 시장 흐름도 함께 확인해야 해요.')
     return DocentResponse(relation=relation,whatHappened=what,possibleReason=reason,marketImpact=impact,
                           newsId=representative.news_id if representative else None,newsTitle=title or None,
                           source=representative.source if representative else None).model_dump()
@@ -116,7 +139,7 @@ level에 맞춰 초보자는 쉽게 풀고 분석자는 비교 기준을 강조�
 @router.post('/docent',response_model=DocentResponse)
 def docent(request: DocentRequest):
     fallback = rule_docent(request)
-    key = hashlib.sha256(json.dumps([request.symbol,request.date,request.period,fallback['newsId'],request.level],ensure_ascii=False).encode()).hexdigest()
+    key = hashlib.sha256(json.dumps([DOCENT_CACHE_VERSION,request.symbol,request.date,request.period,fallback['newsId'],request.level],ensure_ascii=False).encode()).hexdigest()
     path = Path(config.DOCENT_LEDGER_PATH)
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
