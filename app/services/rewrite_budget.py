@@ -8,6 +8,16 @@ from zoneinfo import ZoneInfo
 from app import config
 
 
+def peek(article_key: str) -> dict | None:
+    """Read-only maintenance lookup; never creates a ledger or reserves a call."""
+    path = Path(config.REWRITE_LEDGER_PATH)
+    if not path.exists(): return None
+    key = hashlib.sha256(article_key.encode()).hexdigest()
+    with sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True, timeout=5) as db:
+        row = db.execute('SELECT result FROM rewrite_attempt WHERE article_key=?', (key,)).fetchone()
+        return json.loads(row[0]) if row else None
+
+
 def reserve(article_key: str, fallback: dict) -> tuple[bool, dict]:
     key = hashlib.sha256(article_key.encode()).hexdigest()
     path = Path(config.REWRITE_LEDGER_PATH)

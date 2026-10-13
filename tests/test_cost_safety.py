@@ -81,3 +81,45 @@ class CostSafetyTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_ollama_api_requests_and_other_features_never_dispatch_to_paid_providers(tmp_path):
+    from fastapi.testclient import TestClient
+    from app.main import app
+    with (
+        patch.object(config,'LLM_PROVIDER','ollama'),
+        patch.object(config,'REWRITE_WITH_LLM',True),
+        patch.object(config,'USE_REAL_LLM',True),
+        patch.object(config,'REWRITE_LEDGER_PATH',str(tmp_path/'unused.db')),
+        patch.object(llm_client,'_call_claude',side_effect=AssertionError('paid Claude call')) as claude,
+        patch.object(llm_client,'_call_gemini',side_effect=AssertionError('paid Gemini call')) as gemini,
+        patch('http.client.HTTPConnection',side_effect=AssertionError('real-time Ollama call')) as local,
+    ):
+        response=TestClient(app).post('/ai/news/rewrite',json={'title':'수출 증가','body':'수출액은 전년보다 12.5% 늘었다.','local_batch':True})
+        assert response.status_code==200 and response.json()['mode']=='EXCERPT'
+        assert not (tmp_path/'unused.db').exists()
+        try: llm_client._call_llm('another feature')
+        except RuntimeError: pass
+        else: raise AssertionError('Ollama must be batch-only')
+        claude.assert_not_called();gemini.assert_not_called();local.assert_not_called()
+
+
+def test_local_batch_rejects_paid_provider_and_non_loopback_url_without_any_network(tmp_path):
+    with (
+        patch.object(config,'REWRITE_WITH_LLM',True),
+        patch.object(config,'REWRITE_LEDGER_PATH',str(tmp_path/'budget.db')),
+        patch.object(config,'LLM_PROVIDER','gemini'),
+        patch.object(llm_client,'_call_gemini',side_effect=AssertionError('paid call')) as paid,
+        patch('http.client.HTTPConnection',side_effect=AssertionError('external request')) as http,
+    ):
+        assert llm_client.rewrite_news('수출','수출액은 전년보다 늘었다.',local_batch=True)['mode']=='EXCERPT'
+        paid.assert_not_called();http.assert_not_called()
+        with patch.object(config,'LLM_PROVIDER','ollama'),patch.object(config,'OLLAMA_MODEL','fixture'),patch.object(config,'OLLAMA_BASE_URL','http://external.test'):
+            assert llm_client.rewrite_news('수출','수출액은 전년보다 늘었다.','external',local_batch=True)['mode']=='EXCERPT'
+        paid.assert_not_called();http.assert_not_called()
+
+
+def test_disabled_rewrite_flag_blocks_local_batch_even_when_ollama_selected():
+    with patch.object(config,'LLM_PROVIDER','ollama'),patch.object(config,'REWRITE_WITH_LLM',False),patch('http.client.HTTPConnection') as http:
+        assert llm_client.rewrite_news('수출','수출액은 전년보다 늘었다.',local_batch=True)['mode']=='EXCERPT'
+        http.assert_not_called()

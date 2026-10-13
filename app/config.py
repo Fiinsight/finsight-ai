@@ -79,3 +79,7 @@ ML_NEWS_INDEX_PATH: str = os.getenv("ML_NEWS_INDEX_PATH", "").strip()
 DOCENT_WITH_LLM: bool = _get_bool("DOCENT_WITH_LLM", False)
 MAX_DAILY_DOCENT_CALLS: int = max(0, _get_int("MAX_DAILY_DOCENT_CALLS", 30))
 DOCENT_LEDGER_PATH: str = os.getenv("DOCENT_LEDGER_PATH", "data/chart_docent.sqlite3")
+
+# Local rewrite batches only; the API never starts an Ollama generation.
+OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
+OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "").strip()

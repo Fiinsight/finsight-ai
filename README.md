@@ -60,7 +60,7 @@ python scripts/train_sentiment.py
 | 변수 | 기본값 | 설명 |
 | --- | --- | --- |
 | `USE_REAL_LLM` | `false` | 실제 LLM 호출 여부. 비용 발생 가능성이 있는 스위치 |
-| `LLM_PROVIDER` | `claude` | `claude` 또는 `gemini`; 실제 요금제는 제공자 콘솔에서 확인 |
+| `LLM_PROVIDER` | `claude` | `claude`/`gemini` 또는 배치 전용 `ollama`; 기본 비용 플래그는 false |
 | `LLM_REQUEST_TIMEOUT_SECONDS` | `20` | 외부 LLM의 최대 요청 시간(초), 자동 재시도 없음 |
 | `ANTHROPIC_API_KEY` | 빈 값 | 실제 LLM을 선택했을 때만 사용 |
 | `ANTHROPIC_MODEL` | `claude-haiku-4-5` | 실제 호출 모델 |
@@ -135,3 +135,44 @@ so setting both cost flags to false cannot be undone by `.env` loading.
 `POST /ai/feedback/judgement`는 `verdict`, `headline`, `summary`, `reasons:[{title,detail}]` 2~3개, `nextTip`을 반환합니다. 기사 리드·사용자 근거·실제 비교 데이터를 각각 사용하고, 무근거 칭찬/새 수치/인과 단정을 막습니다. 방향 일치라도 절대 변동률 1.0% 이하이면 PARTIAL입니다. UNKNOWN은 판정하지 않고 verdict=null입니다.
 
 기존 `feedback`, `is_aligned`, `next_learning_point` 별칭을 유지합니다. USE_REAL_LLM=false 기본 규칙 모드와 기존 상한은 그대로이며, 실제 LLM 테스트는 mock만 사용합니다. 선택적 지수 비교 수치가 없으면 생성하지 않습니다.
+
+## ML4 · 배치 전용 Ollama 리라이팅 (선택)
+
+기존 `REWRITE_WITH_LLM` 기본값은 false, `USE_REAL_LLM` 기본값도 false입니다. provider=ollama는 **수집 후 별도 배치에서만** 사용합니다. `/ai/news/rewrite` 등 앱 요청은 Ollama를 실행하지 않고 EXCERPT를 반환하며, 백엔드는 배치가 DB에 저장한 REWRITTEN 결과를 표시합니다. 다른 기능은 Ollama 설정에서 유료 제공자로 넘어가지 않습니다.
+
+아래는 사용자가 로컬에서 실행하는 설치 안내입니다. 이 PR/CI에서 설치·다운로드·실제 생성은 실행하지 않았습니다.
+
+```sh
+brew install ollama
+ollama pull qwen2.5:7b
+ollama serve
+# Ollama 실행 상태에 따라 기존 서버를 그대로 사용합니다.
+```
+
+환경 파일을 수정하지 않고 별도 배치 터미널에서 다음 값을 export합니다:
+
+```sh
+export USE_REAL_LLM=false
+export LLM_PROVIDER=ollama
+export OLLAMA_BASE_URL=http://localhost:11434
+export OLLAMA_MODEL=qwen2.5:7b
+export REWRITE_WITH_LLM=true
+```
+
+OLLAMA_BASE_URL 기본값은 http://localhost:11434, OLLAMA_MODEL 기본값은 빈 값입니다. base URL은 localhost/127.0.0.1/::1의 HTTP(S)만 허용하며 HTTP 리디렉션을 따르지 않습니다. SDK/유료 API/다운로드 경로는 추가하지 않았습니다. DB 배치만 실행할 환경에는 선택 드라이버 `pip install 'psycopg[binary]>=3.2,<4'`가 필요합니다. DB 접속 변수는 이미 export된 DB_URL/DB_USERNAME/DB_PASSWORD를 사용하며 값을 출력하지 않습니다.
+
+```sh
+# 새 수집 cohort를 명시합니다. 기본은 대상 건수만 확인(모델 호출/DB 쓰기 없음).
+python -m scripts.rewrite_news_batch --since 2026-10-13T09:00:00+09:00 --limit 10
+# 운영자가 새 대상만 확인한 뒤 명시적으로 적용할 때 사용하는 명령입니다.
+python -m scripts.rewrite_news_batch --since 2026-10-13T09:00:00+09:00 --limit 10 --apply --output artifacts/rewrite-quality.jsonl
+python -m scripts.check_level_quality --input artifacts/rewrite-quality.jsonl --output artifacts/level-quality.md
+```
+
+예시 since는 그대로 복사하지 말고 **새로 수집하기 시작한 시각**을 지정하세요. 기존 기사 전체 재생성 명령은 제공하지 않습니다. 이미 REWRITTEN인 DB 기사와 영속 ledger에서 처리한 기사에는 모델을 다시 호출하지 않습니다. 처리 완료된 EXCERPT도 다음 배치에서 건너뛰며, 명시한 범위의 최신 1000건 중 아직 처리하지 않은 최대 limit건을 선택합니다. 프로세스 상한에 도달하면 미처리 기사를 예약하지 않고 배치를 멈춥니다. EXCERPT로 수집된 새 기사만 명시한 범위에서 처리합니다. 기사당 3수준 JSON을 한 번에 생성하고 JSON 파싱 실패에만 1회 재시도합니다. 숫자·부호/문장 수/해요체/분석 칸 중복/투자 권유 검증 실패 및 타임아웃은 EXCERPT로 남습니다. 요청 타임아웃은 120초, 기존 일일 기사 상한(기본 50)과 공유 프로세스 호출 상한(기본 20)을 유지합니다. JSON 재시도도 프로세스 상한에 포함됩니다.
+
+원문·제목·저장값이 생성 중 바뀐 행은 저장하지 않습니다. ledger와 DB를 한 트랜잭션으로 묶지 않으므로 모델 결과를 ledger에 남긴 뒤 DB 저장이 실패한 경우 같은 입력으로 재실행해 저장만 복구할 수 있습니다. 이미 처리한 같은 기사의 입력이 바뀌면 재생성하지 않고 배치 대상에서 제외합니다. ledger 파일은 지속 저장해야 기사당 재호출 제한을 유지할 수 있습니다.
+
+품질 비교 도구의 --input 모드는 저장된 최대 10개 기사에서 원문/3수준 발췌/3수준 LLM의 3열 표만 만들며 모델을 호출하지 않습니다. 기존 --title/--body/--base-url 통계 검사 모드는 유지합니다. 실제 한국어 품질·사실 보존은 사용자가 로컬에서 비교해야 합니다. 처리 시간은 측정하지 않았습니다. 테스트는 Ollama HTTP mock만 사용하고 CI는 모델을 다운로드하거나 Ollama 서버를 실행하지 않습니다.
+
+API 형식 참고: [Ollama generate](https://docs.ollama.com/api/generate).

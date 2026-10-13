@@ -9,7 +9,8 @@ accuracy or writing quality — it can't tell you whether a summary correctly
 reflects the source article. Treat it as a smoke test for "did the level
 differentiation regress", not a full quality score.
 
-Usage:
+Usage (existing API text-statistics mode remains available; saved --input mode is offline):
+    python3 -m scripts.check_level_quality --input artifacts/rewrite-quality.jsonl
     python3 scripts/check_level_quality.py
     python3 scripts/check_level_quality.py --title "..." --body "..."
     python3 scripts/check_level_quality.py --base-url http://localhost:8001
@@ -19,6 +20,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import html
+from pathlib import Path
 import re
 import urllib.request
 
@@ -82,12 +85,37 @@ def analyze(text: str) -> dict:
     }
 
 
+def cell(value):
+    return html.escape(str(value)).replace('|','&#124;').replace('\n','<br>')
+
+
+def report(rows):
+    from app.services.llm_client import _clean_article_text, _mock_rewrite_news
+    lines=['# 수준별 리라이팅 비교','', '제공된 저장 결과만 비교하며 모델을 호출하지 않습니다.', '', '| 원문 | 발췌 | 로컬 LLM |','|---|---|---|']
+    for row in rows[:10]:
+        title=row['title'];body=row.get('body',row.get('raw_content',''))
+        excerpt=_mock_rewrite_news(title,_clean_article_text(title,body))
+        excerpts='\n\n'.join(label+'\n'+excerpt[level] for level,label in [('beginner','초보자'),('normal','일반'),('analyst','분석')])
+        generated='\n\n'.join(label+'\n'+row.get(level,'결과 없음') for level,label in [('beginner','초보자'),('normal','일반'),('analyst','분석')]) if row.get('mode')=='REWRITTEN' else 'EXCERPT: 저장된 LLM 리라이팅 없음'
+        lines.append('| '+cell(title+'\n'+body)+' | '+cell(excerpts)+' | '+cell(generated)+' |')
+    return '\n'.join(lines)+'\n'
+
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input", help="Saved batch JSONL; this mode never calls the API or a model")
+    parser.add_argument("--output", default="artifacts/level-quality.md")
     parser.add_argument("--title", default=DEFAULT_TITLE)
     parser.add_argument("--body", default=DEFAULT_BODY)
     parser.add_argument("--base-url", default="http://localhost:8001")
     args = parser.parse_args()
+    if args.input:
+        rows=[json.loads(line) for line in Path(args.input).read_text().splitlines() if line.strip()]
+        output=Path(args.output);output.parent.mkdir(parents=True,exist_ok=True)
+        output.write_text(report(rows),encoding='utf-8')
+        print(f'Compared {min(10,len(rows))} saved articles; no model calls')
+        return
 
     results = {}
     for level in LEVELS:
