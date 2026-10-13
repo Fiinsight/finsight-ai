@@ -23,6 +23,7 @@ def health() -> dict[str, object]:
     # revealing API keys. It makes it explicit whether the optional local
     # classifier is active instead of presenting a rule fallback as deep learning.
     from app.services.ml_sentiment import model_status
+    from app.services import rewrite_budget, llm_client
 
     selected_key = (
         config.GEMINI_API_KEY
@@ -32,7 +33,17 @@ def health() -> dict[str, object]:
         else ""
     )
     llm_enabled = config.USE_REAL_LLM and bool(selected_key)
+    try:
+        rewrite_status = rewrite_budget.status()
+    except Exception:
+        rewrite_status = {"rewriteStatusUnavailable": True}
     return {
+        **rewrite_status,
+        "rewriteEnabled": config.REWRITE_WITH_LLM and config.LLM_PROVIDER == "gemini" and bool(config.GEMINI_API_KEY),
+        "provider": config.LLM_PROVIDER,
+        "rewriteMinIntervalSeconds": config.REWRITE_MIN_INTERVAL_SECONDS,
+        "processCallLimit": config.MAX_REAL_LLM_CALLS_PER_PROCESS,
+        "processCalls": llm_client._real_llm_calls,
         "status": "ok",
         "useRealLlm": llm_enabled,
         "llmEnabled": llm_enabled,

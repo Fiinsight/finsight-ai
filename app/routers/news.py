@@ -9,6 +9,7 @@ router = APIRouter()
 
 
 class RewriteRequest(BaseModel):
+    allow_llm: bool = True
     title: str = Field(min_length=1, max_length=300)
     body: str = Field(min_length=1, max_length=20000)
     article_key: str | None = Field(default=None, max_length=1000)
@@ -16,6 +17,7 @@ class RewriteRequest(BaseModel):
 
 
 class RewriteResponse(BaseModel):
+    retryable: bool = False
     title: str
     summary: str
     beginner: str
@@ -50,14 +52,14 @@ class SimilarNewsResponse(BaseModel):
 
 @router.post("/rewrite", response_model=RewriteResponse)
 def rewrite_news(request: RewriteRequest) -> RewriteResponse:
-    result = llm_client.rewrite_news(title=request.title, raw_content=request.body, article_key=request.article_key)
+    result = llm_client.rewrite_news(title=request.title, raw_content=request.body, article_key=request.article_key, allow_llm=request.allow_llm)
     return RewriteResponse(
         title=request.title,
         summary=result[request.level or "normal"],
         beginner=result["beginner"], normal=result["normal"], analyst=result["analyst"], mode=result["mode"],
         importance_reason=result["importanceReason"],
         importance_reasons=result.get("importanceReasons", {}),
-        detected_terms=result.get("detectedTerms", []),
+        detected_terms=result.get("detectedTerms", []), retryable=result.get("retryable", False),
     )
 
 
