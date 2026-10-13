@@ -1,4 +1,4 @@
-"""Optional DB access for explicit offline maintenance; never loads or prints .env."""
+"""Optional DB access for explicit offline maintenance; never prints or updates .env."""
 import os
 from contextlib import contextmanager
 
