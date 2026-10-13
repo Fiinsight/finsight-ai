@@ -118,3 +118,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     train(build_parser().parse_args())
+
+
+def classification_metrics(expected: list[str], predicted: list[str]) -> dict:
+    if not expected or len(expected) != len(predicted):
+        raise ValueError("Nonempty paired predictions required")
+    labels = ["NEGATIVE", "NEUTRAL", "POSITIVE"]
+    matrix = [[0] * 3 for _ in range(3)]
+    for actual, prediction in zip(expected, predicted):
+        if actual not in labels or prediction not in labels:
+            raise ValueError("Unsupported sentiment label")
+        matrix[labels.index(actual)][labels.index(prediction)] += 1
+    return {"accuracy": sum(a == p for a, p in zip(expected, predicted)) / len(expected), "labels": labels, "confusion_matrix": matrix, "sample_size": len(expected)}
