@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 
 from app.services import llm_client
 from app.services.ml_sentiment import predict_sentiment
-from app.services.news_retrieval import search_news
+from app.services.news_retrieval import search_news, recommend_news
 
 router = APIRouter()
 
@@ -69,3 +69,19 @@ def sentiment(request: SentimentRequest) -> SentimentResponse:
 @router.post("/similar", response_model=SimilarNewsResponse)
 def similar_news(request: SimilarNewsRequest) -> SimilarNewsResponse:
     return SimilarNewsResponse(**search_news(request.query, request.top_k))
+
+
+class Behavior(BaseModel):
+    news_id: int = Field(gt=0)
+    weight: float = Field(gt=0, le=1000, allow_inf_nan=False)
+
+
+class RecommendationRequest(BaseModel):
+    behaviors: list[Behavior] = Field(default_factory=list, max_length=500)
+    candidate_ids: list[int] = Field(default_factory=list, max_length=300)
+    excluded_ids: list[int] = Field(default_factory=list, max_length=5000)
+
+
+@router.post("/recommendations")
+def recommendations(request: RecommendationRequest):
+    return recommend_news([item.model_dump() for item in request.behaviors],request.candidate_ids,request.excluded_ids)

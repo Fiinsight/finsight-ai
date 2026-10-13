@@ -87,6 +87,7 @@ def search(request: SearchRequest) -> dict:
         raise HTTPException(400, 'Invalid time window')
     query = tokens(request.query)
     results = []
+    eligible = []
     for doc in request.documents:
         if doc.kind != request.kind or doc.synthetic:
             continue
@@ -99,9 +100,17 @@ def search(request: SearchRequest) -> dict:
                 continue
             if request.endAt and doc.publishedAt >= request.endAt:
                 continue
+        eligible.append(doc)
+    semantic = {}
+    if request.kind == 'news' and eligible:
+        from app.services.news_retrieval import search_news
+        ranked = search_news(request.query,len(eligible),[doc.id for doc in eligible])
+        if ranked['basis'] == 'LOCAL_SENTENCE_TRANSFORMER':
+            semantic = {str(row.get('news_id')): row['score'] for row in ranked['results']}
+    for doc in eligible:
         title = tokens(doc.title)
         body = tokens(doc.body)
-        score = (_news_score(request, doc) if request.kind == 'news' else
+        score = (semantic.get(doc.id,0) if semantic else _news_score(request, doc) if request.kind == 'news' else
                  (2 * len(query & title) + len(query & body)) / (3 * len(query)) if query else 0)
         if score <= 0:
             continue
@@ -122,9 +131,10 @@ def search(request: SearchRequest) -> dict:
             distinct.append(row)
         results = distinct
     return {
-        'schemaVersion': '1', 'status': 'RULE_FALLBACK' if results else 'DATA_UNAVAILABLE',
-        'fallbackReason': 'LOCAL_MODEL_NOT_CONFIGURED', 'qualityValidated': False,
-        'confidence': None, 'relationType': 'LEXICAL_MATCH',
-        'rankingPolicy': 'LEXICAL_SCORE', 'results': results[:request.topK],
-        'note': '무료 로컬 규칙 검색 (fallback). 의미 유사도나 실제 주가 원인은 확인할 수 없습니다.',
+        'schemaVersion': '1', 'status': ('OK' if semantic else 'RULE_FALLBACK') if results else 'DATA_UNAVAILABLE',
+        'basis': 'LOCAL_SENTENCE_TRANSFORMER' if semantic else 'RULE_BASED_FALLBACK',
+        'fallbackReason': None if semantic else 'LOCAL_MODEL_NOT_CONFIGURED', 'qualityValidated': False,
+        'confidence': None, 'relationType': 'SEMANTIC_SIMILARITY' if semantic else 'LEXICAL_MATCH',
+        'rankingPolicy': 'SEMANTIC_COSINE' if semantic else 'LEXICAL_SCORE', 'results': results[:request.topK],
+        'note': '로컬 문장 임베딩 유사도이며 실제 주가 원인은 확인할 수 없습니다.' if semantic else '무료 로컬 규칙 검색 (fallback). 의미 유사도나 실제 주가 원인은 확인할 수 없습니다.',
     }
