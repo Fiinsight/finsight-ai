@@ -173,6 +173,6 @@ python -m scripts.check_level_quality --input artifacts/rewrite-quality.jsonl --
 
 원문·제목·저장값이 생성 중 바뀐 행은 저장하지 않습니다. ledger와 DB를 한 트랜잭션으로 묶지 않으므로 모델 결과를 ledger에 남긴 뒤 DB 저장이 실패한 경우 같은 입력으로 재실행해 저장만 복구할 수 있습니다. 이미 처리한 같은 기사의 입력이 바뀌면 재생성하지 않고 배치 대상에서 제외합니다. ledger 파일은 지속 저장해야 기사당 재호출 제한을 유지할 수 있습니다.
 
-품질 비교 도구는 저장된 최대 10개 기사에서 원문/3수준 발췌/3수준 LLM의 3열 표만 만들며 모델을 호출하지 않습니다. 실제 한국어 품질·사실 보존은 사용자가 로컬에서 비교해야 합니다. 처리 시간은 측정하지 않았습니다. 테스트는 Ollama HTTP mock만 사용하고 CI는 모델을 다운로드하거나 Ollama 서버를 실행하지 않습니다.
+품질 비교 도구의 --input 모드는 저장된 최대 10개 기사에서 원문/3수준 발췌/3수준 LLM의 3열 표만 만들며 모델을 호출하지 않습니다. 기존 --title/--body/--base-url 통계 검사 모드는 유지합니다. 실제 한국어 품질·사실 보존은 사용자가 로컬에서 비교해야 합니다. 처리 시간은 측정하지 않았습니다. 테스트는 Ollama HTTP mock만 사용하고 CI는 모델을 다운로드하거나 Ollama 서버를 실행하지 않습니다.
 
 API 형식 참고: [Ollama generate](https://docs.ollama.com/api/generate).
