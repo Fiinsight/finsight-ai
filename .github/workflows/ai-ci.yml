@@ -20,5 +20,7 @@ jobs:
           python-version: "3.11"
       - name: Install offline test dependencies
         run: python -m pip install fastapi==0.116.1 pydantic==2.11.7 python-dotenv==1.1.1 httpx==0.28.1 pytest==8.4.2
+      - name: Install vector math for mock embedding tests (no model download)
+        run: python -m pip install 'numpy>=1.26,<3'
       - name: Run tests without paid providers or credentials
         run: python -m pytest
