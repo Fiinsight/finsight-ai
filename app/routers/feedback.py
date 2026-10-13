@@ -24,6 +24,9 @@ class FeedbackRequest(BaseModel):
     comparison_date: date | None = None
     sentiment_hint: Literal["POSITIVE", "NEGATIVE", "NEUTRAL"] | None = None
     sentiment_confidence: float | None = Field(default=None, ge=0, le=1, allow_inf_nan=False)
+    concept_term: str | None = Field(default=None, max_length=100)
+    concept_definition: str | None = Field(default=None, max_length=1000)
+    judgement_id: int | None = Field(default=None, gt=0)
     index_name: str | None = Field(default=None, max_length=100)
     index_change_percent: float | None = Field(default=None, allow_inf_nan=False)
 
@@ -39,6 +42,9 @@ class FeedbackResponse(BaseModel):
     summary: str
     reasons: list[FeedbackReason] = Field(min_length=2, max_length=3)
     nextTip: str
+    conceptTerm: str | None = None
+    conceptDefinition: str | None = None
+    mode: Literal["RULE", "LLM"] = "RULE"
     is_aligned: bool
     feedback: str
     next_learning_point: str
@@ -57,11 +63,13 @@ def judgement_feedback(request: FeedbackRequest) -> FeedbackResponse:
         comparison_date=request.comparison_date.isoformat() if request.comparison_date else None,
         sentiment_hint=request.sentiment_hint, sentiment_confidence=request.sentiment_confidence,
         index_name=request.index_name, index_change_percent=request.index_change_percent,
+        concept_term=request.concept_term, concept_definition=request.concept_definition, judgement_id=request.judgement_id,
     )
 
     reasons = result["reasons"]
     return FeedbackResponse(
         verdict=result["verdict"], headline=result["headline"], summary=result["summary"], nextTip=result["nextTip"],
+        conceptTerm=result.get("conceptTerm"), conceptDefinition=result.get("conceptDefinition"), mode=result.get("mode", "RULE"),
         is_aligned=result["isAligned"],
         feedback=result["feedbackText"],
         next_learning_point=result["nextTip"],

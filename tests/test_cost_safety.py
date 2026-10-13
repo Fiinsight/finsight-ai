@@ -21,6 +21,12 @@ class CostSafetyTest(unittest.TestCase):
         self.assertTrue(result["beginner"])
         provider_call.assert_not_called()
 
+    def test_feedback_default_flag_never_dispatches_to_any_provider(self):
+        with patch.object(config, "USE_REAL_LLM", False), patch.object(config, "FEEDBACK_WITH_LLM", False), patch.object(llm_client, "_call_llm", side_effect=AssertionError("paid call")) as paid, patch.object(llm_client, "_call_gemini", side_effect=AssertionError("real call")) as gemini:
+            result = llm_client.generate_feedback("매출이 증가했다.", "UP", "UP", 1.2)
+        self.assertEqual(result["mode"], "RULE")
+        paid.assert_not_called(); gemini.assert_not_called()
+
     def test_provider_timeout_returns_fallback(self):
         with (
             tempfile.TemporaryDirectory() as directory,

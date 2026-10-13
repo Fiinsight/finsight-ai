@@ -43,6 +43,10 @@ def _get_float(name: str, default: float) -> float:
 
 # Rewrite 외 기능의 LLM 호출 여부. 수집 리라이팅은 별도 opt-in입니다.
 USE_REAL_LLM: bool = _get_bool("USE_REAL_LLM", False)
+# Optional Gemini-only feedback polishing; never enables the other paid paths.
+FEEDBACK_WITH_LLM: bool = _get_bool("FEEDBACK_WITH_LLM", False)
+MAX_DAILY_FEEDBACK_CALLS: int = min(50, max(0, _get_int("MAX_DAILY_FEEDBACK_CALLS", 50)))
+FEEDBACK_LEDGER_PATH: str = os.getenv("FEEDBACK_LEDGER_PATH", "data/feedback_calls.sqlite3")
 
 # Collection-only rewrite opt-in; independent of every other LLM feature.
 REWRITE_WITH_LLM: bool = _get_bool("REWRITE_WITH_LLM", False)

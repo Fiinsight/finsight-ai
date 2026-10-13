@@ -176,3 +176,11 @@ python -m scripts.check_level_quality --input artifacts/rewrite-quality.jsonl --
 품질 비교 도구의 --input 모드는 저장된 최대 10개 기사에서 원문/3수준 발췌/3수준 LLM의 3열 표만 만들며 모델을 호출하지 않습니다. 기존 --title/--body/--base-url 통계 검사 모드는 유지합니다. 실제 한국어 품질·사실 보존은 사용자가 로컬에서 비교해야 합니다. 처리 시간은 측정하지 않았습니다. 테스트는 Ollama HTTP mock만 사용하고 CI는 모델을 다운로드하거나 Ollama 서버를 실행하지 않습니다.
 
 API 형식 참고: [Ollama generate](https://docs.ollama.com/api/generate).
+
+### Optional judgement feedback polishing
+
+`FEEDBACK_WITH_LLM=false` is the default. Rule feedback compares the article signal, user reason and the same target/index closing interval, and returns the backend-selected `conceptTerm`/`conceptDefinition`. No model is called by default.
+
+Opt-in supports only the existing Gemini provider, with a separate KST ledger capped at 50 attempts/day, cached identical results, the existing 20-call process ceiling, and the shared rewrite lock/minimum interval. A non-Gemini provider, provider/ledger failure, invalid JSON, invented numbers, missing source quotes or praise without a user reason returns RULE. Claude/OpenAI dispatch is not enabled by this flag. `USE_REAL_LLM` remains independent. The opt-in does not verify Google project billing eligibility; enable it only with a verified free-tier project. No real call or environment-file change was made for this feature.
+
+Backend request adds `concept_term`, `concept_definition`, `judgement_id`; response adds `conceptTerm`, `conceptDefinition`, `mode`. Definitions are sourced from the local dictionary and are never generated. Model tests use HTTP/provider mocks and temporary ledgers.

@@ -12,6 +12,7 @@ jobs:
     env:
       USE_REAL_LLM: "false"
       REWRITE_WITH_LLM: "false"
+      FEEDBACK_WITH_LLM: "false"
       USE_REAL_EMBEDDINGS: "false"
     steps:
       - uses: actions/checkout@v4
