@@ -106,16 +106,68 @@ def _call_gemini(prompt: str, max_tokens: int = 1024) -> str:
     return response.text or ""
 
 
-def _call_llm(prompt: str, max_tokens: int = 1024) -> str:
-    """Dispatch to LLM_PROVIDER within the shared process ceiling; callers gate feature flags."""
+def _reserve_process_llm_call() -> None:
     global _real_llm_calls
     with _real_llm_calls_lock:
         if _real_llm_calls >= config.MAX_REAL_LLM_CALLS_PER_PROCESS:
             raise RuntimeError("프로세스의 실제 LLM 호출 상한에 도달했습니다.")
         _real_llm_calls += 1
+
+
+def _call_llm(prompt: str, max_tokens: int = 1024) -> str:
+    """Paid dispatch keeps its ceiling; Ollama is only available in rewrite batches."""
+    if config.LLM_PROVIDER == "ollama":
+        raise RuntimeError("Ollama is available only for offline rewrite batches")
+    _reserve_process_llm_call()
     if config.LLM_PROVIDER == "gemini":
         return _call_gemini(prompt, max_tokens)
     return _call_claude(prompt, max_tokens)
+
+
+def _call_ollama(prompt: str, max_tokens: int = 2200) -> str:
+    import http.client
+    from urllib.parse import urlparse
+    if not config.REWRITE_WITH_LLM or config.LLM_PROVIDER != "ollama" or not config.OLLAMA_MODEL:
+        raise RuntimeError("Local rewrite provider is not enabled/configured")
+    url=urlparse(config.OLLAMA_BASE_URL)
+    if url.scheme not in {"http","https"} or url.hostname not in {"localhost","127.0.0.1","::1"} or url.username or url.password or url.query or url.fragment:
+        raise RuntimeError("OLLAMA_BASE_URL must be a loopback HTTP endpoint")
+    _reserve_process_llm_call()
+    connection=(http.client.HTTPSConnection if url.scheme=="https" else http.client.HTTPConnection)(url.hostname,url.port,timeout=120)
+    try:
+        payload={"model":config.OLLAMA_MODEL,"prompt":prompt,"stream":False,"format":"json","options":{"temperature":0,"num_predict":max_tokens}}
+        connection.request("POST",url.path.rstrip("/")+"/api/generate",body=json.dumps(payload,ensure_ascii=False).encode(),headers={"Content-Type":"application/json"})
+        response=connection.getresponse()
+        # HTTPConnection does not follow redirects to another provider.
+        if response.status!=200: raise RuntimeError("Local generation unavailable")
+        raw=response.read(1_048_577)
+        if len(raw)>1_048_576: raise RuntimeError("Local response too large")
+        data=json.loads(raw)
+        if not isinstance(data,dict) or data.get("done") is not True or not isinstance(data.get("response"),str):
+            raise RuntimeError("Incomplete local generation")
+        return data["response"]
+    finally:
+        connection.close()
+
+
+def _local_rewrite(title: str, source: str) -> dict:
+    prompt=_build_rewrite_prompt(title,source)
+    for attempt in range(2):
+        try:
+            data=_extract_json(_call_ollama(prompt))
+        except ValueError:
+            if attempt==1: raise
+            prompt += "\n이전 응답을 JSON으로 읽을 수 없었어요. 설명이나 코드 블록 없이 요청한 JSON 객체만 반환하세요."
+            continue
+        result=_validated_rewrite(data,title+" "+source)
+        tokens=set(_NUMBER.findall(title+" "+source))
+        text=" ".join(result.values())
+        if any(token not in tokens for token in _NUMBER.findall(text)):
+            raise ValueError("Local rewrite changed a source number/sign")
+        if re.search(r"매수하세요|매도하세요|투자하세요|수익.{0,10}보장",text):
+            raise ValueError("Local rewrite contains investment advice")
+        return result
+    raise ValueError("No valid local JSON")
 
 
 def _extract_json(text: str) -> dict:
@@ -515,19 +567,33 @@ def _validated_rewrite(data: dict, source: str) -> dict:
             'analyst': f"근거\n{sections['evidence']}\n\n수치·비교 기준\n{sections['figures']}\n\n리스크·확인할 점\n{sections['risk']}"}
 
 
-def rewrite_news(title: str, raw_content: str, article_key: str | None = None) -> dict:
+def _rewrite_source_hash(title: str, cleaned: str) -> str:
+    import hashlib
+    return hashlib.sha256((title + '::' + cleaned).encode()).hexdigest()
+
+
+def rewrite_news(title: str, raw_content: str, article_key: str | None = None, *, local_batch: bool = False) -> dict:
     cleaned_content = _clean_article_text(title, raw_content)
     fallback = {**_mock_rewrite_news(title, cleaned_content), 'mode': 'EXCERPT'}
-    if not config.REWRITE_WITH_LLM:
+    if not config.REWRITE_WITH_LLM or (config.LLM_PROVIDER == "ollama" and not local_batch):
         return fallback
+    if local_batch and config.LLM_PROVIDER != "ollama":
+        return fallback
+    if local_batch:
+        fallback['_source_hash'] = _rewrite_source_hash(title, cleaned_content)
     from app.services import rewrite_budget
     key = article_key or title + '::' + cleaned_content
     try:
         allowed, previous = rewrite_budget.reserve(key, fallback)
         if not allowed:
+            if local_batch and previous.get('_source_hash') != fallback['_source_hash']:
+                return fallback
             return previous
-        raw = _call_llm(_build_rewrite_prompt(title, cleaned_content), max_tokens=2200)
-        summaries = _validated_rewrite(_extract_json(raw), title + ' ' + cleaned_content)
+        if local_batch:
+            summaries = _local_rewrite(title, cleaned_content[:20000])
+        else:
+            raw = _call_llm(_build_rewrite_prompt(title, cleaned_content), max_tokens=2200)
+            summaries = _validated_rewrite(_extract_json(raw), title + ' ' + cleaned_content)
         result = {**fallback, **summaries, 'mode': 'REWRITTEN'}
         rewrite_budget.finish(key, result)
         return result
