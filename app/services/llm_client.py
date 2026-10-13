@@ -388,13 +388,31 @@ _ARTICLE_NOISE_MARKERS = (
 )
 
 
+def _strip_photo_noise(text: str) -> str:
+    parts = re.split(r'(?<=[.!?。！？])(?!\d)\s*|\n+', text)
+    kept = []
+    changed = False
+    notice = r'^(?:사진은\s*기사(?:\s*내용)?(?:와|과)\s*(?:관련\s*없|무관)|이미지는\s*기사(?:\s*내용)?(?:와|과)\s*관련\s*없|자료사진|일러스트\s*=|그래픽\s*=)'
+    credit = r'^사진\s*=\s*(?:.{1,60}?(?:생성\s*이미지|제공)|게티이미지뱅크|[^\s]+)\s*'
+    for part in parts:
+        item = part.strip()
+        if re.match(notice, item):
+            changed = True
+            continue
+        plain = re.sub(credit, '', item)
+        changed = changed or plain != item
+        if plain:
+            kept.append(plain)
+    return '\n\n'.join(kept) if changed else text
+
+
 def _clean_article_text(title: str, raw_content: str) -> str:
     """Remove publisher chrome and title duplication before any rewrite."""
     title_text = " ".join(title.split()).strip(" \t\n\r\"“”'‘’")
     title_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", title_text).lower()
     title_prefix = re.split(r"[…,:：]", title_text, maxsplit=1)[0].strip()
     title_prefix_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", title_prefix).lower()
-    content = raw_content.replace("\r", "\n")
+    content = _strip_photo_noise(raw_content.replace("\r", "\n"))
     content = re.sub(r"\[[^\]]{0,500}(?:자료사진|사진 제공|재판매|DB 금지)[^\]]{0,500}\]", " ", content)
     photo_credit = re.match(r"^(.{0,700}?)20\d{2}\.\d{1,2}\.\d{1,2}\s+[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}\s*", content, re.S)
     if photo_credit and any(marker in photo_credit[1] for marker in ("사진", "딜링룸", "촬영")) and content[photo_credit.end():].strip():
