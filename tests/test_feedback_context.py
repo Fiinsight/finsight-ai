@@ -40,7 +40,8 @@ def test_structured_verdict_and_grounded_reasons(choice,direction,percent,verdic
     assert '매출이 12% 늘었다.' in result['reasons'][0]['detail']
     assert '수익 개선을 예상했어요.' in result['reasons'][1]['detail']
     assert '코스피' in result['reasons'][2]['detail'] and '-0.30%' in result['reasons'][2]['detail']
-    assert all(_feedback_sentence_count(item['detail'])==1 for item in result['reasons'])
+    assert _feedback_sentence_count(result['reasons'][0]['detail'])==3
+    assert all(_feedback_sentence_count(item['detail'])==1 for item in result['reasons'][1:])
 
 @pytest.mark.parametrize('case',['valid','number','sign','praise','verdict','missing_reason'])
 def test_llm_structure_and_fallback_are_mocked(monkeypatch,case):

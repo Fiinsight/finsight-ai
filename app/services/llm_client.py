@@ -783,6 +783,20 @@ def _feedback_sentence_count(text: str) -> int:
     return len(_split_sentences(re.sub(r'“[^”]*”|"[^"\n]*"', '인용', text)))
 
 
+def _feedback_price_channel(text: str, signal: str) -> str:
+    if '금리' in text: return '금리가 오르면 기업이 돈을 빌리는 비용이 커져 이익 기대에 부담이 될 수 있고, 내려가면 그 부담이 줄 수 있어요.'
+    if '환율' in text: return '환율 변화는 수출로 받는 돈과 수입에 드는 비용에 다르게 작용하므로, 기업의 사업 구조에 따라 주가에 미치는 방향도 달라질 수 있어요.'
+    if re.search(r'실적|매출|영업이익|순이익|흑자|적자', text):
+        return ('실적 개선 소식은 앞으로 벌 이익에 대한 기대를 높여 주식을 사려는 수요와 상승 요인으로 연결될 수 있어요.' if signal == 'POSITIVE' else
+                '실적 부진 소식은 앞으로 벌 이익에 대한 기대를 낮춰 주식을 팔려는 수요와 하락 요인으로 연결될 수 있어요.' if signal == 'NEGATIVE' else
+                '실적 뉴스는 매출뿐 아니라 비용을 뺀 이익이 어떻게 달라지는지에 따라 주가 기대에 다르게 작용할 수 있어요.')
+    if re.search(r'매수|매도|수급|팔자|사자', text): return '매수는 주식을 사려는 수요, 매도는 팔려는 공급이어서 매수 압력이 커지면 상승, 매도 압력이 커지면 하락 요인이 될 수 있어요.'
+    if re.search(r'규제|과징금|소송', text): return '규제나 법적 부담은 사업 범위와 비용을 바꿀 수 있어 앞으로 벌 이익에 대한 기대에도 영향을 줄 수 있어요.'
+    if re.search(r'수주|판매 계약', text): return '수주나 판매 계약은 앞으로의 매출에 대한 기대를 높여 매수 요인이 될 수 있지만, 실제 이익은 비용과 계약 이행에 따라 달라져요.'
+    if '투자 확대' in text: return '투자 확대에는 성장 기대와 당장의 비용 부담이 함께 있어 규모만으로 상승·하락을 단정하기 어려워요.'
+    return '이 기사만으로 실제 주가 움직임의 이유를 특정할 실적·수급 근거는 충분하지 않아요.'
+
+
 def _mock_generate_feedback(news_summary: str, user_choice: str, actual_direction: str,
                             actual_change_percent: float | None, *, user_reason: str | None = None,
                             news_title: str = '', related_symbol: str | None = None,
@@ -828,6 +842,8 @@ def _mock_generate_feedback(news_summary: str, user_choice: str, actual_directio
     positive = bool(re.search(r'급등|상향|호실적|수혜|증가|개선|흑자|반등|상승|급증|치솟', text))
     negative = bool(re.search(r'급락|하향|부진|규제 강화|감소|악화|적자|하락|약세|우려', text))
     signal = ('POSITIVE' if positive else 'NEGATIVE') if positive != negative else sentiment_hint if not positive and sentiment_confidence is not None and sentiment_confidence >= .6 else 'NEUTRAL'
+    from app.services.ml_sentiment import _topic_direction
+    signal = _topic_direction(text) or signal
     if signal == 'POSITIVE':
         interpretation = ('긍정적인 호재 신호가 있었지만 시장 전체 하락에 묻혔을 수 있어요.' if actual_direction == 'DOWN' and has_index and index_change_percent < -.5 else
                           '긍정적인 호재 신호가 있고 실제 상승 방향도 같았어요.' if actual_direction == 'UP' else
@@ -836,7 +852,7 @@ def _mock_generate_feedback(news_summary: str, user_choice: str, actual_directio
         interpretation = '악재 신호가 있고 실제 하락 방향도 같았어요.' if actual_direction == 'DOWN' else '악재 신호가 있어도 다른 시장 요인과 함께 가격이 움직일 수 있어요.'
     else: interpretation = '뚜렷한 한 방향의 신호가 없어 기사 표현만으로 방향을 판단하기 어려워요.'
     reasons = [
-        {'title': '기사 신호', 'detail': f'기사 핵심 “{core}”에 {interpretation}' if core else '저장된 기사 근거가 없어 뉴스와 가격의 관계를 확인하기 어려워요.'},
+        {'title': '기사 신호', 'detail': f'기사에서는 “{core}”라고 전했어요. {_feedback_price_channel(text, signal)} {interpretation}' if core else '저장된 기사 근거가 없어 뉴스와 가격의 관계를 확인하기 어려워요.'},
         {'title': '판단 근거' if reason else '근거 남기기', 'detail': f'남긴 근거 “{reason}”로 예상한 {labels.get(user_choice, user_choice)} 방향은 실제 결과와 {"같았" if aligned else "달랐"}어요.' if reason else '다음엔 판단 근거를 한 줄 남겨보세요.'},
         {'title': '시장 비교', 'detail': market}
     ]
@@ -863,7 +879,8 @@ JSON: verdict, headline, summary, reasons([{{title,detail}}] 3개), nextTip만 �
 제목·리드의 호재/악재 신호와 실제 방향을 비교하세요. 신호의 방향이 결과를 보장하거나 원인임을 단정하지 마세요.
 배울 개념은 제공된 concept_term으로 고정하며 추가로 만들지 마세요. 다음 팁은 시장 비교에 맞게 구체적으로 제시하세요.
 verdict는 {reference['verdict']}로 고정합니다. 방향 일치라도 변동률 절댓값 1.0% 이하면 PARTIAL입니다.
-근거 제목은 8자 내외(최대 16자), detail과 nextTip은 각 한 문장입니다.
+근거 제목은 8자 내외(최대 16자)입니다. 첫 근거 detail은 2~4문장으로 기사 사실 → 이익·수급·금리와 가격의 연결 원리 → 실제 방향과 연결될 가능성을 설명하세요. 나머지 detail과 nextTip은 각 한 문장입니다.
+연결 원리는 일반 학습 설명으로 제시하고 투자자 심리·매매·실적 전망을 실제로 관측한 사실처럼 만들지 마세요. 이유가 부족하면 특정할 수 없다고 밝히세요.
 기사 리드 사실·사용자 근거 문장을 그대로 인용하고 실제 시장 데이터에서 각각 하나씩 근거를 만드세요.
 근거가 없으면 '다음엔 판단 근거를 한 줄 남겨보세요'로 하나를 대체하고 headline을 포함해 칭찬 금지.
 summary에는 종목·비교일·종가 기준의 부호 있는 소수 둘째 자리 변동률을 반드시 표시하세요.
@@ -909,7 +926,7 @@ def generate_feedback(news_summary: str, user_choice: str, actual_direction: str
         if data.get('verdict') != fallback['verdict'] or not isinstance(reasons, list) or len(reasons) != 3:
             return fallback
         if not all(isinstance(item, dict) and isinstance(item.get('title'), str) and 0 < len(item['title']) <= 16
-                   and isinstance(item.get('detail'), str) and _feedback_sentence_count(item['detail']) == 1 for item in reasons):
+                   and isinstance(item.get('detail'), str) and (2 <= _feedback_sentence_count(item['detail']) <= 4 if index == 0 else _feedback_sentence_count(item['detail']) == 1) for index, item in enumerate(reasons)):
             return fallback
         if not all(isinstance(data.get(key), str) and data[key].strip() for key in ['headline', 'summary', 'nextTip']):
             return fallback

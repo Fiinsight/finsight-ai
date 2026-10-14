@@ -64,3 +64,18 @@ def test_opt_in_number_failure_is_rule_fallback(monkeypatch, tmp_path):
     monkeypatch.setattr(config,'FEEDBACK_LEDGER_PATH',str(tmp_path/'bad.db'))
     with patch.object(llm_client,'_call_gemini',return_value='{"verdict":"CORRECT","summary":"999%"}'), patch.object(llm_client,'_reserve_process_llm_call'), patch('app.services.rewrite_budget.status',return_value={'rewriteStoppedToday':False}), patch.object(llm_client.time,'sleep'):
         assert feedback()['mode']=='RULE'
+
+@pytest.mark.parametrize('title,summary,needle',[
+    ('호실적 발표','매출이 전년보다 증가했다. 영업이익이 늘었다.','이익에 대한 기대를 높여'),
+    ('실적 부진','매출이 전년보다 감소했다. 영업이익도 줄었다.','이익에 대한 기대를 낮춰'),
+    ('외국인 매도 확대','외국인이 국내 주식을 순매도했다. 매도 규모가 늘었다.','매도 압력'),
+    ('기준금리 상승','기준금리 상승으로 금융 환경이 달라졌다. 자금 비용을 살폈다.','돈을 빌리는 비용'),
+])
+def test_feedback_explains_source_to_price_channel_without_real_call(monkeypatch,title,summary,needle):
+    monkeypatch.setattr(config,'USE_REAL_LLM',False);monkeypatch.setattr(config,'FEEDBACK_WITH_LLM',False)
+    with patch.object(llm_client,'_call_llm',side_effect=AssertionError()),patch.object(llm_client,'_call_gemini',side_effect=AssertionError()):
+        result=llm_client.generate_feedback(summary,'UP','UP',2,news_title=title,related_symbol='005930',related_symbol_name='삼성전자')
+    detail=result['reasons'][0]['detail']
+    assert needle in detail
+    assert '때문에 올랐' not in detail and '원인입니다' not in detail
+    assert 2 <= llm_client._feedback_sentence_count(detail) <= 4
