@@ -52,7 +52,10 @@ def test_unknown_neutral_article_compares_choice_without_inventing_a_result():
     result = llm_client._mock_generate_feedback('고객센터 상담 서비스가 운영된다.', 'UP', 'UNKNOWN', None)
     detail = result['reasons'][1]['detail']
     assert '기사에 뚜렷한 방향 신호가 없는데 상승을 골랐어요' in detail
-    assert '사실 → 이익·수요·금리 → 방향' in detail
+    assert '“고객센터 상담 서비스가 운영된다” → 이익·수요·금리 변화 → 예상 방향' in detail
+    assert detail.count('다음엔 판단 근거를 한 줄 남겨보세요') == 1
+    assert '순서로 한 줄을 써보세요' not in detail
+    assert llm_client._feedback_sentence_count(detail) == 2
     assert result['verdict'] is None
     assert not result['isAligned']
     assert '다른 방향이에요' not in result['summary']

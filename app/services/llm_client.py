@@ -842,12 +842,15 @@ def _feedback_choice_check(signal: str, choice: str) -> str:
 
 
 def _feedback_reason_check(user_reason: str | None, user_choice: str, verdict: str | None,
-                           article_text: str, interpretation: str = '', *, article_signal: str | None = None) -> str:
+                           article_text: str, interpretation: str = '', *, article_signal: str | None = None,
+                           article_lead: str | None = None) -> str:
     reason = (user_reason or '').strip()
     labels = {'UP': '상승', 'DOWN': '하락', 'NEUTRAL': '중립'}
     choice_check = _feedback_choice_check(article_signal or _feedback_signal(article_text), user_choice) if verdict is None else ''
     if not reason:
-        return (choice_check + ' 다음엔 판단 근거를 한 줄 남겨보세요. ‘사실 → 이익·수요·금리 → 방향’ 순서로 한 줄을 써보세요.' if verdict is None else
+        lead = (_split_sentences(article_lead or '') or [''])[0].rstrip('.!?')[:50]
+        example = f'예: “{lead}” → 이익·수요·금리 변화 → 예상 방향' if lead else '사실 → 이익·수요·금리 → 방향'
+        return (choice_check + f' 다음엔 판단 근거를 한 줄 남겨보세요({example}).' if verdict is None else
                 '다음엔 판단 근거를 한 줄 남겨보세요.')
     source = article_text.lower()
     prefixes = [word[:2].lower() for word in re.findall(r'[가-힣A-Za-z0-9]{2,}', reason)]
@@ -923,7 +926,7 @@ def _mock_generate_feedback(news_summary: str, user_choice: str, actual_directio
     interpretation = _feedback_interpretation(signal, actual_direction, actual_change_percent, index_change_percent if has_index else None)
     reasons = [
         {'title': '기사 신호와 결과', 'detail': f'기사에서는 “{core}”라고 전했어요. {_feedback_price_channel(text, signal)} {interpretation}' if core else '저장된 기사 근거가 없어 뉴스와 가격의 관계를 확인하기 어려워요. ' + interpretation},
-        {'title': '내 근거 점검' if reason else '근거 남기기', 'detail': _feedback_reason_check(user_reason, user_choice, verdict, text, interpretation, article_signal=signal)},
+        {'title': '내 근거 점검' if reason else '근거 남기기', 'detail': _feedback_reason_check(user_reason, user_choice, verdict, text, interpretation, article_signal=signal, article_lead=core)},
         {'title': '시장 비교', 'detail': market}
     ]
     headline = '결과를 비교할 수 없어요' if verdict is None else '방향은 맞았지만 변동이 작았어요' if verdict == 'PARTIAL' else '다르게 움직였어요' if verdict == 'WRONG' else '예측 방향이 같았어요'
