@@ -1017,7 +1017,7 @@ def generate_feedback(news_summary: str, user_choice: str, actual_direction: str
         result_line = fallback['summary'].split('. ', 1)[0] + '.'
         if result_line not in data['summary']: return fallback
         if not context.get('user_reason') or not context['user_reason'].strip():
-            if re.search(r'잘 연결|잘했|훌륭|칭찬|정확한 판단', text) or '다음엔 판단 근거를 한 줄 남겨보세요.' not in reasons[1]['detail']: return fallback
+            if re.search(r'잘 연결|잘했|훌륭|칭찬|정확한 판단|탄탄|타당한 추론', text) or '다음엔 판단 근거를 한 줄 남겨보세요.' not in reasons[1]['detail']: return fallback
         elif f'남긴 근거 “{context["user_reason"].strip()}”' not in reasons[1]['detail']:
             return fallback
         for quote in [(_split_sentences(_clean_article_text(context.get('news_title', ''), news_summary) or context.get('news_title', '')) or [''])[0], (_split_sentences(context.get('user_reason') or '') or [''])[0]]:
