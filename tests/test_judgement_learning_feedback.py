@@ -13,7 +13,7 @@ def feedback(**updates):
     return llm_client.generate_feedback('매출이 증가했다.', 'DOWN', 'DOWN', -4.4, **context)
 
 
-@pytest.mark.parametrize('index,phrase', [(-3.41,'시장 전체 흐름과 함께'),(-3.4,'개별 소식의 영향'),(-3.39,'개별 소식의 영향')])
+@pytest.mark.parametrize('index,phrase', [(-3.41,'시장 전체 흐름과 함께'),(-3.4,'개별 소식 등 다른 요인'),(-3.39,'개별 소식 등 다른 요인')])
 def test_market_difference_and_article_signal(monkeypatch, index, phrase):
     monkeypatch.setattr(config,'USE_REAL_LLM',False)
     monkeypatch.setattr(config,'FEEDBACK_WITH_LLM',False)

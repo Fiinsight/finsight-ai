@@ -17,22 +17,23 @@ def test_outcome_and_reason_quality_are_separate():
     assert weak['verdict'] == 'CORRECT'
     assert [item['title'] for item in weak['reasons']] == ['기사 신호와 결과', '내 근거 점검', '시장 비교']
     assert '운이 섞였을 수' in weak['reasons'][1]['detail']
-    assert '기사에서 확인한 사실' in weak['reasons'][1]['detail']
-    assert '이익·수요·금리와 가격의 연결' in weak['reasons'][1]['detail']
+    assert '기사에서 본 사실' in weak['reasons'][1]['detail']
+    assert '그 사실이 이익·수요·금리 중 무엇을 바꾸는지' in weak['reasons'][1]['detail']
     strong = coaching('매출 증가로 이익 개선을 기대해요.')
     assert '판단 과정도 탄탄했어요' in strong['reasons'][1]['detail']
-    assert '남긴 근거 “매출 증가로 이익 개선을 기대해요.”' in strong['reasons'][1]['detail']
+    assert '남긴 근거: “매출 증가로 이익 개선을 기대해요.”' in strong['reasons'][1]['detail']
     wrong = coaching('매출 증가로 이익 개선을 기대해요.', direction='DOWN', percent=-4.4,
                      index_name='코스피', index_change_percent=-3.7)
     assert wrong['verdict'] == 'WRONG'
-    assert '타당한 추론' in wrong['reasons'][1]['detail']
-    assert all('시장 전체 하락에 묻혔을 수 있어요' in item['detail'] for item in wrong['reasons'][:2])
+    assert '타당했지만' in wrong['reasons'][1]['detail']
+    assert '시장 전체 하락에 묻혔을 수 있어요' in wrong['reasons'][0]['detail']
+    assert '시장 전체의 반대 움직임' in wrong['reasons'][1]['detail']
     assert '좋은 근거도' in wrong['reasons'][1]['detail']
 
 
 def test_contradiction_missing_link_and_missing_fact_each_explain_the_gap():
-    assert '모순' in coaching('매출 감소를 예상해요')['reasons'][1]['detail']
-    assert '가격의 연결' in coaching('증가 소식이에요')['reasons'][1]['detail']
+    assert '근거는 하락 쪽 이야기인데 상승을 골랐어요' in coaching('매출 감소를 예상해요')['reasons'][1]['detail']
+    assert '가격 경로를 연결' in coaching('증가 소식이에요')['reasons'][1]['detail']
     assert '확인한 사실' in coaching('수요를 생각해요')['reasons'][1]['detail']
     partial = coaching('매출 증가로 이익 개선을 기대해요.', percent=.7)
     assert partial['verdict'] == 'PARTIAL'
@@ -52,7 +53,7 @@ def test_unknown_neutral_article_compares_choice_without_inventing_a_result():
     result = llm_client._mock_generate_feedback('고객센터 상담 서비스가 운영된다.', 'UP', 'UNKNOWN', None)
     detail = result['reasons'][1]['detail']
     assert '기사에 뚜렷한 방향 신호가 없는데 상승을 골랐어요' in detail
-    assert '“고객센터 상담 서비스가 운영된다” → 이익·수요·금리 변화 → 예상 방향' in detail
+    assert '“고객센터 상담 서비스 운영” → 이익·수요·금리 변화 → 예상 방향' in detail
     assert detail.count('다음엔 판단 근거를 한 줄 남겨보세요') == 1
     assert '순서로 한 줄을 써보세요' not in detail
     assert llm_client._feedback_sentence_count(detail) == 2
@@ -67,7 +68,7 @@ def test_unknown_neutral_article_compares_choice_without_inventing_a_result():
     ('POSITIVE', 'DOWN', -2, -.51, '시장 전체 하락에 묻혔을 수 있어요'),
     ('POSITIVE', 'DOWN', -2, -.5, '다른 악재'),
     ('NEGATIVE', 'UP', 2, 0, '안도감'),
-    ('NEUTRAL', 'UP', 2, 0, '시장 흐름이나 수급'),
+    ('NEUTRAL', 'UP', 2, 0, '다른 개별 요인'),
     ('POSITIVE', 'NEUTRAL', .5, 0, '크게 반영하지 않았을 수'),
     ('NEGATIVE', 'NEUTRAL', -.5, 0, '크게 반영하지 않았을 수'),
 ])
@@ -92,4 +93,4 @@ def test_llm_sentence_limits_and_full_reason_quote(monkeypatch, index, count, ac
     with patch.object(llm_client, '_call_llm', return_value=json.dumps(candidate, ensure_ascii=False)):
         result = llm_client.generate_feedback('매출이 증가했다.', 'UP', 'UP', 2, news_title='매출 증가', **context)
     assert (result['mode'] == 'LLM') == accepted
-    assert f'남긴 근거 “{reason}”' in result['reasons'][1]['detail']
+    assert f'남긴 근거: “{reason}”' in result['reasons'][1]['detail']
