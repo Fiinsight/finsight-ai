@@ -1,0 +1,1 @@
+PASS: actual summary+feedback+is_aligned+next_learning_point response parsed; summary priority and 3 reasons verified; legacy feedback parsed. No Spring startup, DB connection or AI call.

@@ -1,0 +1,81 @@
+[
+  {
+    "account": "finsight-demo@finsight.test (user 31)",
+    "screen": "로그인",
+    "action": "이메일 로그인",
+    "target": "브라우저 로그인 세션",
+    "time": "2026-10-15T03:24:28.758Z"
+  },
+  {
+    "account": "user 31",
+    "screen": "뉴스 178 / 분석용 퀴즈",
+    "action": "② 답안 제출",
+    "target": "learning_progress newsId=178, level=analyst (개념은 후속 조회)",
+    "time": "2026-10-15T03:26:16.867Z"
+  },
+  {
+    "account": "user 31",
+    "screen": "판단하기",
+    "action": "상승 예측 제출",
+    "target": "newsId=178, target=KOSDAQ, reason=[QA 2026-10-15]…",
+    "time": "2026-10-15T03:26:58.340Z"
+  },
+  {
+    "account": "user 31",
+    "screen": "판단 수정",
+    "action": "상승 → 중립, 근거 수정",
+    "target": "newsId=178 (동일 judgement)",
+    "time": "2026-10-15T03:27:33.535Z"
+  },
+  {
+    "account": "user 31",
+    "screen": "프로필",
+    "action": "기본 읽기 수준 저장",
+    "target": "normal → beginner",
+    "time": "2026-10-15T03:33:34.145Z"
+  },
+  {
+    "account": "user 31",
+    "screen": "프로필",
+    "action": "기본 읽기 수준 저장",
+    "target": "beginner → analyst",
+    "time": "2026-10-15T03:33:53.269Z"
+  },
+  {
+    "account": "user 31",
+    "screen": "프로필",
+    "action": "원래 읽기 수준으로 복원",
+    "target": "analyst → normal (원래 값)",
+    "time": "2026-10-15T03:34:24.769Z"
+  },
+  {
+    "account": "user 31",
+    "screen": "판단하기",
+    "action": "근거 없이 하락 예측 제출",
+    "target": "newsId=340, target=KOSPI, reason empty",
+    "time": "2026-10-15T03:36:50.852Z"
+  },
+  {
+    "account": "demo31",
+    "screen": "학습 추천",
+    "action": "추천 기사 열기(읽기 기록)",
+    "target": "news 311",
+    "time": "2026-10-15T03:47:33.702Z",
+    "storage": "browser localStorage"
+  },
+  {
+    "account": "demo31",
+    "screen": "차트 도슨트",
+    "action": "관련 기사 열기(읽기 기록)",
+    "target": "news chart Oct13 related",
+    "time": "2026-10-15T03:48:14.204Z",
+    "storage": "browser localStorage"
+  },
+  {
+    "account": "user 31",
+    "screen": "프로필",
+    "action": "로그아웃 확인",
+    "target": "데모 브라우저 세션 종료",
+    "time": "2026-10-15T03:49:42.958Z"
+  }
+]

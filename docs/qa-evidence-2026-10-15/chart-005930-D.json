@@ -1,0 +1,1484 @@
+{
+  "symbol": "005930",
+  "price": 0.0,
+  "changePercent": 0.0,
+  "candles": [
+    {
+      "date": "2026-08-31",
+      "open": 249000.0,
+      "high": 260000.0,
+      "low": 246000.0,
+      "close": 260000.0
+    },
+    {
+      "date": "2026-09-01",
+      "open": 256500.0,
+      "high": 262500.0,
+      "low": 254000.0,
+      "close": 261000.0
+    },
+    {
+      "date": "2026-09-02",
+      "open": 252000.0,
+      "high": 255500.0,
+      "low": 249500.0,
+      "close": 250500.0
+    },
+    {
+      "date": "2026-09-03",
+      "open": 254000.0,
+      "high": 255000.0,
+      "low": 243000.0,
+      "close": 250000.0
+    },
+    {
+      "date": "2026-09-04",
+      "open": 254000.0,
+      "high": 259000.0,
+      "low": 252500.0,
+      "close": 255500.0
+    },
+    {
+      "date": "2026-09-07",
+      "open": 267000.0,
+      "high": 270000.0,
+      "low": 264000.0,
+      "close": 270000.0
+    },
+    {
+      "date": "2026-09-08",
+      "open": 272000.0,
+      "high": 279000.0,
+      "low": 269000.0,
+      "close": 269500.0
+    },
+    {
+      "date": "2026-09-09",
+      "open": 269500.0,
+      "high": 275000.0,
+      "low": 267500.0,
+      "close": 269500.0
+    },
+    {
+      "date": "2026-09-10",
+      "open": 269000.0,
+      "high": 270500.0,
+      "low": 263500.0,
+      "close": 269000.0
+    },
+    {
+      "date": "2026-09-11",
+      "open": 258000.0,
+      "high": 261500.0,
+      "low": 256500.0,
+      "close": 259500.0
+    },
+    {
+      "date": "2026-09-14",
+      "open": 249500.0,
+      "high": 254500.0,
+      "low": 248500.0,
+      "close": 249000.0
+    },
+    {
+      "date": "2026-09-15",
+      "open": 248000.0,
+      "high": 252000.0,
+      "low": 246000.0,
+      "close": 248500.0
+    },
+    {
+      "date": "2026-09-16",
+      "open": 248000.0,
+      "high": 254000.0,
+      "low": 247500.0,
+      "close": 253500.0
+    },
+    {
+      "date": "2026-09-17",
+      "open": 257000.0,
+      "high": 259000.0,
+      "low": 251500.0,
+      "close": 252500.0
+    },
+    {
+      "date": "2026-09-18",
+      "open": 261000.0,
+      "high": 262000.0,
+      "low": 257500.0,
+      "close": 261000.0
+    },
+    {
+      "date": "2026-09-21",
+      "open": 264000.0,
+      "high": 275000.0,
+      "low": 263500.0,
+      "close": 274000.0
+    },
+    {
+      "date": "2026-09-22",
+      "open": 283000.0,
+      "high": 283500.0,
+      "low": 274500.0,
+      "close": 276500.0
+    },
+    {
+      "date": "2026-09-23",
+      "open": 284500.0,
+      "high": 285500.0,
+      "low": 281000.0,
+      "close": 285500.0
+    },
+    {
+      "date": "2026-09-28",
+      "open": 284500.0,
+      "high": 285500.0,
+      "low": 270000.0,
+      "close": 270000.0
+    },
+    {
+      "date": "2026-09-29",
+      "open": 266000.0,
+      "high": 276000.0,
+      "low": 266000.0,
+      "close": 272500.0
+    },
+    {
+      "date": "2026-09-30",
+      "open": 274500.0,
+      "high": 276000.0,
+      "low": 267500.0,
+      "close": 268500.0
+    },
+    {
+      "date": "2026-10-01",
+      "open": 266500.0,
+      "high": 276000.0,
+      "low": 264500.0,
+      "close": 276000.0
+    },
+    {
+      "date": "2026-10-02",
+      "open": 273500.0,
+      "high": 277000.0,
+      "low": 271500.0,
+      "close": 276000.0
+    },
+    {
+      "date": "2026-10-06",
+      "open": 278500.0,
+      "high": 279000.0,
+      "low": 270000.0,
+      "close": 272000.0
+    },
+    {
+      "date": "2026-10-07",
+      "open": 269500.0,
+      "high": 279500.0,
+      "low": 268500.0,
+      "close": 268500.0
+    },
+    {
+      "date": "2026-10-08",
+      "open": 269500.0,
+      "high": 270000.0,
+      "low": 262000.0,
+      "close": 262000.0
+    },
+    {
+      "date": "2026-10-12",
+      "open": 260000.0,
+      "high": 262500.0,
+      "low": 249500.0,
+      "close": 250500.0
+    },
+    {
+      "date": "2026-10-13",
+      "open": 241500.0,
+      "high": 244000.0,
+      "low": 228000.0,
+      "close": 232000.0
+    },
+    {
+      "date": "2026-10-14",
+      "open": 233500.0,
+      "high": 241500.0,
+      "low": 230000.0,
+      "close": 232000.0
+    },
+    {
+      "date": "2026-10-15",
+      "open": 216500.0,
+      "high": 221500.0,
+      "low": 209000.0,
+      "close": 209250.0
+    }
+  ],
+  "newsMarkers": [
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-14T02:13:08Z",
+      "newsId": 389,
+      "title": "전날 급락했던 코스피 반등…1~2%대에서 상승폭 조절",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-14T02:08:59Z",
+      "newsId": 390,
+      "title": "삼전닉스 주가 뒤흔든 중국 CXMT…실질적 위협 단계까지 왔나",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-14T01:04:35Z",
+      "newsId": 406,
+      "title": "HBM4E부터 용인 산단까지…삼성, AI 반도체 청사진 공개",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-14T00:40:21Z",
+      "newsId": 401,
+      "title": "[말랑말랑톡] 농협은행 '호남반도체' 곳곳 현수막…\"금고 역할\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-14T00:30:02Z",
+      "newsId": 402,
+      "title": "전날 급락했던 코스피, 상승 출발…1∼2%대 오름세(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-13T23:04:41Z",
+      "newsId": 381,
+      "title": "[마켓뷰] 6천피 깨지나 반등하나…'급락' 코스피 향배는",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T10:21:37Z",
+      "newsId": 361,
+      "title": "삼전·닉스 급락…中 반도체 굴기에 글로벌 반도체주 '휘청'",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T09:24:54Z",
+      "newsId": 363,
+      "title": "삼성전자, 반도체 협력사 임직원에 커피차",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T08:47:32Z",
+      "newsId": 365,
+      "title": "中반도체 D램 승부수에 삼전닉스 '휘청'…\"이익률 하락할 수도\" [이슈+]",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T08:16:05Z",
+      "newsId": 342,
+      "title": "국고채 금리, 코스피 급락·외인 매수에 이틀째 큰 폭 하락",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T07:48:09Z",
+      "newsId": 340,
+      "title": "사상최대 반도체 실적인데 왜…'검은 화요일' 코스피 추락에 악소리(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T07:22:36Z",
+      "newsId": 345,
+      "title": "코스피 연일 급락에 공포지수 19% 급등…시총 5천조원 깨져(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T07:22:01Z",
+      "newsId": 346,
+      "title": "코스피, 5.5% 급락 '6천피' 간신히 사수…외국인 4.5조 팔았다(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T07:03:13Z",
+      "newsId": 357,
+      "title": "기업은행, 코스피200 따라 최고 9.1% 적용",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T06:38:58Z",
+      "newsId": 349,
+      "title": "코스피, 5.5% 급락한 6,035 마감…간신히 '6천피' 사수",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T03:07:43Z",
+      "newsId": 333,
+      "title": "\"삼성전자 당분간은…\" 충격 전망에 '반도체 돈잔치' 딜레마",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T02:45:38Z",
+      "newsId": 322,
+      "title": "'검은 화요일' 코스피 추락에 악소리…닷새만에 '7천피→5천피'",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T02:28:43Z",
+      "newsId": 324,
+      "title": "코스피, 장중 6% 급락해 '6천피' 밑으로…삼전닉스 7∼8%↓",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T01:59:33Z",
+      "newsId": 334,
+      "title": "삼성·SK, 글로벌 장비 1위 어플라이드머티리얼즈와 손잡고 AI반도체 공정 확 당긴다",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T01:33:58Z",
+      "newsId": 327,
+      "title": "키움운용, '삼성전자&SK하이닉스채권혼합50' 이달 분배금 146원",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T00:52:15Z",
+      "newsId": 332,
+      "title": "세계 최대 반도체 R&D 공동 거점 '에픽센터'에 삼성·SK 참여",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T00:35:23Z",
+      "newsId": 302,
+      "title": "코스피·코스닥, 연이틀 급락세…장초반 3~4%대 하락(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T00:09:04Z",
+      "newsId": 308,
+      "title": "\"강원 반도체 기술력 한눈에\"…도내 기업 3곳, 서울 코엑스 출격",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-12T23:56:23Z",
+      "newsId": 311,
+      "title": "iM증권 \"원화 강세가 외국인 매도 부추겨…코스피 부진 심화\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-12T23:11:35Z",
+      "newsId": 303,
+      "title": "[마켓뷰] 美반도체 약세에 추가 하락? 반발매수?…코스피 향배는",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T07:26:17Z",
+      "newsId": 287,
+      "title": "외국인, 올해 코스피서 199조 순매도…\"시장 고민은 외인 수급\"(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T07:23:51Z",
+      "newsId": 288,
+      "title": "코스피, 6,300대로 내려앉으며 '출렁'…한달만에 최대 하락률(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T07:14:18Z",
+      "newsId": 269,
+      "title": "코스피, 삼전 역대급 실적에도 3.7% 급락…코스닥도 4.8%↓(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T05:51:16Z",
+      "newsId": 295,
+      "title": "삼성·SK '차세대 칩' 총동원…'반도체 인재' 현장 면접도",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T02:45:57Z",
+      "newsId": 264,
+      "title": "반등 활로 못 찾는 코스피…역대급 삼전 실적에도 오히려 낙폭 확대",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T02:13:08Z",
+      "newsId": 265,
+      "title": "오드리 찰스 램리서치 부사장 \"韓반도체 생태계 매력적…첨단 패키징·초미세공정에 투자할 것\"",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T01:43:35Z",
+      "newsId": 232,
+      "title": "코스피·코스닥, 삼전닉스 약세에 2~3%대 급락…외국인 '팔자'",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T00:44:41Z",
+      "newsId": 246,
+      "title": "코스피, 장초반 1% 내외 내리며 6,500대…4거래일 연속 하락세(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-11T23:15:17Z",
+      "newsId": 254,
+      "title": "한투증권 \"방향성 부재 코스피…3분기 이익 전망치 하향 조정\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-11T23:11:24Z",
+      "newsId": 255,
+      "title": "[마켓뷰] 연휴서 돌아온 코스피, 중동정세 악화속 반등 시도하나",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-06",
+      "publishedAt": "2026-10-05T23:23:28Z",
+      "newsId": 212,
+      "title": "\"10월 코스피 6,400∼7,600 예상…유동성 위축·금리 반락 기대\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-06",
+      "publishedAt": "2026-10-05T15:27:44Z",
+      "newsId": 229,
+      "title": "머스크 '테라팹'에 TSMC도 참여?…인텔주가 하락",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-01",
+      "publishedAt": "2026-10-01T06:37:41Z",
+      "newsId": 175,
+      "title": "'마이크론·반도체 수출' 훈풍…코스피 1.95%·코스닥 4.48%↑",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-01",
+      "publishedAt": "2026-10-01T05:46:04Z",
+      "newsId": 180,
+      "title": "\"대미 전략투자, 코스피엔 중립…원전·가스터빈은 수혜\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-01",
+      "publishedAt": "2026-10-01T03:00:12Z",
+      "newsId": 201,
+      "title": "전답·비닐하우스 펼쳐진 235만평…'반도체 도시'로 바뀐다",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T09:35:42Z",
+      "newsId": 173,
+      "title": "삼성그룹, AI 인프라 베팅…美 헬릭스에 10억달러 투자",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T09:11:09Z",
+      "newsId": 157,
+      "title": "은행들 \"금리 오르기전에 빨리 채권 찍자\"",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T07:07:05Z",
+      "newsId": 155,
+      "title": "'美 국채 금리 악재' 코스피, 0.27%↓…이틀 연속 하락(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T06:58:50Z",
+      "newsId": 167,
+      "title": "전날 5%대 급락했던 삼성전자, 배당락에도 0.9% 상승 마감(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T02:18:51Z",
+      "newsId": 137,
+      "title": "코스피, 美국채금리 부담에 보합세 지속…장중 반짝 상승도",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T02:05:56.771746Z",
+      "newsId": 134,
+      "title": "삼성, 美 AI 인프라 기업 헬릭스에 10억달러 투자…반도체 넘어 데이터센터로",
+      "source": "매일경제 : 기업/경영",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T00:52:02Z",
+      "newsId": 115,
+      "title": "반도체서 데이터센터로…삼성 6개사, 美 AI 인프라 헬릭스에 10억달러 투자",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T00:32:14Z",
+      "newsId": 111,
+      "title": "코스피, 美국채금리 부담 속 하락출발해 보합권(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T00:22:26Z",
+      "newsId": 122,
+      "title": "아산시, '삼성발 훈풍' 발판 10월 2일 서울서 첫 투자유치설명회",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-28T23:34:41Z",
+      "newsId": 126,
+      "title": "삼성 6개사, 미국 헬릭스에 10억달러 투자…AI 인프라 협력(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-28T23:33:01Z",
+      "newsId": 132,
+      "title": "\"수출길 막힐라\" 날벼락에…1165억달러 베트남 시장 살린 묘수",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-28T23:32:59Z",
+      "newsId": 128,
+      "title": "DS증권 \"삼전·닉스 3분기 실적, 시장전망치 하회 전망\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-28T23:10:56Z",
+      "newsId": 114,
+      "title": "[마켓뷰] '7천피' 내준 코스피, 美금리 악재에 추가 하락하나",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-28T09:00:11.693594Z",
+      "newsId": 100,
+      "title": "삼성전자, 화성에 1조7000억원 신규 투자",
+      "source": "매일경제 : 기업/경영",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-28T07:38:20Z",
+      "newsId": 91,
+      "title": "삼성전자, 화성에 1조7천억 신규 투자…연구동 짓는다",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-28T07:19:35Z",
+      "newsId": 82,
+      "title": "연휴서 돌아온 코스피, 美금리 악재에 2.7%↓…다시 '7천피' 밑으로(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-28T02:23:13Z",
+      "newsId": 77,
+      "title": "코스피, 삼전닉스 약세에 하락폭 확대…장중 '7천피' 밑으로",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-28T00:34:05Z",
+      "newsId": 75,
+      "title": "연휴 마치고 돌아온 코스피, 하락 출발해 보합권(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-27T23:18:49Z",
+      "newsId": 66,
+      "title": "IBK증권 \"씨엠티엑스, 성장 기대 실적 입증 구간\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-27T23:10:42Z",
+      "newsId": 67,
+      "title": "[마켓뷰] 연휴 끝낸 코스피, '7천피' 사수하며 상승 이어갈까",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-09-27",
+      "publishedAt": "2026-09-27T12:53:08.294186Z",
+      "newsId": 57,
+      "title": "반도체 초호황에 성과급 기대감...삼성·SK하닉 육아휴직률 첫 동반 하락",
+      "source": "매일경제 : 기업/경영",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-27",
+      "publishedAt": "2026-09-26T22:15:02Z",
+      "newsId": 36,
+      "title": "상장사 3분기 실적 전망치 변화는…삼전닉스 상향 조정",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-26",
+      "publishedAt": "2026-09-25T23:50:01Z",
+      "newsId": 42,
+      "title": "전통 제조업에서 반도체·AI로…전남광주 산업지도 다시 그린다",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-23",
+      "publishedAt": "2026-09-23T07:07:39Z",
+      "newsId": 11,
+      "title": "코스피, 추석연휴 앞두고 또 '전강후약'…0.9% 올라 7,080(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-23",
+      "publishedAt": "2026-09-23T00:28:18Z",
+      "newsId": 9,
+      "title": "코스피, 반도체 강세에 장 초반 1%대 상승(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    }
+  ],
+  "relatedNews": [
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-14T02:13:08Z",
+      "newsId": 389,
+      "title": "전날 급락했던 코스피 반등…1~2%대에서 상승폭 조절",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-14T02:08:59Z",
+      "newsId": 390,
+      "title": "삼전닉스 주가 뒤흔든 중국 CXMT…실질적 위협 단계까지 왔나",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-14T01:04:35Z",
+      "newsId": 406,
+      "title": "HBM4E부터 용인 산단까지…삼성, AI 반도체 청사진 공개",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-14T00:40:21Z",
+      "newsId": 401,
+      "title": "[말랑말랑톡] 농협은행 '호남반도체' 곳곳 현수막…\"금고 역할\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-14T00:30:02Z",
+      "newsId": 402,
+      "title": "전날 급락했던 코스피, 상승 출발…1∼2%대 오름세(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-14",
+      "publishedAt": "2026-10-13T23:04:41Z",
+      "newsId": 381,
+      "title": "[마켓뷰] 6천피 깨지나 반등하나…'급락' 코스피 향배는",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T10:21:37Z",
+      "newsId": 361,
+      "title": "삼전·닉스 급락…中 반도체 굴기에 글로벌 반도체주 '휘청'",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T09:24:54Z",
+      "newsId": 363,
+      "title": "삼성전자, 반도체 협력사 임직원에 커피차",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T08:47:32Z",
+      "newsId": 365,
+      "title": "中반도체 D램 승부수에 삼전닉스 '휘청'…\"이익률 하락할 수도\" [이슈+]",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T08:16:05Z",
+      "newsId": 342,
+      "title": "국고채 금리, 코스피 급락·외인 매수에 이틀째 큰 폭 하락",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T07:48:09Z",
+      "newsId": 340,
+      "title": "사상최대 반도체 실적인데 왜…'검은 화요일' 코스피 추락에 악소리(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T07:22:36Z",
+      "newsId": 345,
+      "title": "코스피 연일 급락에 공포지수 19% 급등…시총 5천조원 깨져(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T07:22:01Z",
+      "newsId": 346,
+      "title": "코스피, 5.5% 급락 '6천피' 간신히 사수…외국인 4.5조 팔았다(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T07:03:13Z",
+      "newsId": 357,
+      "title": "기업은행, 코스피200 따라 최고 9.1% 적용",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T06:38:58Z",
+      "newsId": 349,
+      "title": "코스피, 5.5% 급락한 6,035 마감…간신히 '6천피' 사수",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T03:07:43Z",
+      "newsId": 333,
+      "title": "\"삼성전자 당분간은…\" 충격 전망에 '반도체 돈잔치' 딜레마",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T02:45:38Z",
+      "newsId": 322,
+      "title": "'검은 화요일' 코스피 추락에 악소리…닷새만에 '7천피→5천피'",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T02:28:43Z",
+      "newsId": 324,
+      "title": "코스피, 장중 6% 급락해 '6천피' 밑으로…삼전닉스 7∼8%↓",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T01:59:33Z",
+      "newsId": 334,
+      "title": "삼성·SK, 글로벌 장비 1위 어플라이드머티리얼즈와 손잡고 AI반도체 공정 확 당긴다",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T01:33:58Z",
+      "newsId": 327,
+      "title": "키움운용, '삼성전자&SK하이닉스채권혼합50' 이달 분배금 146원",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T00:52:15Z",
+      "newsId": 332,
+      "title": "세계 최대 반도체 R&D 공동 거점 '에픽센터'에 삼성·SK 참여",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T00:35:23Z",
+      "newsId": 302,
+      "title": "코스피·코스닥, 연이틀 급락세…장초반 3~4%대 하락(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-13T00:09:04Z",
+      "newsId": 308,
+      "title": "\"강원 반도체 기술력 한눈에\"…도내 기업 3곳, 서울 코엑스 출격",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-12T23:56:23Z",
+      "newsId": 311,
+      "title": "iM증권 \"원화 강세가 외국인 매도 부추겨…코스피 부진 심화\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-13",
+      "publishedAt": "2026-10-12T23:11:35Z",
+      "newsId": 303,
+      "title": "[마켓뷰] 美반도체 약세에 추가 하락? 반발매수?…코스피 향배는",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T07:26:17Z",
+      "newsId": 287,
+      "title": "외국인, 올해 코스피서 199조 순매도…\"시장 고민은 외인 수급\"(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T07:23:51Z",
+      "newsId": 288,
+      "title": "코스피, 6,300대로 내려앉으며 '출렁'…한달만에 최대 하락률(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T07:14:18Z",
+      "newsId": 269,
+      "title": "코스피, 삼전 역대급 실적에도 3.7% 급락…코스닥도 4.8%↓(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T05:51:16Z",
+      "newsId": 295,
+      "title": "삼성·SK '차세대 칩' 총동원…'반도체 인재' 현장 면접도",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T02:45:57Z",
+      "newsId": 264,
+      "title": "반등 활로 못 찾는 코스피…역대급 삼전 실적에도 오히려 낙폭 확대",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T02:13:08Z",
+      "newsId": 265,
+      "title": "오드리 찰스 램리서치 부사장 \"韓반도체 생태계 매력적…첨단 패키징·초미세공정에 투자할 것\"",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T01:43:35Z",
+      "newsId": 232,
+      "title": "코스피·코스닥, 삼전닉스 약세에 2~3%대 급락…외국인 '팔자'",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-12T00:44:41Z",
+      "newsId": 246,
+      "title": "코스피, 장초반 1% 내외 내리며 6,500대…4거래일 연속 하락세(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-11T23:15:17Z",
+      "newsId": 254,
+      "title": "한투증권 \"방향성 부재 코스피…3분기 이익 전망치 하향 조정\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-12",
+      "publishedAt": "2026-10-11T23:11:24Z",
+      "newsId": 255,
+      "title": "[마켓뷰] 연휴서 돌아온 코스피, 중동정세 악화속 반등 시도하나",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-06",
+      "publishedAt": "2026-10-05T23:23:28Z",
+      "newsId": 212,
+      "title": "\"10월 코스피 6,400∼7,600 예상…유동성 위축·금리 반락 기대\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-06",
+      "publishedAt": "2026-10-05T15:27:44Z",
+      "newsId": 229,
+      "title": "머스크 '테라팹'에 TSMC도 참여?…인텔주가 하락",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-10-01",
+      "publishedAt": "2026-10-01T06:37:41Z",
+      "newsId": 175,
+      "title": "'마이크론·반도체 수출' 훈풍…코스피 1.95%·코스닥 4.48%↑",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-01",
+      "publishedAt": "2026-10-01T05:46:04Z",
+      "newsId": 180,
+      "title": "\"대미 전략투자, 코스피엔 중립…원전·가스터빈은 수혜\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-10-01",
+      "publishedAt": "2026-10-01T03:00:12Z",
+      "newsId": 201,
+      "title": "전답·비닐하우스 펼쳐진 235만평…'반도체 도시'로 바뀐다",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T09:35:42Z",
+      "newsId": 173,
+      "title": "삼성그룹, AI 인프라 베팅…美 헬릭스에 10억달러 투자",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T09:11:09Z",
+      "newsId": 157,
+      "title": "은행들 \"금리 오르기전에 빨리 채권 찍자\"",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T07:07:05Z",
+      "newsId": 155,
+      "title": "'美 국채 금리 악재' 코스피, 0.27%↓…이틀 연속 하락(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T06:58:50Z",
+      "newsId": 167,
+      "title": "전날 5%대 급락했던 삼성전자, 배당락에도 0.9% 상승 마감(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T02:18:51Z",
+      "newsId": 137,
+      "title": "코스피, 美국채금리 부담에 보합세 지속…장중 반짝 상승도",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T02:05:56.771746Z",
+      "newsId": 134,
+      "title": "삼성, 美 AI 인프라 기업 헬릭스에 10억달러 투자…반도체 넘어 데이터센터로",
+      "source": "매일경제 : 기업/경영",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T00:52:02Z",
+      "newsId": 115,
+      "title": "반도체서 데이터센터로…삼성 6개사, 美 AI 인프라 헬릭스에 10억달러 투자",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T00:32:14Z",
+      "newsId": 111,
+      "title": "코스피, 美국채금리 부담 속 하락출발해 보합권(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-29T00:22:26Z",
+      "newsId": 122,
+      "title": "아산시, '삼성발 훈풍' 발판 10월 2일 서울서 첫 투자유치설명회",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-28T23:34:41Z",
+      "newsId": 126,
+      "title": "삼성 6개사, 미국 헬릭스에 10억달러 투자…AI 인프라 협력(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-28T23:33:01Z",
+      "newsId": 132,
+      "title": "\"수출길 막힐라\" 날벼락에…1165억달러 베트남 시장 살린 묘수",
+      "source": "한국경제 | 뉴스 | 경제",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-28T23:32:59Z",
+      "newsId": 128,
+      "title": "DS증권 \"삼전·닉스 3분기 실적, 시장전망치 하회 전망\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-29",
+      "publishedAt": "2026-09-28T23:10:56Z",
+      "newsId": 114,
+      "title": "[마켓뷰] '7천피' 내준 코스피, 美금리 악재에 추가 하락하나",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-28T09:00:11.693594Z",
+      "newsId": 100,
+      "title": "삼성전자, 화성에 1조7000억원 신규 투자",
+      "source": "매일경제 : 기업/경영",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-28T07:38:20Z",
+      "newsId": 91,
+      "title": "삼성전자, 화성에 1조7천억 신규 투자…연구동 짓는다",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-28T07:19:35Z",
+      "newsId": 82,
+      "title": "연휴서 돌아온 코스피, 美금리 악재에 2.7%↓…다시 '7천피' 밑으로(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-28T02:23:13Z",
+      "newsId": 77,
+      "title": "코스피, 삼전닉스 약세에 하락폭 확대…장중 '7천피' 밑으로",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-28T00:34:05Z",
+      "newsId": 75,
+      "title": "연휴 마치고 돌아온 코스피, 하락 출발해 보합권(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-27T23:18:49Z",
+      "newsId": 66,
+      "title": "IBK증권 \"씨엠티엑스, 성장 기대 실적 입증 구간\"",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-28",
+      "publishedAt": "2026-09-27T23:10:42Z",
+      "newsId": 67,
+      "title": "[마켓뷰] 연휴 끝낸 코스피, '7천피' 사수하며 상승 이어갈까",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "MARKET"
+    },
+    {
+      "date": "2026-09-27",
+      "publishedAt": "2026-09-27T12:53:08.294186Z",
+      "newsId": 57,
+      "title": "반도체 초호황에 성과급 기대감...삼성·SK하닉 육아휴직률 첫 동반 하락",
+      "source": "매일경제 : 기업/경영",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-27",
+      "publishedAt": "2026-09-26T22:15:02Z",
+      "newsId": 36,
+      "title": "상장사 3분기 실적 전망치 변화는…삼전닉스 상향 조정",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-26",
+      "publishedAt": "2026-09-25T23:50:01Z",
+      "newsId": 42,
+      "title": "전통 제조업에서 반도체·AI로…전남광주 산업지도 다시 그린다",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-23",
+      "publishedAt": "2026-09-23T07:07:39Z",
+      "newsId": 11,
+      "title": "코스피, 추석연휴 앞두고 또 '전강후약'…0.9% 올라 7,080(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    },
+    {
+      "date": "2026-09-23",
+      "publishedAt": "2026-09-23T00:28:18Z",
+      "newsId": 9,
+      "title": "코스피, 반도체 강세에 장 초반 1%대 상승(종합)",
+      "source": "연합뉴스 경제 최신기사",
+      "relationType": "DIRECT"
+    }
+  ],
+  "docent": {
+    "relation": "NONE",
+    "whatHappened": "이날 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+    "possibleReason": "수급이나 시장 전체 요인이 영향을 줬을 수 있어요.",
+    "marketImpact": "매수·매도 수급과 시장 흐름도 함께 확인해야 해요.",
+    "newsId": null,
+    "newsTitle": null,
+    "source": null,
+    "mode": "RULE",
+    "whyItMoved": "수급이나 시장 전체 요인이 영향을 줬을 수 있어요."
+  },
+  "period": "D",
+  "intervalMinutes": null,
+  "minuteCandles": [],
+  "fallback": false,
+  "moveInsights": [
+    {
+      "timestamp": "2026-10-15T00:00:00",
+      "changePercent": -9.81,
+      "newsId": null,
+      "newsTitle": null,
+      "newsSource": null,
+      "explanation": "수급이나 시장 전체 요인이 영향을 줬을 수 있어요.",
+      "causeScore": 0.0,
+      "candidateNews": [],
+      "docent": {
+        "relation": "NONE",
+        "whatHappened": "이날 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+        "possibleReason": "수급이나 시장 전체 요인이 영향을 줬을 수 있어요.",
+        "marketImpact": "매수·매도 수급과 시장 흐름도 함께 확인해야 해요.",
+        "newsId": null,
+        "newsTitle": null,
+        "source": null,
+        "mode": "RULE",
+        "whyItMoved": "수급이나 시장 전체 요인이 영향을 줬을 수 있어요."
+      }
+    },
+    {
+      "timestamp": "2026-10-13T00:00:00",
+      "changePercent": -7.39,
+      "newsId": 324,
+      "newsTitle": "코스피, 장중 6% 급락해 '6천피' 밑으로…삼전닉스 7∼8%↓",
+      "newsSource": "연합뉴스 경제 최신기사",
+      "explanation": "이날 삼성전자 관련 ‘코스피, 장중 6% 급락해 '6천피' 밑으로…삼전닉스 7∼8%↓’ 소식이 나왔고, 주가가 -8.08% 움직였어요. 이 소식이 악재로 받아들여졌을 가능성이 있어요.",
+      "causeScore": 6.0,
+      "candidateNews": [
+        {
+          "date": "2026-10-13",
+          "publishedAt": "2026-10-13T02:28:43Z",
+          "newsId": 324,
+          "title": "코스피, 장중 6% 급락해 '6천피' 밑으로…삼전닉스 7∼8%↓",
+          "source": "연합뉴스 경제 최신기사",
+          "relationType": "DIRECT"
+        },
+        {
+          "date": "2026-10-13",
+          "publishedAt": "2026-10-13T10:21:37Z",
+          "newsId": 361,
+          "title": "삼전·닉스 급락…中 반도체 굴기에 글로벌 반도체주 '휘청'",
+          "source": "한국경제 | 뉴스 | 경제",
+          "relationType": "DIRECT"
+        },
+        {
+          "date": "2026-10-13",
+          "publishedAt": "2026-10-13T08:47:32Z",
+          "newsId": 365,
+          "title": "中반도체 D램 승부수에 삼전닉스 '휘청'…\"이익률 하락할 수도\" [이슈+]",
+          "source": "한국경제 | 뉴스 | 경제",
+          "relationType": "DIRECT"
+        }
+      ],
+      "docent": {
+        "relation": "DIRECT",
+        "whatHappened": "코스피가 13일 6%대의 급락세를 보이며 크게 출렁이고 있어요.",
+        "possibleReason": "이날 삼성전자 관련 ‘코스피, 장중 6% 급락해 '6천피' 밑으로…삼전닉스 7∼8%↓’ 소식이 나왔고, 주가가 -8.08% 움직였어요. 이 소식이 악재로 받아들여졌을 가능성이 있어요.",
+        "marketImpact": "투자 주체별 매수·매도 수급 흐름을 함께 확인해요.",
+        "newsId": 324,
+        "newsTitle": "코스피, 장중 6% 급락해 '6천피' 밑으로…삼전닉스 7∼8%↓",
+        "source": "연합뉴스 경제 최신기사",
+        "mode": "RULE",
+        "whyItMoved": "이날 삼성전자 관련 ‘코스피, 장중 6% 급락해 '6천피' 밑으로…삼전닉스 7∼8%↓’ 소식이 나왔고, 주가가 -8.08% 움직였어요. 이 소식이 악재로 받아들여졌을 가능성이 있어요."
+      }
+    },
+    {
+      "timestamp": "2026-09-28T00:00:00",
+      "changePercent": -5.43,
+      "newsId": 77,
+      "newsTitle": "코스피, 삼전닉스 약세에 하락폭 확대…장중 '7천피' 밑으로",
+      "newsSource": "연합뉴스 경제 최신기사",
+      "explanation": "이날 삼성전자 관련 ‘코스피, 삼전닉스 약세에 하락폭 확대…장중 '7천피' 밑으로’ 소식이 나왔고, 주가가 -5.43% 움직였어요. 다른 요인과 함께 시장 반응에 영향을 줬을 수 있어요.",
+      "causeScore": 6.0,
+      "candidateNews": [
+        {
+          "date": "2026-09-28",
+          "publishedAt": "2026-09-28T02:23:13Z",
+          "newsId": 77,
+          "title": "코스피, 삼전닉스 약세에 하락폭 확대…장중 '7천피' 밑으로",
+          "source": "연합뉴스 경제 최신기사",
+          "relationType": "DIRECT"
+        },
+        {
+          "date": "2026-09-29",
+          "publishedAt": "2026-09-28T23:32:59Z",
+          "newsId": 128,
+          "title": "DS증권 \"삼전·닉스 3분기 실적, 시장전망치 하회 전망\"",
+          "source": "연합뉴스 경제 최신기사",
+          "relationType": "DIRECT"
+        },
+        {
+          "date": "2026-09-28",
+          "publishedAt": "2026-09-28T00:34:05Z",
+          "newsId": 75,
+          "title": "연휴 마치고 돌아온 코스피, 하락 출발해 보합권(종합)",
+          "source": "연합뉴스 경제 최신기사",
+          "relationType": "DIRECT"
+        }
+      ],
+      "docent": {
+        "relation": "DIRECT",
+        "whatHappened": "추석 연휴를 마치고 돌아온 코스피가 28일 하락 폭을 키우며 장중 '7천피'(코스피 7,000)를 내줬다고 해요.",
+        "possibleReason": "이날 삼성전자 관련 ‘코스피, 삼전닉스 약세에 하락폭 확대…장중 '7천피' 밑으로’ 소식이 나왔고, 주가가 -5.43% 움직였어요. 다른 요인과 함께 시장 반응에 영향을 줬을 수 있어요.",
+        "marketImpact": "외국인 매도 등 수급 흐름을 함께 확인해요.",
+        "newsId": 77,
+        "newsTitle": "코스피, 삼전닉스 약세에 하락폭 확대…장중 '7천피' 밑으로",
+        "source": "연합뉴스 경제 최신기사",
+        "mode": "RULE",
+        "whyItMoved": "이날 삼성전자 관련 ‘코스피, 삼전닉스 약세에 하락폭 확대…장중 '7천피' 밑으로’ 소식이 나왔고, 주가가 -5.43% 움직였어요. 다른 요인과 함께 시장 반응에 영향을 줬을 수 있어요."
+      }
+    },
+    {
+      "timestamp": "2026-10-12T00:00:00",
+      "changePercent": -4.39,
+      "newsId": 232,
+      "newsTitle": "코스피·코스닥, 삼전닉스 약세에 2~3%대 급락…외국인 '팔자'",
+      "newsSource": "연합뉴스 경제 최신기사",
+      "explanation": "이날 삼성전자 관련 ‘코스피·코스닥, 삼전닉스 약세에 2~3%대 급락…외국인 '팔자'’ 소식이 나왔고, 주가가 -4.39% 움직였어요. 이 소식이 악재로 받아들여졌을 가능성이 있어요.",
+      "causeScore": 6.0,
+      "candidateNews": [
+        {
+          "date": "2026-10-12",
+          "publishedAt": "2026-10-12T01:43:35Z",
+          "newsId": 232,
+          "title": "코스피·코스닥, 삼전닉스 약세에 2~3%대 급락…외국인 '팔자'",
+          "source": "연합뉴스 경제 최신기사",
+          "relationType": "DIRECT"
+        },
+        {
+          "date": "2026-10-12",
+          "publishedAt": "2026-10-12T02:45:57Z",
+          "newsId": 264,
+          "title": "반등 활로 못 찾는 코스피…역대급 삼전 실적에도 오히려 낙폭 확대",
+          "source": "연합뉴스 경제 최신기사",
+          "relationType": "DIRECT"
+        },
+        {
+          "date": "2026-10-12",
+          "publishedAt": "2026-10-12T07:14:18Z",
+          "newsId": 269,
+          "title": "코스피, 삼전 역대급 실적에도 3.7% 급락…코스닥도 4.8%↓(종합)",
+          "source": "연합뉴스 경제 최신기사",
+          "relationType": "DIRECT"
+        }
+      ],
+      "docent": {
+        "relation": "DIRECT",
+        "whatHappened": "한글날 연휴에서 돌아온 코스피는 12일 장중 낙폭을 키워 2∼3%대의 급락세를 보이고 있어요.",
+        "possibleReason": "이날 삼성전자 관련 ‘코스피·코스닥, 삼전닉스 약세에 2~3%대 급락…외국인 '팔자'’ 소식이 나왔고, 주가가 -4.39% 움직였어요. 이 소식이 악재로 받아들여졌을 가능성이 있어요.",
+        "marketImpact": "외국인 매도 등 수급 흐름을 함께 확인해요.",
+        "newsId": 232,
+        "newsTitle": "코스피·코스닥, 삼전닉스 약세에 2~3%대 급락…외국인 '팔자'",
+        "source": "연합뉴스 경제 최신기사",
+        "mode": "RULE",
+        "whyItMoved": "이날 삼성전자 관련 ‘코스피·코스닥, 삼전닉스 약세에 2~3%대 급락…외국인 '팔자'’ 소식이 나왔고, 주가가 -4.39% 움직였어요. 이 소식이 악재로 받아들여졌을 가능성이 있어요."
+      }
+    },
+    {
+      "timestamp": "2026-09-23T00:00:00",
+      "changePercent": 3.25,
+      "newsId": 9,
+      "newsTitle": "코스피, 반도체 강세에 장 초반 1%대 상승(종합)",
+      "newsSource": "연합뉴스 경제 최신기사",
+      "explanation": "이날 삼성전자 관련 ‘코스피, 반도체 강세에 장 초반 1%대 상승(종합)’ 소식이 나왔고, 주가가 +3.25% 움직였어요. 다른 요인과 함께 시장 반응에 영향을 줬을 수 있어요.",
+      "causeScore": 4.0,
+      "candidateNews": [
+        {
+          "date": "2026-09-23",
+          "publishedAt": "2026-09-23T00:28:18Z",
+          "newsId": 9,
+          "title": "코스피, 반도체 강세에 장 초반 1%대 상승(종합)",
+          "source": "연합뉴스 경제 최신기사",
+          "relationType": "DIRECT"
+        },
+        {
+          "date": "2026-09-23",
+          "publishedAt": "2026-09-23T07:07:39Z",
+          "newsId": 11,
+          "title": "코스피, 추석연휴 앞두고 또 '전강후약'…0.9% 올라 7,080(종합)",
+          "source": "연합뉴스 경제 최신기사",
+          "relationType": "DIRECT"
+        },
+        {
+          "date": "2026-09-23",
+          "publishedAt": "2026-09-23T00:04:19Z",
+          "newsId": 10,
+          "title": "코스피, 반도체 강세에 장 초반 1%대 상승",
+          "source": "연합뉴스 경제 최신기사",
+          "relationType": "MARKET"
+        }
+      ],
+      "docent": {
+        "relation": "DIRECT",
+        "whatHappened": "코스피가 23일 미국 기술주 강세에 4거래일 연속 상승세를 이어가고 있어요.",
+        "possibleReason": "이날 삼성전자 관련 ‘코스피, 반도체 강세에 장 초반 1%대 상승(종합)’ 소식이 나왔고, 주가가 +3.25% 움직였어요. 다른 요인과 함께 시장 반응에 영향을 줬을 수 있어요.",
+        "marketImpact": "외국인 매도 등 수급 흐름을 함께 확인해요.",
+        "newsId": 9,
+        "newsTitle": "코스피, 반도체 강세에 장 초반 1%대 상승(종합)",
+        "source": "연합뉴스 경제 최신기사",
+        "mode": "RULE",
+        "whyItMoved": "이날 삼성전자 관련 ‘코스피, 반도체 강세에 장 초반 1%대 상승(종합)’ 소식이 나왔고, 주가가 +3.25% 움직였어요. 다른 요인과 함께 시장 반응에 영향을 줬을 수 있어요."
+      }
+    }
+  ],
+  "symbolName": "삼성전자"
+}

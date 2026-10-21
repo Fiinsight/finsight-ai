@@ -1,0 +1,46 @@
+{
+  "collected_at": "2026-10-15T03:48:52.276123+00:00",
+  "logs": [
+    {
+      "file": "/tmp/finsight-server-ai.log",
+      "feedback_http_requests": 2,
+      "fallback_codes": {
+        "llm_disabled": 2
+      },
+      "bytes": 3326
+    },
+    {
+      "file": "/tmp/gemini-ai-runtime-2.log",
+      "feedback_http_requests": 0,
+      "fallback_codes": {},
+      "bytes": 1132
+    },
+    {
+      "file": "/tmp/gemini-ai-runtime-3.log",
+      "feedback_http_requests": 1,
+      "fallback_codes": {},
+      "bytes": 4291
+    },
+    {
+      "file": "/tmp/gemini-ai-runtime-4.log",
+      "feedback_http_requests": 0,
+      "fallback_codes": {},
+      "bytes": 1106
+    },
+    {
+      "file": "/tmp/gemini-ai-runtime-5.log",
+      "feedback_http_requests": 0,
+      "fallback_codes": {},
+      "bytes": 8474
+    },
+    {
+      "file": "/tmp/gemini-ai-runtime.log",
+      "feedback_http_requests": 0,
+      "fallback_codes": {},
+      "bytes": 1225
+    }
+  ],
+  "audit_rule_probes": 2,
+  "llm_attempts_current_audit": 0,
+  "llm_rejection_rate": null
+}

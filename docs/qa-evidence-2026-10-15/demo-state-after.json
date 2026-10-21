@@ -1,0 +1,111 @@
+{
+  "judgements": [
+    {
+      "id": 27,
+      "news_id": 230,
+      "choice": "UP",
+      "reason_text": "[시연용 가상 결과] 실제 시세가 아닌 판단 비교 연습입니다.",
+      "target_symbol": null,
+      "actual_direction": "UP",
+      "comparison_date": null,
+      "created_at": "2026-10-05T23:59:59+09:00",
+      "feedback_generated_at": "2026-10-05T23:59:59+09:00"
+    },
+    {
+      "id": 28,
+      "news_id": 184,
+      "choice": "UP",
+      "reason_text": "[시연용 가상 결과] 실제 시세가 아닌 판단 비교 연습입니다.",
+      "target_symbol": null,
+      "actual_direction": "DOWN",
+      "comparison_date": null,
+      "created_at": "2026-10-03T23:59:59+09:00",
+      "feedback_generated_at": "2026-10-03T23:59:59+09:00"
+    },
+    {
+      "id": 29,
+      "news_id": 8,
+      "choice": "NEUTRAL",
+      "reason_text": "[시연용 가상 결과] 실제 시세가 아닌 판단 비교 연습입니다.",
+      "target_symbol": null,
+      "actual_direction": "NEUTRAL",
+      "comparison_date": null,
+      "created_at": "2026-09-22T23:59:59+09:00",
+      "feedback_generated_at": "2026-09-22T23:59:59+09:00"
+    },
+    {
+      "id": 34,
+      "news_id": 178,
+      "choice": "NEUTRAL",
+      "reason_text": "[QA 2026-10-15 수정] 수출 증가와 이미 반영됐을 가능성을 함께 보고 단기 변동은 제한적일 것으로 선택했어요.",
+      "target_symbol": "KOSDAQ",
+      "actual_direction": null,
+      "comparison_date": null,
+      "created_at": "2026-10-15T12:27:33.362143+09:00",
+      "feedback_generated_at": null
+    },
+    {
+      "id": 35,
+      "news_id": 340,
+      "choice": "DOWN",
+      "reason_text": null,
+      "target_symbol": "KOSPI",
+      "actual_direction": null,
+      "comparison_date": null,
+      "created_at": "2026-10-15T12:36:50.680236+09:00",
+      "feedback_generated_at": null
+    }
+  ],
+  "quiz": [
+    {
+      "id": 6,
+      "news_id": 230,
+      "term": "반도체",
+      "level": "normal",
+      "correct": false,
+      "answered_at": "2026-10-05T23:59:59+09:00"
+    },
+    {
+      "id": 7,
+      "news_id": 184,
+      "term": "투자",
+      "level": "normal",
+      "correct": true,
+      "answered_at": "2026-10-03T23:59:59+09:00"
+    },
+    {
+      "id": 8,
+      "news_id": 8,
+      "term": "투자",
+      "level": "normal",
+      "correct": false,
+      "answered_at": "2026-09-22T23:59:59+09:00"
+    },
+    {
+      "id": 331,
+      "news_id": 178,
+      "term": "국채금리",
+      "level": "analyst",
+      "correct": true,
+      "answered_at": "2026-10-15T12:26:16.656031+09:00"
+    }
+  ],
+  "mastery": [
+    {
+      "term": "국채금리",
+      "p_known": 0.641566265060241,
+      "attempts": 1
+    }
+  ],
+  "profile": {
+    "id": 31,
+    "learning_level": "normal",
+    "learning_pace": "short",
+    "learning_focus": "routine",
+    "daily_goal": "기사 메모 남기고 복습하기",
+    "onboarding_answers_json": "[{\"questionId\": \"experience\", \"question\": \"지금 투자 여정을 어디쯤 걷고 있나요?\", \"answer\": \"조금씩 알아가고 있어요\"}, {\"questionId\": \"interest\", \"question\": \"투자할 때 가장 알고 싶은 것은 무엇인가요?\", \"answer\": \"내 투자 기록을 돌아보고 싶어요\"}, {\"questionId\": \"pace\", \"question\": \"나에게 맞는 투자 공부 방식은 어떤 모습인가요?\", \"answer\": \"짧게, 매일 조금씩\"}, {\"questionId\": \"goal\", \"question\": \"오늘 핀사이트에서 어떤 습관을 시작해볼까요?\", \"answer\": \"기사 메모 남기고 복습하기\"}]"
+  },
+  "mastery_fk": [
+    "FOREIGN KEY (user_id) REFERENCES app_user(id)"
+  ]
+}

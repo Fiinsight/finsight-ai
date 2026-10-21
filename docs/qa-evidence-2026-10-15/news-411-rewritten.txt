@@ -1,0 +1,52 @@
+- generic: 
+- generic: 산업·기술
+- generic: 22시간 전
+- generic: "\"피지컬AI 시대 이미 열려…AI반도체 확보가 최대 과제\""
+- generic: 한국경제 | 뉴스 | 경제 원문 보기
+- generic: 
+- generic: 원문
+- generic: 쉽게읽기
+- generic: 초보자용
+- generic: 일반용
+- generic: 분석용
+- generic: 내 수준에 맞게 읽기
+- generic: 핵심 사실과 비교 기준을 확인해보세요.
+- generic: 아래 용어는 일반 개념 설명이며 기사의 사실과 구분해 읽어주세요.
+- generic: "[사실] 신동주 모빌린트 대표는 14일 서울 삼성동 코엑스에서 열린 반도체대전 2026 기조연설에서 피지컬 AI 구현을 위해 전용 AI 반도체가 필수적이라고 밝혔다. [사실] 디지털 세계에 있던 인공지능이 화면 밖으로 나오는 세상이 다가오면서 대규모 연산 능력, 실시간 응답 속도, 전력 효율을 갖춘 반도체의 중요성이 커지고 있다. [전망] 원문에 전망은 없다."
+- generic: 알아둘 용어
+- generic: 아래는 일반 용어 설명이며 기사에 추가된 사실이 아닙니다.
+- generic: 반도체
+- generic: 전기 흐름을 제어하는 성질을 이용해 연산·기억 등의 기능을 수행하는 전자 부품의 핵심 재료입니다.
+- generic: AI
+- generic: 데이터를 바탕으로 인식·예측·생성 등의 작업을 수행하도록 만든 인공지능 기술입니다.
+- generic: 이 기사는 퀴즈로 낼 개념이 없어요
+- generic: 기사 메모
+- generic: 이 기사에서 기억할 점이나 내 생각을 남겨보세요.
+- button "메모 새로고침":
+  - generic: 
+- 'textbox "예: 매출 증가뿐 아니라 비용과 영업이익도 같이 확인하기"'
+- generic: 0/1000
+- button "메모 저장" [disabled]:
+  - generic: 메모 저장
+- generic: 판단하기
+- tablist:
+  - tab "홈" [selected]:
+    - generic: 
+    - generic: 
+    - generic: 홈
+  - tab "차트":
+    - generic: 
+    - generic: 
+    - generic: 차트
+  - tab "기록":
+    - generic: 
+    - generic: 
+    - generic: 기록
+  - tab "학습":
+    - generic: 
+    - generic: 
+    - generic: 학습
+  - tab "프로필":
+    - generic: 
+    - generic: 
+    - generic: 프로필
