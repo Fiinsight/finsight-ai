@@ -6,7 +6,7 @@ from app.routers.feedback import FeedbackRequest, judgement_feedback
 
 @pytest.mark.parametrize('reason,percent,symbol,choice,expected', [
     (None, -1.76, '035720', 'DOWN', '다음엔 판단 근거를 한 줄 남겨보세요.'),
-    ('실적 부담을 예상했어요', -1.76, '035720', 'DOWN', '남긴 근거 “실적 부담을 예상했어요”'),
+    ('실적 부담을 예상했어요', -1.76, '035720', 'DOWN', '남긴 근거: “실적 부담을 예상했어요”'),
     ('작은 상승을 예상했어요', 0.7, '035720', 'UP', '방향은 맞았지만 변동이 작아 우연일 수 있어요.'),
     ('시장 약세를 예상했어요', -1.76, 'KOSPI', 'DOWN', '개별 종목이 아니라 시장 전체 움직임'),
     ('상승을 예상했어요', -1.76, '035720', 'UP', '다른 방향이에요.'),

@@ -1,0 +1,28 @@
+{
+  "rewriteDay": "2026-10-15",
+  "rewriteSuccessCount": 0,
+  "rewriteFailureCount": 0,
+  "rewrite429Count": 0,
+  "rewriteUsedCalls": 0,
+  "rewriteDailyLimit": 400,
+  "rewriteStoppedToday": false,
+  "rewriteLast429At": null,
+  "rewriteEnabled": true,
+  "provider": "gemini",
+  "rewriteMinIntervalSeconds": 6.0,
+  "processCallLimit": 20,
+  "processCalls": 0,
+  "rewriteProcessCalls": 0,
+  "status": "ok",
+  "useRealLlm": false,
+  "llmEnabled": false,
+  "llmProvider": "disabled",
+  "llmFallback": true,
+  "llmMode": "fallback",
+  "llmTimeoutSeconds": 20.0,
+  "realEmbeddingsEnabled": false,
+  "sentimentModel": {
+    "mode": "rule_fallback",
+    "configured": false
+  }
+}
