@@ -520,23 +520,29 @@ def _reading_summary(title: str, body: str, level: str) -> str:
 def _mock_rewrite_news(title: str, raw_content: str) -> dict:
     cleaned = _clean_article_text(title, raw_content)
     detected = _detected_terms(f"{title} {cleaned}")
-    terms = sorted((term for term in detected if term in title or cleaned.count(term) >= 2), key=lambda term: term not in title)[:2]
-    subject = ', '.join(terms)
-    if any(term in subject for term in ('금리', '물가', '인플레이션')):
-        impact = '금리 경로와 물가의 비교 시점, 시장 예상치를 확인하세요.'
-    elif any(term in subject for term in ('환율', '원화', '원달러', '수출', '수입')):
-        impact = '환율과 교역 지표의 비교 시점과 실제 변화 폭을 확인하세요.'
-    elif re.search(r'코스피|코스닥|증시|지수', title):
-        impact = '지수 등락과 수급을 확인하고 개별 종목의 움직임을 따로 비교하세요.'
-    elif re.search(r'기업|종목|실적|매출|영업이익|삼성|현대|SK|LG|카카오|NAVER', title):
-        impact = '기업의 실제 매출·비용과 실적 전망의 연결을 확인하세요.'
+    sentences = _split_sentences(cleaned)
+    drivers = [
+        (r'매출|영업이익|순이익|실적', '기업이 실제로 번 돈을 살펴볼 단서', '같은 기간의 매출·이익과 일회성 요인'),
+        (r'수주|계약|공급|판매|수출|수요', '향후 매출로 이어지는지 살펴볼 단서', '계약·판매의 반영 시점과 실제 실적'),
+        (r'비용|원가|원재료|인건비', '기업이 쓰는 비용과 이익을 살펴볼 단서', '해당 비용의 비중과 실제 이익 변화'),
+        (r'금리|이자', '기업의 이자 부담과 연결되는지 살펴볼 단서', '차입 규모와 금리 적용 시점'),
+        (r'환율|원화|원달러', '수출입 기업의 매출·비용과 연결되는지 살펴볼 단서', '기업별 수출입 비중과 적용 환율'),
+    ]
+    candidates = [(sentence, connection, check) for sentence in sentences
+                  for pattern, connection, check in drivers if re.search(pattern, sentence)]
+    if candidates:
+        fact, connection, check = max(candidates, key=lambda row: bool(re.search(r'\d', row[0])))
+        quote = fact[:180] + ('…' if len(fact) > 180 else '')
+        reasons = {
+            'beginner': f'기사 사실: “{quote}” {connection}예요. {check}를 확인해요. 주가 방향은 단정할 수 없어요.',
+            'normal': f'기사 사실: “{quote}” {connection}입니다. 확인할 변수: {check}. 주가 방향은 단정할 수 없습니다.',
+            'analyst': f'기사 근거: “{quote}” 사업·실적 연결: {connection}입니다. 검증할 변수: {check}. 인과관계나 가격 반응은 별도 확인이 필요합니다.',
+        }
     else:
-        impact = '기사 지표의 비교 기준과 후속 발표를 확인하세요.'
-    reasons = {
-        'beginner': f'{subject}에 관한 사실을 먼저 확인해요. ' + impact,
-        'normal': f'확인할 지표: {subject}. ' + impact,
-        'analyst': f'확인할 변수: {subject}. ' + impact + ' 전망의 가정과 리스크를 따로 검토하세요.'
-    } if terms else {level: None for level in ('beginner', 'normal', 'analyst')}
+        reasons = {
+            level: '기사에 사업·실적과 연결할 구체적인 근거가 부족합니다. 원문과 후속 공시를 확인하세요. 주가 방향은 단정할 수 없습니다.'
+            for level in ('beginner', 'normal', 'analyst')
+        }
     return {
         **{level: _reading_summary(title, cleaned, level) for level in ('beginner', 'normal', 'analyst')},
         'importanceReason': reasons['normal'], 'importanceReasons': reasons, 'detectedTerms': detected,
