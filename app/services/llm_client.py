@@ -499,18 +499,36 @@ def _reading_summary(title: str, body: str, level: str) -> str:
                 sentence = re.sub(re.escape(ending) + r'(?=[.!?]|$)', replacement, sentence)
             return re.sub(r'다(?=[.!?]|$)', '다고 해요', sentence)
         sentences = [polite(sentence) for sentence in sentences]
+        simplified = []
+        for sentence in sentences:
+            codes = re.findall(r'\[\d{6}\]', sentence)
+            percentages = re.findall(r'[+-]?\d+(?:\.\d+)?%', sentence)
+            if len(codes) >= 2 and len(percentages) >= 2:
+                count = {2:'두',3:'세',4:'네',5:'다섯',6:'여섯',7:'일곱',8:'여덟',9:'아홉',10:'열'}.get(len(codes),'여러')
+                movement = '올랐어요' if all(float(value.rstrip('%')) > 0 for value in percentages) else '움직였어요'
+                simplified.append(f'기사에 나온 {count} 종목이 크게 {movement}.')
+            else:
+                simplified.append(re.sub(r'\[\d{6}\]', '', sentence))
+        sentences = simplified
+        term = next((term for term in _detected_terms(title + ' ' + body) if term in TERM_DEFINITIONS), None)
+        if term:
+            sentences.append(f'{term}({TERM_DEFINITIONS[term]})을 함께 살펴봐요.')
+    elif level == 'normal':
+        sentences = [('\u005b전망\u005d ' if re.search(r'전망|예상|보고 있다|계획', sentence) else '\u005b사실\u005d ') + sentence
+                     for sentence in sentences]
+
     if level == 'analyst' and sentences:
         all_sentences = _split_sentences(body)
         evidence_sentences = sentences[:1]
-        risk_pattern = r'위험|리스크|불확실|우려|제약|변수|순매도|약세|하락|급락|하향|부진|매도 우위'
-        risks = [sentence for sentence in all_sentences if sentence not in evidence_sentences and re.search(risk_pattern, sentence)]
+        risk_pattern = r'위험|리스크|불확실|우려|제약|변수|순매도|약세|하락|급락|하향|부진|매도 우위|부담|규제|변동성|불안|경고|제재|관세|둔화|지연'
+        risks = sorted([sentence for sentence in all_sentences if re.search(risk_pattern, sentence)], key=lambda sentence: (not bool(re.match(r'^(다만|그러나|하지만)', sentence)), sentence in evidence_sentences))
         risk_sentences = risks[:1]
         numeric = [sentence for sentence in all_sentences if sentence not in evidence_sentences + risk_sentences and re.search(r'\d', sentence)]
         clip = lambda text, size: text if len(text) <= size else text[:size].rstrip() + '…'
         evidence = clip(' '.join(evidence_sentences), 210)
         figures = clip(' '.join(numeric[:2]), 170) if numeric else '추가 비교 수치 없음'
         lead_risks = list(dict.fromkeys(re.findall(risk_pattern, evidence)))
-        risk = clip(' '.join(risk_sentences), 130) if risk_sentences else ('기사에 나타난 ' + '·'.join(lead_risks) + ' 흐름의 지속 여부를 확인하세요.' if lead_risks else '기사에 구체적인 위험 요인이 명시되지 않았습니다. 전망의 가정은 추가 확인이 필요합니다.')
+        risk = clip(' '.join(risk_sentences), 130) if risk_sentences else ('기사에 나타난 ' + '·'.join(lead_risks) + ' 흐름의 지속 여부를 확인하세요.' if lead_risks else '기사에 별도로 언급된 위험 요인은 없습니다. 추가 확인이 필요합니다.')
         result = f'근거\n{evidence}\n\n수치·비교 기준\n{figures}\n\n리스크·확인할 점\n{risk}'
     else:
         result = '\n\n'.join(sentences)

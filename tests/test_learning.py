@@ -16,7 +16,7 @@ class LearningTest(unittest.TestCase):
         self.assertIn('수치·비교 기준', results[2].summary)
         self.assertIn('리스크·확인할 점', results[2].summary)
         self.assertIn('12.5%', results[2].summary)
-        self.assertIn('명시되지 않았습니다', results[2].summary)
+        self.assertIn('별도로 언급된 위험 요인은 없습니다', results[2].summary)
 
     def test_photo_captions_and_reporter_credit_do_not_replace_article_facts(self):
         body = '[연합뉴스 자료사진. 현대로템 제공. 재판매 및 DB 금지] (서울=연합뉴스) 황철환 기자 = DS증권은 목표주가를 22만6천원으로 낮췄다. 매출은 전년 동기 대비 12.5% 증가했다.'
