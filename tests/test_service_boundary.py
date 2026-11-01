@@ -74,3 +74,15 @@ def test_concurrent_requests_are_bounded():
         finally:
             release.set()
         assert first.result().status_code == 200
+
+
+def test_empty_ai_token_does_not_require_matching_backend_token():
+    # Empty token is explicitly loopback/private-network mode, not a failing auth setup.
+    app = FastAPI()
+    app.add_middleware(ServiceBoundary, token='')
+    @app.get('/ai/probe')
+    async def probe():
+        return {'mode': 'RULE'}
+    with TestClient(app) as client:
+        assert client.get('/ai/probe').status_code == 200
+        assert client.get('/ai/probe', headers={'Authorization': 'Bearer backend-only-token'}).status_code == 200
