@@ -414,7 +414,16 @@ def _clean_article_text(title: str, raw_content: str) -> str:
     title_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", title_text).lower()
     title_prefix = re.split(r"[…,:：]", title_text, maxsplit=1)[0].strip()
     title_prefix_key = re.sub(r"[^0-9a-zA-Z가-힣]", "", title_prefix).lower()
-    content = _strip_photo_noise(raw_content.replace("\r", "\n"))
+    raw_content = re.sub(r'\[[^\]]{0,500}(?:자료사진|사진 제공|재판매|DB\s*금지)[^\]]{0,500}\]', ' ', raw_content)
+    lines = []
+    for line in raw_content.replace('\r', '\n').splitlines():
+        if re.match(r'^\s*(?:송고(?:시간)?|20\d{2}[-.]\d{1,2}[-.]\d{1,2}.*송고)', line):
+            continue
+        line = re.split(r'<저작권자|무단\s*전재|제보는\s*카카오톡|재판매\s*및\s*DB\s*금지', line, maxsplit=1)[0]
+        line = re.sub(r'^.{0,60}?기자\s*=\s*', '', line)
+        line = re.sub(r'[가-힣·]{2,12}\s+기자\s*=\s*', '', line)
+        if line.strip(): lines.append(line)
+    content = _strip_photo_noise('\n'.join(lines))
     content = re.sub(r"\[[^\]]{0,500}(?:자료사진|사진 제공|재판매|DB 금지)[^\]]{0,500}\]", " ", content)
     photo_credit = re.match(r"^(.{0,700}?)20\d{2}\.\d{1,2}\.\d{1,2}\s+[\w.+-]+@[\w.-]+\.[a-zA-Z]{2,}\s*", content, re.S)
     if photo_credit and any(marker in photo_credit[1] for marker in ("사진", "딜링룸", "촬영")) and content[photo_credit.end():].strip():
@@ -467,11 +476,19 @@ def _beginner_direction_hint(direction: str) -> str:
 
 
 def _with_particle(word: str, pair: str) -> str:
-    """Use the consonant/vowel particle for a Hangul ending; neutral slash for other scripts."""
+    """Use the consonant/vowel particle for a Hangul ending; readings for finance acronyms and a noun phrase for other scripts."""
     code = ord(word[-1]) if word else 0
     if 0xAC00 <= code <= 0xD7A3:
         return word + (pair.split('/')[0] if (code - 0xAC00) % 28 else pair.split('/')[1])
-    return word + '(' + pair + ')'
+    pronunciation = {'AI': '아이', 'HBM': '엠', 'PF': '에프', 'ETF': '에프', 'PER': '알', 'PBR': '알', 'GDP': '피'}
+    ending = pronunciation.get(word.upper())
+    if ending is None and word and word[-1].isascii() and word[-1].isalpha():
+        ending = dict(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZ', '에이 비 씨 디 이 에프 지 에이치 아이 제이 케이 엘 엠 엔 오 피 큐 알 에스 티 유 브이 더블유 엑스 와이 지'.split()))[word[-1].upper()]
+    if ending is None and word and word[-1].isdigit():
+        ending = '영일이삼사오육칠팔구'[int(word[-1])]
+    if ending:
+        return word + _with_particle(ending, pair)[len(ending):]
+    return word + ' 같은 용어' + pair.split('/')[1]
 
 
 def _select_article_facts(title: str, content: str, limit: int, level: str = 'normal') -> list[str]:
@@ -495,7 +512,26 @@ def _strip_stock_codes(text: str) -> str:
     return re.sub(r'[ \t]+', ' ', text).strip()
 
 
+def _sentence_label(sentence: str) -> str:
+    if re.search(r'분석(?:된다|했다|이다)|(?:로|것으로) 보인다|평가된다', sentence):
+        return '[분석]'
+    if re.search(r'(?:할|될|날|를|질) 것으로|예상(?:된다|했다|한다|이다)|전망(?:된다|했다|한다|이다)|보고 있다|계획', sentence):
+        return '[전망]'
+    if re.search(r'(?:하락|상승|기록|증가|감소|발표|집계|마감|동결)했다|(?:올랐|내렸|늘었|줄었|기록됐)다', sentence):
+        return '[사실]'
+    return '[전망]' if re.search(r'예상|전망', sentence) else '[사실]'
+
+
+def _is_tabular_article(title: str, body: str) -> bool:
+    numbers = re.findall(r'\d[\d,.]*', body)
+    currencies = re.findall(r'미국달러|미국 달러|일본엔|일본 엔|유로|위안|파운드|스위스프랑|USD|JPY|EUR|GBP|CNY', body, re.I)
+    return (bool(re.search(r'외국환시세|외국환 시세|환율표', title)) and len(numbers) >= 6
+            or len(currencies) >= 4 and len(numbers) >= 12 and len(_split_sentences(body)) <= 1)
+
+
 def _reading_summary(title: str, body: str, level: str) -> str:
+    if _is_tabular_article(title, body):
+        return '표 형식 시세 자료는 문장형 읽기 지원을 제공하지 않아요.'
     sentences = _select_article_facts(title, body, {'beginner': 2, 'normal': 3, 'analyst': 4}[level], level)
     if level == 'beginner':
         replacements = [('컨센서스', '시장 전문가들의 예상'), ('유동성', '시장에 돌고 있는 돈'), ('매크로 불확실성', '경제 전반을 예측하기 어려운 상황'), ('상방 압력', '오를 가능성을 높이는 힘'), ('하방 압력', '내릴 가능성을 높이는 힘'), ('전년 동기', '지난해 같은 기간'), ('전 거래일', '직전 거래일'), ('전장 대비', '직전 거래일과 비교해')]
@@ -523,10 +559,11 @@ def _reading_summary(title: str, body: str, level: str) -> str:
         sentences = simplified
         term = next((term for term in _detected_terms(title + ' ' + body) if term in TERM_DEFINITIONS), None)
         if term:
-            sentences.append(f"{_with_particle(term, '을/를')} 함께 살펴봐요. ({TERM_DEFINITIONS[term]})")
+            definition = re.sub(r'(?:입니다|이에요|예요)[.!?。]*$', '', TERM_DEFINITIONS[term]).rstrip('.!?。 ')
+            particle = _with_particle(term, '을/를')[len(term):]
+            sentences.append(f'{term}({definition}){particle} 함께 살펴봐요.')
     elif level == 'normal':
-        sentences = [('\u005b전망\u005d ' if re.search(r'전망|예상|보고 있다|계획', sentence) else '\u005b사실\u005d ') + sentence
-                     for sentence in sentences]
+        sentences = [_sentence_label(sentence) + ' ' + sentence for sentence in sentences]
 
     if level == 'analyst' and sentences:
         all_sentences = _split_sentences(body)
@@ -557,6 +594,7 @@ def _mock_rewrite_news(title: str, raw_content: str) -> dict:
         (r'금리|이자', '기업의 이자 부담과 연결되는지 살펴볼 단서', '차입 규모와 금리 적용 시점'),
         (r'환율|원화|원달러', '수출입 기업의 매출·비용과 연결되는지 살펴볼 단서', '기업별 수출입 비중과 적용 환율'),
     ]
+    drivers.insert(0, (r'코스피|코스닥|사이드카|서킷브레이커', '시장 전체의 움직임을 살펴볼 단서', '지수 등락과 거래량·수급'))
     candidates = [(sentence, connection, check) for sentence in sentences
                   for pattern, connection, check in drivers if re.search(pattern, sentence)]
     if candidates:
@@ -569,7 +607,7 @@ def _mock_rewrite_news(title: str, raw_content: str) -> dict:
         }
     else:
         reasons = {
-            level: '기사에 사업·실적과 연결할 구체적인 근거가 부족합니다. 원문과 후속 공시를 확인하세요. 주가 방향은 단정할 수 없습니다.'
+            level: ('기사에 가격과 연결할 구체적인 근거가 부족해요. 원문과 후속 공시를 살펴봐요. 주가 방향은 단정할 수 없어요.' if level == 'beginner' else '기사에 사업·실적과 연결할 구체적인 근거가 부족합니다. 원문과 후속 공시를 확인하세요. 주가 방향은 단정할 수 없습니다.')
             for level in ('beginner', 'normal', 'analyst')
         }
     return {
@@ -645,6 +683,8 @@ def _quota_error(exc: Exception) -> bool:
 
 def rewrite_news(title: str, raw_content: str, article_key: str | None = None, *, local_batch: bool = False, allow_llm: bool = True) -> dict:
     global _last_rewrite_started, _rewrite_llm_calls
+    if _is_tabular_article(title, raw_content):
+        return {**{level: '' for level in ('beginner', 'normal', 'analyst')}, 'importanceReason': None, 'importanceReasons': {}, 'detectedTerms': [], 'mode': 'UNAVAILABLE', 'retryable': False}
     cleaned_content = _clean_article_text(title, raw_content)
     fallback = {**_mock_rewrite_news(title, cleaned_content), 'mode': 'EXCERPT', 'retryable': False}
     if not config.REWRITE_WITH_LLM or not allow_llm:
@@ -1016,7 +1056,7 @@ def _mock_generate_feedback(news_summary: str, user_choice: str, actual_directio
                             concept_definition: str | None = None, judgement_id: int | None = None) -> dict:
     aligned = user_choice == actual_direction and actual_direction != 'UNKNOWN'
     small = actual_change_percent is not None and abs(actual_change_percent) <= NEUTRAL_BAND_PERCENT + 0.5 + 1e-9
-    verdict = None if actual_direction == 'UNKNOWN' else 'PARTIAL' if aligned and small else 'CORRECT' if aligned else 'WRONG'
+    verdict = None if actual_direction == 'UNKNOWN' else 'PARTIAL' if aligned and small and user_choice != 'NEUTRAL' else 'CORRECT' if aligned else 'WRONG'
     labels = {'UP': '상승', 'DOWN': '하락', 'NEUTRAL': '중립', 'UNKNOWN': '확인 불가'}
     name = related_symbol_name or {'KOSPI': '코스피', 'KOSDAQ': '코스닥'}.get(related_symbol, related_symbol) or '판단 대상'
     change = f'{actual_change_percent:+.2f}%' if actual_change_percent is not None else '변동률 확인 불가'
@@ -1024,7 +1064,9 @@ def _mock_generate_feedback(news_summary: str, user_choice: str, actual_directio
     outcome = ('실제 결과가 없어 예측의 적중 여부는 아직 확인할 수 없어요.' if actual_direction == 'UNKNOWN' else
                f'예측({labels.get(user_choice, user_choice)})은 실제 결과({labels.get(actual_direction, actual_direction)})와 ' + ('같은 방향이에요.' if aligned else '다른 방향이에요.'))
     summary = result_line + ' ' + outcome
-    if small:
+    if aligned and user_choice == 'NEUTRAL':
+        summary += ' 중립 예측대로 등락이 ±0.5% 이내에 머물렀어요.'
+    elif small:
         summary += ' ' + ('방향은 맞았지만 변동이 작아 우연일 수 있어요.' if aligned else '변동이 작아 방향 차이만으로 판단 근거를 평가하기 어려워요.')
     summary += ' 가격 변화가 이 뉴스 때문에 생겼다고 단정할 수는 없어요.'
     reason = (user_reason or '').strip()
@@ -1054,7 +1096,7 @@ def _mock_generate_feedback(news_summary: str, user_choice: str, actual_directio
         {'title': '내 근거 점검' if reason else '근거 남기기', 'detail': _feedback_reason_check(user_reason, user_choice, verdict, text, article_signal=signal, article_lead=core, actual_direction=actual_direction, actual_change_percent=actual_change_percent, miss_cause=miss_cause)},
         {'title': '시장 비교', 'detail': market}
     ]
-    headline = '결과를 비교할 수 없어요' if verdict is None else '방향은 맞았지만 변동이 작았어요' if verdict == 'PARTIAL' else '다르게 움직였어요' if verdict == 'WRONG' else '예측 방향이 같았어요'
+    headline = '결과를 비교할 수 없어요' if verdict is None else '방향은 맞았지만 변동이 작았어요' if verdict == 'PARTIAL' else '다르게 움직였어요' if verdict == 'WRONG' else '중립 예측이 맞았어요' if aligned and user_choice == 'NEUTRAL' else '예측 방향이 같았어요'
     tip = _feedback_next_tip(reason, user_choice, text, index_target, follows_market, name if index_target else index_name)
     result = {'verdict': verdict, 'headline': headline, 'summary': summary, 'reasons': reasons, 'nextTip': tip, 'isAligned': aligned,
               'conceptTerm': concept_term, 'conceptDefinition': concept_definition, 'mode': 'RULE'}
@@ -1277,8 +1319,9 @@ def personalize_term(explanation: dict, term: str, context: str, level: str) -> 
             "코스닥": "지수는 여러 종목의 움직임을 한눈에 보여주는 시장 온도계와 같아요.",
         }
         analogy = next((value for key, value in analogies.items() if key in term),
-                       "용어 설명은 낯선 길을 읽는 지도처럼 기사 내용을 이해하는 데 도움을 줘요.")
-        result['contextExplanation'] = (result.get('contextExplanation') or result.get('definition', '')) + ' ' + analogy
+                       None)
+        if analogy:
+            result['contextExplanation'] = (result.get('contextExplanation') or result.get('definition', '')) + ' ' + analogy
     elif level == "analyst":
         numeric = next((sentence for sentence in _split_sentences(context) if term in sentence and re.search(r'\d', sentence)), None)
         result['marketImpact'] = ((result.get('marketImpact') or '') +

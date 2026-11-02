@@ -46,12 +46,12 @@ _COMPANIES = ('현대로템', '현대백화점', '현대차', '현대자동차',
               '네이버', '카카오', 'LG에너지솔루션', '셀트리온', '포스코', '인텔', '엔비디아', '애플')
 _TOPICS = ({'금리', '기준금리', '국채금리', '물가', '인플레이션'}, {'환율', '원화', '원달러', '수출', '수입'},
            {'영업이익', '매출', '밸류에이션'}, {'반도체', 'HBM', 'AI'}, {'PF', '연체율', '프로젝트파이낸싱'})
-_GENERIC = {'증권', '목표가', '목표주가', '전망', '영향', '상승', '하락', '하향', '상향', '예상', '기자'}
+_GENERIC = {'증권', '목표가', '목표주가', '전망', '영향', '상승', '하락', '하향', '상향', '예상', '기자', '실적', '원인', '급락', '급등', '발표', '소식', '분석', '시장', '전체', '관련', '이유', '가격', '주가', '기업', '뉴스', '기사'}
 
 
 def _words(text: str) -> set[str]:
     words = re.findall(r'[가-힣a-z]+', text.lower())
-    return {re.sub(r'(?:에서는|에서|으로|은|는|을|를|의|와|과)$', '', word) for word in words if len(word) >= 2} - _GENERIC
+    return {re.sub(r'(?:에서는|에서|으로|은|는|을|를|의|와|과|이|가)$', '', word) for word in words if len(word) >= 2} - _GENERIC
 
 
 def _headline(text: str) -> str:
@@ -71,9 +71,11 @@ def _news_score(request: SearchRequest, doc: Document) -> float:
     topic_matches = sum(bool(query_terms & topic and (title_terms | body_terms) & topic) for topic in _TOPICS)
     words = _words(request.query)
     word_matches = len(words & _words(doc.title))
+    unique_matches = words & _words(doc.title)
+    index_match = any(name in request.query and name in doc.title for name in ('코스피', '코스닥'))
     company_matches = len(companies & title_companies)
     symbol_match = bool(request.symbol and request.symbol == doc.symbol)
-    if not (company_matches or body_companies or shared_terms or symbol_match or word_matches >= 2):
+    if not (company_matches or body_companies or shared_terms or symbol_match or unique_matches or index_match):
         return 0
     return (8 * company_matches + 3 * len(body_companies) + 4 * symbol_match
             + 3 * len(query_terms & title_terms) + len(shared_terms) + topic_matches + word_matches)

@@ -59,7 +59,7 @@ def test_reported_speech_only_changes_the_sentence_ending(body, expected):
     ('수출', '은/는', '수출은'), ('주가', '은/는', '주가는'),
     ('실적', '이/가', '실적이'), ('매출추이', '이/가', '매출추이가'),
     ('수출', '과/와', '수출과'), ('금리', '과/와', '금리와'),
-    ('AI', '을/를', 'AI(을/를)'),
+    ('AI', '을/를', 'AI를'),
 ])
 def test_particles(word, pair, expected):
     assert llm_client._with_particle(word, pair) == expected
