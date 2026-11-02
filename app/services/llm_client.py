@@ -487,15 +487,25 @@ def _select_article_facts(title: str, content: str, limit: int, level: str = 'no
     return [sentences[0]] + [sentence for _, sentence in sorted(ranked[:limit - 1])]
 
 
+def _strip_stock_codes(text: str) -> str:
+    text = re.sub(r'\(\s*\d{6}\s*\)|\[\s*\d{6}\s*\]', '', text)
+    # A bare code is not a decimal, grouped amount, or a number with a money/date unit.
+    text = re.sub(r'(?<![\w.,$€₩¥])\d{6}(?!\w|[.,]\d)(?!\s*(?:원|달러|유로|엔|위안|조|억|만|천|년|월|일|%))',
+                  lambda match: match[0] if re.search(r'[$€₩¥]\s*$', text[:match.start()]) else '', text)
+    return re.sub(r'[ \t]+', ' ', text).strip()
+
+
 def _reading_summary(title: str, body: str, level: str) -> str:
     sentences = _select_article_facts(title, body, {'beginner': 2, 'normal': 3, 'analyst': 4}[level], level)
     if level == 'beginner':
-        replacements = [('컨센서스', '시장 전문가들의 예상'), ('유동성', '시장에 돌고 있는 돈'), ('매크로 불확실성', '경제 전반을 예측하기 어려운 상황'), ('상방 압력', '오를 가능성을 높이는 힘'), ('하방 압력', '내릴 가능성을 높이는 힘'), ('전년 동기', '지난해 같은 기간'), ('전 거래일', '직전 거래일'), ('전장 대비', '직전 거래일과 비교해'),
-                        ('상승했다', '올랐어요'), ('하락했다', '내렸어요'), ('밝혔다', '밝혔어요'), ('설명했다', '설명했어요'), ('전망했다', '전망했어요'), ('증가했다', '늘었어요'), ('감소했다', '줄었어요'), ('기록했다', '기록했어요')]
+        replacements = [('컨센서스', '시장 전문가들의 예상'), ('유동성', '시장에 돌고 있는 돈'), ('매크로 불확실성', '경제 전반을 예측하기 어려운 상황'), ('상방 압력', '오를 가능성을 높이는 힘'), ('하방 압력', '내릴 가능성을 높이는 힘'), ('전년 동기', '지난해 같은 기간'), ('전 거래일', '직전 거래일'), ('전장 대비', '직전 거래일과 비교해')]
+        particles = {particle: pair for pair in ('은/는', '이/가', '을/를', '과/와') for particle in pair.split('/')}
         for original, plain in replacements:
-            sentences = [sentence.replace(original, plain) for sentence in sentences]
+            sentences = [re.sub(re.escape(original) + r'(은|는|이|가|을|를|과|와)?',
+                                lambda match: _with_particle(plain, particles[match[1]]) if match[1] else plain,
+                                sentence) for sentence in sentences]
         def polite(sentence: str) -> str:
-            for ending, replacement in [('습니다', '어요'), ('했다', '했어요'), ('됐다', '됐어요'), ('있다', '있어요'), ('없다', '없어요'), ('한다', '해요'), ('된다', '돼요'), ('이다', '이에요'), ('우위다', '우위예요')]:
+            for ending, replacement in [('상승했다', '올랐어요'), ('하락했다', '내렸어요'), ('밝혔다', '밝혔어요'), ('설명했다', '설명했어요'), ('전망했다', '전망했어요'), ('증가했다', '늘었어요'), ('감소했다', '줄었어요'), ('기록했다', '기록했어요'), ('내다봤다', '내다봤어요'), ('습니다', '어요'), ('했다', '했어요'), ('됐다', '됐어요'), ('있다', '있어요'), ('없다', '없어요'), ('한다', '해요'), ('된다', '돼요'), ('이다', '이에요'), ('우위다', '우위예요')]:
                 sentence = re.sub(re.escape(ending) + r'(?=[.!?]|$)', replacement, sentence)
             return re.sub(r'다(?=[.!?]|$)', '다고 해요', sentence)
         sentences = [polite(sentence) for sentence in sentences]
@@ -503,16 +513,17 @@ def _reading_summary(title: str, body: str, level: str) -> str:
         for sentence in sentences:
             codes = re.findall(r'\[\d{6}\]', sentence)
             percentages = re.findall(r'[+-]?\d+(?:\.\d+)?%', sentence)
-            if len(codes) >= 2 and len(percentages) >= 2:
+            has_money_or_year = re.search(r'\d[\d,.]*(?:\s*[조억만천])*(?:\s*(?:원|달러|유로|엔|위안|년))|[$€₩¥]\s*\d', sentence)
+            if len(codes) >= 2 and len(percentages) >= 2 and not has_money_or_year:
                 count = {2:'두',3:'세',4:'네',5:'다섯',6:'여섯',7:'일곱',8:'여덟',9:'아홉',10:'열'}.get(len(codes),'여러')
                 movement = '올랐어요' if all(float(value.rstrip('%')) > 0 for value in percentages) else '움직였어요'
                 simplified.append(f'기사에 나온 {count} 종목이 크게 {movement}.')
             else:
-                simplified.append(re.sub(r'\[\d{6}\]', '', sentence))
+                simplified.append(_strip_stock_codes(sentence))
         sentences = simplified
         term = next((term for term in _detected_terms(title + ' ' + body) if term in TERM_DEFINITIONS), None)
         if term:
-            sentences.append(f'{term}({TERM_DEFINITIONS[term]})을 함께 살펴봐요.')
+            sentences.append(f"{_with_particle(term, '을/를')} 함께 살펴봐요. ({TERM_DEFINITIONS[term]})")
     elif level == 'normal':
         sentences = [('\u005b전망\u005d ' if re.search(r'전망|예상|보고 있다|계획', sentence) else '\u005b사실\u005d ') + sentence
                      for sentence in sentences]
@@ -552,7 +563,7 @@ def _mock_rewrite_news(title: str, raw_content: str) -> dict:
         fact, connection, check = max(candidates, key=lambda row: bool(re.search(r'\d', row[0])))
         quote = fact[:180] + ('…' if len(fact) > 180 else '')
         reasons = {
-            'beginner': f'기사 사실: “{quote}” {connection}예요. {check}를 확인해요. 주가 방향은 단정할 수 없어요.',
+            'beginner': f"기사 사실: “{_strip_stock_codes(quote)}” {connection}예요. {_with_particle(check, '을/를')} 확인해요. 주가 방향은 단정할 수 없어요.",
             'normal': f'기사 사실: “{quote}” {connection}입니다. 확인할 변수: {check}. 주가 방향은 단정할 수 없습니다.',
             'analyst': f'기사 근거: “{quote}” 사업·실적 연결: {connection}입니다. 검증할 변수: {check}. 인과관계나 가격 반응은 별도 확인이 필요합니다.',
         }
@@ -913,7 +924,7 @@ def _feedback_choice_check(signal: str, choice: str | None) -> str:
     label = {'UP': '상승', 'DOWN': '하락', 'NEUTRAL': '중립'}[choice]
     if signal == 'NEUTRAL':
         return ('기사에 뚜렷한 방향 신호가 없어 중립을 고른 점은 기사 표현과 맞아요.' if choice == 'NEUTRAL' else
-                f'기사에 뚜렷한 방향 신호가 없는데 {label}을 골랐어요.')
+                f"기사에 뚜렷한 방향 신호가 없는데 {_with_particle(label, '을/를')} 골랐어요.")
     aligned = choice == ('UP' if signal == 'POSITIVE' else 'DOWN')
     return f'기사의 {"호재" if signal == "POSITIVE" else "악재"} 신호와 {label} 선택은 {"같은" if aligned else "다른"} 방향이에요.'
 
@@ -933,7 +944,7 @@ def _feedback_example_phrase(lead: str) -> str:
 def _feedback_improve(quality: dict, choice: str | None) -> str:
     if quality['contradicts']:
         labels = {'UP': '상승', 'DOWN': '하락', 'NEUTRAL': '중립'}
-        return f'근거는 {labels[quality["expected"]]} 쪽 이야기인데 {labels[choice]}을 골랐어요.'
+        return f"근거는 {labels[quality['expected']]} 쪽 이야기인데 {_with_particle(labels[choice], '을/를')} 골랐어요."
     if not quality['has_fact'] and not quality['has_link']:
         return '다음엔 기사에서 본 사실과, 그 사실이 이익·수요·금리 중 무엇을 바꾸는지를 함께 적어보세요.'
     if not quality['has_fact']: return '다음엔 기사에서 확인한 사실을 먼저 적고 예상과 구분해보세요.'
