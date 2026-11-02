@@ -103,3 +103,22 @@ def test_inline_reporter_and_timestamp_noise_preserve_article_numbers():
     clean=llm._clean_article_text('기업 실적',body)
     assert '12조1000억원' in clean
     assert '기자 =' not in clean and '송고' not in clean and 'DB금지' not in clean
+
+
+@pytest.mark.parametrize('change',[-.51,-.5,0,.5,.51])
+@pytest.mark.parametrize('relation',['DIRECT','MARKET'])
+@pytest.mark.parametrize('sentiment',['POSITIVE','NEGATIVE'])
+def test_docent_neutral_band_boundaries(change,relation,sentiment):
+    text=chart.rule_docent(request(sentiment,change,relation,index=-1.2))['possibleReason']
+    neutral=abs(change)<=.5
+    if neutral:
+        assert ('소식이 나왔지만 주가는 거의 움직이지 않았어요' if relation=='DIRECT' else '시장이 움직인 날에도 주가는 거의 변하지 않았어요') in text
+        assert '받아들여졌을 가능성' not in text and '시장과 반대로' not in text and '소식에도 주가는' not in text
+        assert (f'{change:+.2f}%' if relation=='DIRECT' else '코스피 -1.20%') in text
+    else:
+        assert '거의' not in text
+        if relation=='MARKET':
+            assert ('시장과 반대로' if change>0 else '함께 움직였을') in text
+        else:
+            opposite=(sentiment=='POSITIVE' and change<0 or sentiment=='NEGATIVE' and change>0)
+            assert ('소식에도 주가는' if opposite else '받아들여졌을 가능성') in text
