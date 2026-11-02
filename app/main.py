@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 
 from app import config
+from app.security import ServiceBoundary
 from app.routers import feedback, impact, news, terms, local_retrieval, learning, chart
 
 app = FastAPI(title="FinSight AI Service", version="0.1.0")
+
+app.add_middleware(ServiceBoundary)
 
 app.include_router(chart.router, prefix="/ai/chart", tags=["chart-docent"])
 
@@ -17,8 +20,8 @@ app.include_router(terms.router, prefix="/ai/terms", tags=["terms"])
 app.include_router(feedback.router, prefix="/ai/feedback", tags=["feedback"])
 
 
-@app.get("/health")
-def health() -> dict[str, object]:
+@app.get("/internal/status")
+def diagnostics() -> dict[str, object]:
     # Keep this endpoint useful on a laptop or school GPU server without
     # revealing API keys. It makes it explicit whether the optional local
     # classifier is active instead of presenting a rule fallback as deep learning.
@@ -57,3 +60,8 @@ def health() -> dict[str, object]:
         ),
         "sentimentModel": model_status(),
     }
+
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "ok"}

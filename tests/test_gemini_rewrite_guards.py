@@ -125,7 +125,7 @@ def test_other_features_never_dispatch_and_health_has_no_secrets(generation,monk
     llm_client.analyze_market_impact('금리 변화',SOURCE,None)
     call.assert_not_called()
     monkeypatch.setattr(config,'GEMINI_API_KEY','test-secret-not-a-real-key')
-    health=client.get('/health').json()
+    health=client.get('/internal/status').json()
     assert health['rewriteEnabled'] and health['provider']=='gemini'
     assert health['rewriteDailyLimit']==400 and health['processCallLimit']==20
     assert 'test-secret-not-a-real-key' not in json.dumps(health)

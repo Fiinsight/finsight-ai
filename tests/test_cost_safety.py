@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 
 from app import config
-from app.main import health
+from app.main import diagnostics as health
 from app.services import llm_client, vector_store
 from app.services.ml_sentiment import predict_sentiment
 

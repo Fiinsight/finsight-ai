@@ -16,7 +16,7 @@ def test_feedback_level_is_local_and_no_reason_never_praises(level, expected):
 
 def test_level_personalization_reuses_base_cache_without_extra_llm_calls():
     base={'definition':'돈을 빌리는 비용','contextExplanation':'기사에서는 금리가 상승했어요.','marketImpact':'비용을 비교하세요.'}
-    with patch('app.routers.terms.vector_store.query_similar',return_value=base) as cache, patch.object(llm_client,'explain_term') as llm:
+    with patch.object(llm_client.config,'USE_REAL_LLM',True), patch('app.routers.terms.vector_store.query_similar',return_value=base) as cache, patch.object(llm_client,'explain_term') as llm:
         beginner=explain_term(TermExplainRequest(term='금리',article_context='금리가 2% 상승했다.',level='beginner'))
         analyst=explain_term(TermExplainRequest(term='금리',article_context='금리가 2% 상승했다.',level='analyst'))
     assert '대여료와 비슷' in beginner.contextual_meaning

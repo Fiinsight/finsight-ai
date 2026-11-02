@@ -13,7 +13,7 @@ from app import config
 from app.services import llm_client
 
 router = APIRouter()
-DOCENT_CACHE_VERSION = 'news-direction-v2'
+DOCENT_CACHE_VERSION = 'news-direction-v4-neutral'
 DOWN = r'급락|하락|약세|낙폭|내려|떨어|팔자|매도|하회|부진|우려'
 UP = r'급등|상승|강세|반등|올라|사자|매수|상회|호실적|수혜'
 
@@ -81,6 +81,7 @@ def rule_docent(request: DocentRequest) -> dict:
     lead = event_lead(title, representative.summary, request.date, request.change_percent) if representative else ''
     if lead and request.level != 'analyst':
         lead = llm_client._reading_summary(title, lead, 'beginner')
+    neutral = abs(request.change_percent) <= llm_client.NEUTRAL_BAND_PERCENT
     if not representative:
         what = '이날 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.'
         reason = '수급이나 시장 전체 요인이 영향을 줬을 수 있어요.'
@@ -89,7 +90,7 @@ def rule_docent(request: DocentRequest) -> dict:
         index = request.index_name or '관련 지수'
         numeric = f' {request.index_change_percent:+.2f}%' if request.index_change_percent is not None and request.index_name else ''
         direction = '하락' if request.index_change_percent is not None and request.index_change_percent < 0 else '상승' if request.index_change_percent is not None and request.index_change_percent > 0 else '흐름'
-        reason = f'시장 전체 {direction}({index}{numeric})과 함께 움직였을 수 있어요.'
+        reason = (f'시장이 움직인 날에도 주가는 거의 변하지 않았어요 ({index}{numeric})' if neutral else f'시장과 반대로 움직여 개별 요인을 확인해야 해요. ({index}{numeric})' if request.index_change_percent is not None and request.change_percent * request.index_change_percent < 0 else f'시장 전체 {direction}({index}{numeric})과 함께 움직였을 수 있어요.')
     else:
         what = lead or title
         positive = bool(re.search(r'급등|상향|호실적|수혜', title))
@@ -100,7 +101,8 @@ def rule_docent(request: DocentRequest) -> dict:
                          if representative.sentiment_confidence >= 0.6 else None)
         period = '이 주간에' if request.period == 'W' else '이 시점에' if request.period == 'MINUTE' else '이날'
         reason = f"{period} {request.symbol_name} 관련 ‘{title}’ 소식이 나왔고, 주가가 {request.change_percent:+.2f}% 움직였어요. "
-        reason += f'이 소식이 {sentiment}로 받아들여졌을 가능성이 있어요.' if sentiment else '다른 요인과 함께 시장 반응에 영향을 줬을 수 있어요.'
+        opposite = sentiment == '호재' and request.change_percent < 0 or sentiment == '악재' and request.change_percent > 0
+        reason += (f"소식이 나왔지만 주가는 거의 움직이지 않았어요({request.change_percent:+.2f}%)." if neutral else f"{sentiment} 소식에도 주가는 {'내렸어요' if request.change_percent < 0 else '올랐어요'}. 다른 요인이 더 컸을 수 있어요." if opposite else f'이 소식이 {sentiment}로 받아들여졌을 가능성이 있어요.' if sentiment and request.change_percent else '다른 요인과 함께 시장 반응에 영향을 줬을 수 있어요.')
     evidence = title + ' ' + (representative.summary if representative else '')
     templates = [('외국인|순매도|순매수|팔자|수급|매도|매수', '외국인 매도 등 수급 흐름을 함께 확인해요.' if re.search(r'외국인.*(순매도|팔자|매도)', evidence) else '투자 주체별 매수·매도 수급 흐름을 함께 확인해요.'),
                  ('실적|매출|이익', '실적 변화와 시장 기대치의 차이를 함께 확인해요.'),
@@ -139,7 +141,7 @@ level에 맞춰 초보자는 쉽게 풀고 분석자는 비교 기준을 강조�
 @router.post('/docent',response_model=DocentResponse)
 def docent(request: DocentRequest):
     fallback = rule_docent(request)
-    key = hashlib.sha256(json.dumps([DOCENT_CACHE_VERSION,request.symbol,request.date,request.period,fallback['newsId'],request.level],ensure_ascii=False).encode()).hexdigest()
+    key = hashlib.sha256(json.dumps([DOCENT_CACHE_VERSION,request.symbol,request.date,request.period,fallback['newsId'],request.level,f'{request.change_percent:.2f}',request.index_name, None if request.index_change_percent is None else f'{request.index_change_percent:.2f}'],ensure_ascii=False).encode()).hexdigest()
     path = Path(config.DOCENT_LEDGER_PATH)
     try:
         path.parent.mkdir(parents=True, exist_ok=True)

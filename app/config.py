@@ -88,3 +88,10 @@ DOCENT_LEDGER_PATH: str = os.getenv("DOCENT_LEDGER_PATH", "data/chart_docent.sql
 # Local rewrite batches only; the API never starts an Ollama generation.
 OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
 OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "").strip()
+
+# Leave empty only for a loopback/private-network deployment.
+AI_INTERNAL_TOKEN: str = os.getenv("AI_INTERNAL_TOKEN", "")
+AI_MAX_BODY_BYTES: int = max(1024, _get_int("AI_MAX_BODY_BYTES", 12_000_000))
+AI_REQUESTS_PER_MINUTE: int = max(1, _get_int("AI_REQUESTS_PER_MINUTE", 600))
+AI_MAX_CONCURRENT_REQUESTS: int = max(1, _get_int("AI_MAX_CONCURRENT_REQUESTS", 4))
+AI_REQUEST_TIMEOUT_SECONDS: float = _get_float("AI_REQUEST_TIMEOUT_SECONDS", 30.0)

@@ -31,7 +31,7 @@ def test_missing_market_result_is_not_invented_as_neutral():
 
 @pytest.mark.parametrize('choice,direction,percent,verdict',[
     ('UP','UP',1.01,'CORRECT'),('UP','UP',1.0,'PARTIAL'),('UP','UP',1.0000000000000002,'PARTIAL'),('DOWN','DOWN',-1.0,'PARTIAL'),
-    ('NEUTRAL','NEUTRAL',0,'PARTIAL'),('UP','DOWN',-1.76,'WRONG')])
+    ('NEUTRAL','NEUTRAL',0,'CORRECT'),('UP','DOWN',-1.76,'WRONG')])
 def test_structured_verdict_and_grounded_reasons(choice,direction,percent,verdict):
     from app.services.llm_client import generate_feedback, _feedback_sentence_count
     result=generate_feedback('매출이 12% 늘었다.',choice,direction,percent,user_reason='수익 개선을 예상했어요.',related_symbol_name='삼성전자',comparison_date='2026-10-07',judgement_close=100,comparison_close=100+percent,index_name='코스피',index_change_percent=-.3)
