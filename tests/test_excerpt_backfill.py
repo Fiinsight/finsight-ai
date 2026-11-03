@@ -55,7 +55,8 @@ def test_excerpt_apply_bypasses_paid_providers_and_persists_summaries_and_reason
             for key in batch.EXCERPT_COLUMNS:
                 assert key + '=%s' in sql and key + ' IS NOT DISTINCT FROM %s' in sql
             assert not any('005930' in str(value) for value in (params[0], params[4]))
-            assert '요인을 확인해요' in params[4]
+            assert '일회성인지 다음 실적 발표' in params[4]
+            assert '요인를' not in params[4]
             return SimpleNamespace(rowcount=1)
         yield SimpleNamespace(execute=execute)
     monkeypatch.setattr(batch, 'database', database)

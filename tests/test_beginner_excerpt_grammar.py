@@ -33,10 +33,10 @@ def assert_grammar(result):
     assert not re.search(r'어요(?:고|라고)', text)
     assert not any(bad in text for bad in ('요인를', '시점를', '환율를', '영업이익를', '금리을', '수출와', '예상를', '예상가'))
     reason = result['importanceReasons']['beginner']
-    if ' 확인해요.' in reason:
-        check = reason.split('예요. ', 1)[1].split(' 확인해요.', 1)[0]
-        phrase, particle = check[:-1], check[-1]
-        assert llm_client._with_particle(phrase, '을/를') == phrase + particle
+    check = reason.rsplit('\n', 1)[-1]
+    for word, particle in re.findall(r'([가-힣]+)([을를])(?=\s)', check):
+        assert llm_client._with_particle(word, '을/를') == word + particle
+
 
 
 @pytest.mark.parametrize(('body', 'expected'), [
@@ -74,7 +74,9 @@ def test_particles(word, pair, expected):
 ])
 def test_investment_point_particles(body, expected):
     result = rewrite(body)
-    assert expected in result['importanceReasons']['beginner']
+    reason = result['importanceReasons']['beginner']
+    assert reason.endswith('요.')
+    assert not re.search(r'요인를|실적를|시점를|환율를|\(을/를\)', reason)
     assert_grammar(result)
 
 

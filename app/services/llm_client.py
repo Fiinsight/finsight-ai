@@ -515,7 +515,7 @@ def _strip_stock_codes(text: str) -> str:
 def _sentence_label(sentence: str) -> str:
     if re.search(r'분석(?:된다|했다|이다)|(?:로|것으로) 보인다|평가된다', sentence):
         return '[분석]'
-    if re.search(r'(?:할|될|날|를|질) 것으로|예상(?:된다|했다|한다|이다)|전망(?:된다|했다|한다|이다)|보고 있다|계획', sentence):
+    if re.search(r'(?:할|될|날|를|질) 것으로|예상(?:된다|했다|한다|이다)|전망(?:된다|했다|한다|이다)|수 있을지|(?:할|될)지 주목|보고 있다|계획', sentence):
         return '[전망]'
     if re.search(r'(?:하락|상승|기록|증가|감소|발표|집계|마감|동결)했다|(?:올랐|내렸|늘었|줄었|기록됐)다', sentence):
         return '[사실]'
@@ -583,33 +583,108 @@ def _reading_summary(title: str, body: str, level: str) -> str:
     return result if len(result) <= 600 else result[:600].rstrip() + '…'
 
 
+def _point_fact(title: str, content: str) -> str:
+    sentences = _split_sentences(content)
+    words = re.findall(r'[가-힣A-Za-z][가-힣A-Za-z/·-]+', _strip_stock_codes(title))
+    words = [re.sub(r'(에서는|에서|으로|에도|은|는|이|가|의|를|을)$', '', word) if len(word) > 3 else word for word in words]
+    words = [word for word in words if len(word) >= 2 and word not in {'종합', '단독', '전망', '주목', '상승', '하락', '증가', '감소', '최저', '향방', '마켓뷰'}]
+    def score(item):
+        index, sentence = item
+        overlap = sum(min(len(word), 8) ** 2 for word in set(words) if word in sentence)
+        meaningful = bool(re.search(r'했다|됐다|이다|한다|된다|나타났다|전망|예상|상승|하락|증가|감소|기록|집계|올랐|내렸|늘었|줄었', sentence))
+        numeric = 12 if overlap and re.search(r"\d[\d,.]*(?:%|포인트|억원|조원|원|달러)", sentence) else 0
+        return overlap + numeric + (4 if meaningful else 0) - min(index, 3) * 4, -index
+    ranked = sorted(enumerate(sentences), key=score, reverse=True)
+    return ranked[0][1] if ranked else title
+
+
+def _point_check(title: str, fact: str, content: str) -> str:
+    # The title decides the topic: a background FX sentence must not turn a sentiment-index article into an exporter story.
+    topic = title + ' ' + fact
+    number = re.search(r'(?<![\d.])\d+(?:,\d{3})*(?:\.\d+)?(?:[조억만천]\d+)*[조억만천]*(?:%p|%|포인트|원|달러|개월)', fact)
+    value = number[0] if number else ''
+    if '뉴스심리지수' in topic:
+        period = re.search(r'\d+개월', title + ' ' + fact)
+        anchor = f'{period[0]} 만의 ' if period else ''
+        return f'뉴스심리지수가 {anchor}저점에서 회복하는지 다음 발표치를 확인해요' if '최저' in topic else '뉴스심리지수와 실제 경기지표가 같은 방향인지 다음 발표치를 확인해요'
+    if '기술특례' in title:
+        return '기술특례 기업의 장기 수익률을 같은 보유기간의 코스닥 지수와 비교해요'
+    if re.search(r'입성|상장 첫날', title):
+        return '상장 첫날 가격을 공모가·유통 가능 물량과 비교해요'
+    if re.search(r'중간선거|대선|총선', title):
+        return '선거 결과별 정책 변화가 AI 투자 수익성 우려를 줄일지 구분해 살펴봐요' if 'AI' in title else '선거 결과별 정책 변화와 실제 시행 일정을 구분해 살펴봐요'
+    if '공시' in title:
+        return '공시 위반 횟수별 가중 기준과 적용 시점을 확인해요'
+    if 'ETF' in title:
+        return 'ETF의 편입 종목별 비중과 총보수를 비교해요'
+    if re.search(r'세미나|설명회', title):
+        date = re.search(r'\d+일', title + ' ' + fact)
+        subject = '배당투자' if '배당' in topic else '개인 투자'
+        return f'{date[0] + " " if date else ""}{subject} 세미나의 신청 방법과 참여 조건을 확인해요'
+    if re.search(r'국제유가|정유주', title):
+        return '국제유가 하락이 정유사의 정제마진·재고 평가에 미치는 영향을 나눠 살펴봐요'
+    if re.search(r'반도체주|삼전·닉스', title):
+        return '미국 반도체주 약세가 국내 반도체 실적 전망 변화와 연결되는지 확인해요'
+    if re.search(r'코스피|코스닥|사이드카|서킷브레이커', title):
+        index = '코스닥' if '코스닥' in title and '코스피' not in title else '코스피'
+        subject = index + (f' {value}' if value else '')
+        return f'{subject} 움직임을 같은 날 외국인·기관 매매와 비교해요' if re.search(r'외국인|기관|수급', content) else f'{subject} 흐름이 다음 거래일 종가에도 이어지는지 확인해요'
+    def metric(pattern, fallback):
+        found = re.search(pattern, title + ' ' + fact)
+        return (found[0] if found else fallback) + (f' {value}' if value else '')
+    if re.search(r'물가|소비자물가', title):
+        if re.search(r'이어갈|예상|전망', title + ' ' + fact):
+            return '예상한 물가 흐름이 다음 소비자물가 발표에서 실제로 나타나는지 확인해요'
+        items = [item for item in ['가공식품', '외식', '쇠고기', '고등어', '기름값', '신선식품'] if item in title]
+        if items:
+            return f'{"·".join(items)} 가격 변화가 전체 소비자물가에 미친 기여도를 확인해요'
+        region = re.search(r'충북|부산|전남광주|서울|경기', title)
+        subject = (region[0] + ' ' if region else '') + metric(r"소비자물가|생활물가|물가", "물가")
+        return f'{subject} 상승을 이끈 품목을 전국 물가와 비교해요'
+    if 'CP' in title:
+        return 'CP 금리와 국채 금리의 차이가 벌어지는지 단기자금 수요와 함께 확인해요'
+    if re.search(r'금리|국고채|국채', title):
+        maturity = re.search(r'\d+년물', fact + ' ' + title)
+        subject = (maturity[0] + ' 금리' if maturity else '금리') + (f' {value}' if value else '')
+        return f'{subject} 변화가 다른 만기 채권에도 나타나는지 확인해요'
+    if re.search(r'환율|원/달러|원화', title):
+        driver = '수출기업의 네고 물량' if re.search(r'네고|수출업체.*달러 매도', content) else '달러 매수·매도 요인'
+        return f'{metric(r"원/달러 환율|원달러 환율|환율", "환율")} 움직임을 {_with_particle(driver, "과/와")} 비교해요'
+    if re.search(r'목표가|목표주가', title):
+        amounts = re.findall(r'(?<![\d.])\d+(?:,\d{3})*(?:\.\d+)?(?:[조억만천]\d+)*[조억만천]*원', fact)
+        if amounts: value = amounts[-1]
+        return f'{metric(r"목표주가|목표가", "목표주가")} 산정에 사용한 실적 가정이 바뀌었는지 확인해요'
+    if re.search(r'영업이익|순이익|실적|매출', title):
+        return f'{metric(r"영업이익|영업익|순이익|매출|실적", "실적")} 변화가 일회성인지 다음 실적 발표에서 확인해요'
+    if re.search(r'수주|계약|수출|공급|판매', title):
+        return f'{metric(r"수주|계약|수출|공급|판매", "계약·판매")} 내용이 실제 매출에 반영되는 시점을 확인해요'
+    if re.search(r'정책|규제|지원|대책', title):
+        subject = re.search(r'[가-힣]{2,8}\s*(?:대책|정책|규제|지원)', title)
+        return f'{subject[0] if subject else "발표된 정책"}의 실제 적용 대상과 시행 일정을 확인해요'
+    if re.search(r'데모데이|포럼|행사', title):
+        date = re.search(r'\d+일', title)
+        event = re.search(r'[가-힣A-Za-z]{0,10}(?:데모데이|포럼|행사)', title)
+        subject = ((date[0] + ' ') if date else '') + (event[0] if event else '행사')
+        return f'{subject}의 참여기관과 후속 투자 결과를 확인해요' if '투자' in content else f'{subject}의 참여기관과 후속 공지를 확인해요'
+    return '발표 주체가 공개한 원문 자료와 후속 공지를 확인해요'
+
+
+
+def _investment_points(title: str, cleaned: str) -> dict:
+    fact = _strip_stock_codes(_point_fact(title, cleaned))
+    quote = fact if len(fact) <= 130 else fact[:129].rstrip() + '…'
+    check = _point_check(title, fact, cleaned)
+    return {
+        'beginner': f'“{quote}”\n{check}.',
+        'normal': f'“{quote}”\n{check.replace("확인해요", "확인하세요").replace("비교해요", "비교하세요")}.',
+        'analyst': f'“{quote}”\n{check.replace("확인해요", "대조해 보세요").replace("비교해요", "나란히 대조하세요")}.',
+    }
+
+
 def _mock_rewrite_news(title: str, raw_content: str) -> dict:
     cleaned = _clean_article_text(title, raw_content)
     detected = _detected_terms(f"{title} {cleaned}")
-    sentences = _split_sentences(cleaned)
-    drivers = [
-        (r'매출|영업이익|순이익|실적', '기업이 실제로 번 돈을 살펴볼 단서', '같은 기간의 매출·이익과 일회성 요인'),
-        (r'수주|계약|공급|판매|수출|수요', '향후 매출로 이어지는지 살펴볼 단서', '계약·판매의 반영 시점과 실제 실적'),
-        (r'비용|원가|원재료|인건비', '기업이 쓰는 비용과 이익을 살펴볼 단서', '해당 비용의 비중과 실제 이익 변화'),
-        (r'금리|이자', '기업의 이자 부담과 연결되는지 살펴볼 단서', '차입 규모와 금리 적용 시점'),
-        (r'환율|원화|원달러', '수출입 기업의 매출·비용과 연결되는지 살펴볼 단서', '기업별 수출입 비중과 적용 환율'),
-    ]
-    drivers.insert(0, (r'코스피|코스닥|사이드카|서킷브레이커', '시장 전체의 움직임을 살펴볼 단서', '지수 등락과 거래량·수급'))
-    candidates = [(sentence, connection, check) for sentence in sentences
-                  for pattern, connection, check in drivers if re.search(pattern, sentence)]
-    if candidates:
-        fact, connection, check = max(candidates, key=lambda row: bool(re.search(r'\d', row[0])))
-        quote = fact[:180] + ('…' if len(fact) > 180 else '')
-        reasons = {
-            'beginner': f"기사 사실: “{_strip_stock_codes(quote)}” {connection}예요. {_with_particle(check, '을/를')} 확인해요. 주가 방향은 단정할 수 없어요.",
-            'normal': f'기사 사실: “{quote}” {connection}입니다. 확인할 변수: {check}. 주가 방향은 단정할 수 없습니다.',
-            'analyst': f'기사 근거: “{quote}” 사업·실적 연결: {connection}입니다. 검증할 변수: {check}. 인과관계나 가격 반응은 별도 확인이 필요합니다.',
-        }
-    else:
-        reasons = {
-            level: ('기사에 가격과 연결할 구체적인 근거가 부족해요. 원문과 후속 공시를 살펴봐요. 주가 방향은 단정할 수 없어요.' if level == 'beginner' else '기사에 사업·실적과 연결할 구체적인 근거가 부족합니다. 원문과 후속 공시를 확인하세요. 주가 방향은 단정할 수 없습니다.')
-            for level in ('beginner', 'normal', 'analyst')
-        }
+    reasons = _investment_points(title, cleaned)
     return {
         **{level: _reading_summary(title, cleaned, level) for level in ('beginner', 'normal', 'analyst')},
         'importanceReason': reasons['normal'], 'importanceReasons': reasons, 'detectedTerms': detected,
