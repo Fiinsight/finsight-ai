@@ -85,3 +85,14 @@ def test_article_specific_checks_for_events_and_funds():
     assert '13일 배당투자' in _point_check('13일 배당투자 세미나', '증권사가 세미나를 연다.', '')
     assert '편입 종목별 비중' in _point_check('삼성그룹 ETF 상장', 'ETF를 상장했다.', '')
     assert '공시 위반 횟수별' in _point_check('공시의무 1회 위반 과태료 가중', '과태료가 늘어난다.', '')
+
+
+def test_inflation_checkpoint_never_labels_a_support_budget_as_inflation():
+    point = llm_client.rewrite_news('정부 "체감 물가 높아…역대 최대 김장 대책"', '정부는 김장 대책에 640억원을 투입한다. 체감 물가가 여전히 높다고 밝혔다.', allow_llm=False)['importanceReason']
+    assert '640억원 상승' not in point
+    assert '할인·지원 대상 품목' in point
+    assert llm_client._point_check('체감 물가 여전히 높아', '지원액은 640억원이다.', '') == '물가 상승을 이끈 품목을 전국 물가와 비교해요'
+
+
+def test_mixed_krx_stock_codes_are_removed_without_removing_bracketed_words():
+    assert llm_client._strip_stock_codes('래블업[0147B0] (0147B0) [market]') == '래블업 [market]'

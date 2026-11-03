@@ -505,7 +505,7 @@ def _select_article_facts(title: str, content: str, limit: int, level: str = 'no
 
 
 def _strip_stock_codes(text: str) -> str:
-    text = re.sub(r'\(\s*\d{6}\s*\)|\[\s*\d{6}\s*\]', '', text)
+    text = re.sub(r'\(\s*(?=[A-Za-z0-9]*\d)[A-Za-z0-9]{6}\s*\)|\[\s*(?=[A-Za-z0-9]*\d)[A-Za-z0-9]{6}\s*\]', '', text)
     # A bare code is not a decimal, grouped amount, or a number with a money/date unit.
     text = re.sub(r'(?<![\w.,$€₩¥])\d{6}(?!\w|[.,]\d)(?!\s*(?:원|달러|유로|엔|위안|조|억|만|천|년|월|일|%))',
                   lambda match: match[0] if re.search(r'[$€₩¥]\s*$', text[:match.start()]) else '', text)
@@ -626,6 +626,8 @@ def _point_check(title: str, fact: str, content: str) -> str:
     if re.search(r'반도체주|삼전·닉스', title):
         return '미국 반도체주 약세가 국내 반도체 실적 전망 변화와 연결되는지 확인해요'
     if re.search(r'코스피|코스닥|사이드카|서킷브레이커', title):
+        percent = re.search(r'\d+(?:\.\d+)?%', fact)
+        value = percent[0] if percent else ''
         index = '코스닥' if '코스닥' in title and '코스피' not in title else '코스피'
         subject = index + (f' {value}' if value else '')
         return f'{subject} 움직임을 같은 날 외국인·기관 매매와 비교해요' if re.search(r'외국인|기관|수급', content) else f'{subject} 흐름이 다음 거래일 종가에도 이어지는지 확인해요'
@@ -633,6 +635,10 @@ def _point_check(title: str, fact: str, content: str) -> str:
         found = re.search(pattern, title + ' ' + fact)
         return (found[0] if found else fallback) + (f' {value}' if value else '')
     if re.search(r'물가|소비자물가', title):
+        if '김장' in title:
+            return '김장 대책의 할인·지원 대상 품목과 시행 기간을 확인해요'
+        percent = re.search(r'\d+(?:\.\d+)?%', title + ' ' + fact)
+        value = percent[0] if percent else ''
         if re.search(r'이어갈|예상|전망', title + ' ' + fact):
             return '예상한 물가 흐름이 다음 소비자물가 발표에서 실제로 나타나는지 확인해요'
         items = [item for item in ['가공식품', '외식', '쇠고기', '고등어', '기름값', '신선식품'] if item in title]
@@ -644,6 +650,8 @@ def _point_check(title: str, fact: str, content: str) -> str:
     if 'CP' in title:
         return 'CP 금리와 국채 금리의 차이가 벌어지는지 단기자금 수요와 함께 확인해요'
     if re.search(r'금리|국고채|국채', title):
+        percent = re.search(r'\d+(?:\.\d+)?%', fact)
+        value = percent[0] if percent else ''
         maturity = re.search(r'\d+년물', fact + ' ' + title)
         subject = (maturity[0] + ' 금리' if maturity else '금리') + (f' {value}' if value else '')
         return f'{subject} 변화가 다른 만기 채권에도 나타나는지 확인해요'
