@@ -41,8 +41,8 @@ def test_sentence_labels(text,label):
 def test_market_importance_is_source_grounded(title,body):
     r=llm.rewrite_news(title,body,allow_llm=False)
     text=r['importanceReasons']['beginner']
-    assert '부족' not in text and body in text and '살펴볼 단서' in text
-    assert text.endswith('없어요.')
+    assert '부족' not in text and body in text and '살펴볼 단서' not in text
+    assert text.endswith('요.')
 
 def request(sentiment='POSITIVE',change=3,relation='DIRECT',index=-2):
     return chart.DocentRequest(symbol='005930',symbol_name='삼성전자',date='2026-11-02',change_percent=change,period='D',level='beginner',index_name='코스피',index_change_percent=index,

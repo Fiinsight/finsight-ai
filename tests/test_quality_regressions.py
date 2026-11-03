@@ -26,10 +26,10 @@ def test_index_explanation_uses_known_definition_without_appending_it_to_context
 
 def test_no_terms_means_no_placeholder_and_fx_has_no_company_template():
     empty = _mock_rewrite_news("행사 개최", "오늘 행사에는 여러 사람이 참석했습니다.")
-    assert "근거가 부족" in empty["importanceReason"]
+    assert "오늘 행사에는 여러 사람이 참석했습니다." in empty["importanceReason"]
     assert "핵심 지표" not in empty["normal"]
     fx = _mock_rewrite_news("환율 상승", "환율이 1350원으로 올랐다. 환율 변화를 확인했다. 반도체가 한 번 언급됐다.")
     assert "반도체" not in fx["importanceReason"]
     assert "1350원" in fx["importanceReason"]
-    assert "수출입 비중과 적용 환율" in fx["importanceReason"]
-    assert "연결되는지" in fx["importanceReason"]
+    assert "달러 매수·매도 요인" in fx["importanceReason"]
+    assert "살펴볼 단서" not in fx["importanceReason"]
