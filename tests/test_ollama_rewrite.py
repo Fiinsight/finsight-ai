@@ -51,6 +51,14 @@ def test_json_parse_retry_once_but_not_number_validation(local):
     assert connection.request.call_count==2
 
 
+def test_local_parse_retry_cannot_bypass_daily_budget(local, monkeypatch):
+    _, connection = local
+    monkeypatch.setattr(config, 'MAX_DAILY_REWRITE_CALLS', 1)
+    connection.getresponse.return_value.read.return_value = json.dumps({'done':True,'response':'not json'}).encode()
+    assert llm_client.rewrite_news('수출 증가', SOURCE, 'limited-retry', local_batch=True)['mode'] == 'EXCERPT'
+    connection.request.assert_called_once()
+
+
 @pytest.mark.parametrize('failure',['number','sign','timeout','bad_json','redirect','advice'])
 def test_failures_stay_excerpt_without_external_fallback(local,failure):
     _,connection=local

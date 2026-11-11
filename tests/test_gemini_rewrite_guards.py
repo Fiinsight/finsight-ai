@@ -111,8 +111,8 @@ def test_invalid_numbers_and_non_eligible_article_stay_excerpt(generation):
     assert result['mode']=='EXCERPT' and not result['retryable']
     assert rewrite_budget.status()['rewriteFailureCount']==1
     llm_client.rewrite_news('수출 증가',SOURCE,'explicitly-disabled',allow_llm=False)
-    assert call.call_count==1
-    assert rewrite_budget.status()['rewriteUsedCalls']==1
+    assert call.call_count==2
+    assert rewrite_budget.status()['rewriteUsedCalls']==2
 
 
 def test_other_features_never_dispatch_and_health_has_no_secrets(generation,monkeypatch):
@@ -144,7 +144,7 @@ def test_gemini_rewrite_requests_json_without_changing_other_features(monkeypatc
     client.models.generate_content.return_value.text = '{}'
     monkeypatch.setattr(llm_client, '_get_gemini_client', lambda: client)
     # Exercise the SDK configuration without an HTTP request.
-    generate_gemini(llm_client._build_rewrite_prompt('수출 증가', SOURCE), 2200)
+    generate_gemini('프롬프트 문구를 변경해도 JSON 설정은 유지됩니다.', 2200, json_mode=True)
     options = client.models.generate_content.call_args.kwargs['config']
     assert options.response_mime_type == 'application/json' and options.temperature == 0
     generate_gemini('용어 설명', 1024)

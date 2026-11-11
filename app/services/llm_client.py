@@ -12,6 +12,8 @@ import logging
 import re
 import threading
 import time
+import unicodedata
+from decimal import Decimal
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -28,6 +30,7 @@ _rewrite_llm_calls = 0
 _real_llm_calls_lock = threading.Lock()
 _rewrite_lock = threading.Lock()
 _last_rewrite_started = None
+REWRITE_PROMPT_VERSION = '2026-11-11.1'
 
 
 def _get_anthropic_client():
@@ -99,13 +102,13 @@ def _get_gemini_client():
     return _gemini_client
 
 
-def _call_gemini(prompt: str, max_tokens: int = 1024) -> str:
+def _call_gemini(prompt: str, max_tokens: int = 1024, *, json_mode: bool = False) -> str:
     """Make a single real Gemini call and return the text output."""
     client = _get_gemini_client()
     from google.genai import types
 
     options = {"max_output_tokens": max_tokens}
-    if prompt.startswith(("초보자가 이해하도록 금융 기사를 세 수준으로 다시 쓰세요.", "판단 결과를 코칭하세요.")):
+    if json_mode:
         options.update(response_mime_type="application/json", temperature=0)
     response = client.models.generate_content(
         model=config.GEMINI_MODEL,
@@ -123,13 +126,13 @@ def _reserve_process_llm_call() -> None:
         _real_llm_calls += 1
 
 
-def _call_llm(prompt: str, max_tokens: int = 1024) -> str:
+def _call_llm(prompt: str, max_tokens: int = 1024, *, json_mode: bool = False) -> str:
     """Paid dispatch keeps its ceiling; Ollama is only available in rewrite batches."""
     if config.LLM_PROVIDER == "ollama":
         raise RuntimeError("Ollama is available only for offline rewrite batches")
     _reserve_process_llm_call()
     if config.LLM_PROVIDER == "gemini":
-        return _call_gemini(prompt, max_tokens)
+        return _call_gemini(prompt, max_tokens, json_mode=json_mode)
     return _call_claude(prompt, max_tokens)
 
 
@@ -159,19 +162,18 @@ def _call_ollama(prompt: str, max_tokens: int = 2200) -> str:
         connection.close()
 
 
-def _local_rewrite(title: str, source: str) -> dict:
+def _local_rewrite(title: str, source: str, *, before_retry=None) -> dict:
     prompt=_build_rewrite_prompt(title,source)
     for attempt in range(2):
         try:
             data=_extract_json(_call_ollama(prompt))
         except ValueError:
-            if attempt==1: raise
+            if attempt==1 or (before_retry is not None and not before_retry()): raise
             prompt += "\n이전 응답을 JSON으로 읽을 수 없었어요. 설명이나 코드 블록 없이 요청한 JSON 객체만 반환하세요."
             continue
         result=_validated_rewrite(data,title+" "+source)
-        tokens=set(_NUMBER.findall(title+" "+source))
         text=" ".join(result.values())
-        if any(token not in tokens for token in _NUMBER.findall(text)):
+        if not _numbers_in_source(text, title+" "+source):
             raise ValueError("Local rewrite changed a source number/sign")
         if re.search(r"매수하세요|매도하세요|투자하세요|수익.{0,10}보장",text):
             raise ValueError("Local rewrite contains investment advice")
@@ -181,10 +183,15 @@ def _local_rewrite(title: str, source: str) -> dict:
 
 def _extract_json(text: str) -> dict:
     """Pull the first JSON object out of a model response (handles code fences)."""
-    match = re.search(r"\{.*\}", text, re.DOTALL)
-    if not match:
-        raise ValueError("모델 응답에서 JSON 객체를 찾을 수 없습니다.")
-    return json.loads(match.group(0))
+    decoder = json.JSONDecoder()
+    for match in re.finditer(r'\{', text):
+        try:
+            value, _ = decoder.raw_decode(text[match.start():])
+            if isinstance(value, dict):
+                return value
+        except ValueError:
+            continue
+    raise ValueError("모델 응답에서 JSON 객체를 찾을 수 없습니다.")
 
 
 # ---------------------------------------------------------------------------
@@ -723,14 +730,37 @@ def _build_rewrite_prompt(title: str, raw_content: str) -> str:
 _NUMBER = re.compile(r"(?<![\d.])[-+]?\d+(?:,\d{3})*(?:\.\d+)?(?:[조억만천]\d+)*[조억만천]*(?:%p|%포인트|%|퍼센트|원|달러|엔|유로|배|명|건|년|월|일)?")
 
 
+def _number_tokens(text: str) -> set[str]:
+    text = unicodedata.normalize('NFKC', text).replace('−', '-')
+    text = re.sub(r'([+-])\s+(?=\d)', r'\1', text)
+    text = re.sub(r'퍼센트\s*포인트|%\s*포인트', '%p', text).replace('퍼센트', '%')
+    text = re.sub(r'(?<=[\d조억만천])\s+(?=(?:[조억만천]|원|달러|엔|유로|배|명|건|년|월|일|%))', '', text)
+    text = re.sub(r'(?<=[조억만천])\s+(?=\d)', '', text)
+    text = re.sub(r'(?<=\d),(?=\d)', '', text)
+    def canonical(match):
+        value = Decimal(match[0])
+        return format((abs(value) if value == 0 else value).normalize(), 'f')
+    return {re.sub(r'[-+]?\d+(?:\.\d+)?', canonical, token) for token in _NUMBER.findall(text)}
+
+
 def _numbers_in_source(summary: str, source: str) -> bool:
-    # Token comparison prevents a fabricated 5 from matching source 15 or 5.5.
-    source_numbers = {token.lstrip('+-') for token in _NUMBER.findall(source)}
-    return all(token.lstrip('+-') in source_numbers for token in _NUMBER.findall(summary))
+    # Values, units and negative signs must agree; formatting differences are harmless.
+    return _number_tokens(summary) <= _number_tokens(source)
+
+
+def _repair_rewrite_style(text: str) -> str:
+    for ending, replacement in [('늘었다', '늘었어요'), ('줄었다', '줄었어요'), ('올랐다', '올랐어요'),
+                                ('내렸다', '내렸어요'), ('했다', '했어요'), ('됐다', '됐어요'),
+                                ('있다', '있어요'), ('없다', '없어요'), ('한다', '해요'), ('된다', '돼요')]:
+        text = re.sub(re.escape(ending) + r'(?=[.!?。！？]|$)', replacement, text)
+    return text
 
 
 def _validated_rewrite(data: dict, source: str) -> dict:
-    for level, minimum, maximum in [('beginner', 4, 5), ('normal', 3, 4)]:
+    data = dict(data)
+    if isinstance(data.get('beginner'), str):
+        data['beginner'] = _repair_rewrite_style(data['beginner'])
+    for level, minimum, maximum in [('beginner', 3, 6), ('normal', 2, 5)]:
         text = data.get(level)
         if not isinstance(text, str) or not minimum <= len(_split_sentences(text)) <= maximum:
             raise ValueError('Invalid rewrite sentence count')
@@ -783,21 +813,29 @@ def rewrite_news(title: str, raw_content: str, article_key: str | None = None, *
     key = article_key or title + '::' + cleaned_content
     with _rewrite_lock:
         try:
-            allowed, previous = rewrite_budget.reserve(key, fallback)
+            allowed, previous = rewrite_budget.reserve(key, fallback, prompt_version=REWRITE_PROMPT_VERSION)
             if not allowed:
                 if local_batch and previous.get('_source_hash') != fallback['_source_hash']:
                     return fallback
                 return previous
             if local_batch:
-                summaries = _local_rewrite(title, cleaned_content[:20000])
+                summaries = _local_rewrite(title, cleaned_content[:20000], before_retry=lambda: rewrite_budget.reserve_retry(key))
             else:
-                now = time.monotonic()
-                if _last_rewrite_started is not None:
-                    time.sleep(max(0, config.REWRITE_MIN_INTERVAL_SECONDS - (now - _last_rewrite_started)))
-                _last_rewrite_started = time.monotonic()
-                _rewrite_llm_calls += 1
-                raw = _call_gemini(_build_rewrite_prompt(title, cleaned_content), max_tokens=2200)
-                summaries = _validated_rewrite(_extract_json(raw), title + ' ' + cleaned_content)
+                prompt = _build_rewrite_prompt(title, cleaned_content)
+                for attempt in range(2):
+                    now = time.monotonic()
+                    if _last_rewrite_started is not None:
+                        time.sleep(max(0, config.REWRITE_MIN_INTERVAL_SECONDS - (now - _last_rewrite_started)))
+                    _last_rewrite_started = time.monotonic()
+                    _rewrite_llm_calls += 1
+                    raw = _call_gemini(prompt, max_tokens=2200, json_mode=True)
+                    try:
+                        summaries = _validated_rewrite(_extract_json(raw), title + ' ' + cleaned_content)
+                        break
+                    except ValueError as error:
+                        if attempt or not rewrite_budget.reserve_retry(key):
+                            raise
+                        prompt += '\n이전 응답 검증 실패: ' + str(error) + '. 원문 사실과 수치를 유지하고 요청한 JSON 형식으로 한 번만 바로잡으세요.'
             result = {**fallback, **summaries, 'mode': 'REWRITTEN'}
             rewrite_budget.finish(key, result)
             return result
@@ -805,7 +843,7 @@ def rewrite_news(title: str, raw_content: str, article_key: str | None = None, *
             quota = not local_batch and _quota_error(exc)
             result = {**fallback, 'retryable': quota}
             try:
-                rewrite_budget.finish(key, result, failed=True, quota=quota)
+                rewrite_budget.finish(key, result, failed=True, quota=quota, validation=isinstance(exc, ValueError))
             except Exception:
                 logger.warning("리라이팅 ledger 상태 저장 실패; 발췌 유지")
             safe_validation = {
@@ -1325,12 +1363,12 @@ def generate_feedback(news_summary: str, user_choice: str, actual_direction: str
                         if _last_rewrite_started is not None:
                             time.sleep(max(0, config.REWRITE_MIN_INTERVAL_SECONDS - (time.monotonic() - _last_rewrite_started)))
                         _last_rewrite_started = time.monotonic()
-                        raw = _call_gemini(prompt, max_tokens=1800)
+                        raw = _call_gemini(prompt, max_tokens=1800, json_mode=True)
                     except Exception:
                         feedback_budget.finish(key, fallback)
                         raise
         else:
-            raw = _call_llm(prompt, max_tokens=1800)
+            raw = _call_llm(prompt, max_tokens=1800, json_mode=True)
         data = _extract_json(raw)
         if not isinstance(data, dict): return reject('invalid_json_shape')
         lead = (_split_sentences(_clean_article_text(context.get('news_title', ''), news_summary) or context.get('news_title', '')) or [''])[0]
