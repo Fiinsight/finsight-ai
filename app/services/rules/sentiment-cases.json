@@ -1,0 +1,242 @@
+[
+  {
+    "title": "적자 감소",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "적자 감소 소식",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "적자 감소 발표",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "손실 축소",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "손실 축소 소식",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "손실 축소 발표",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "우려 완화",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "우려 완화 소식",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "우려 완화 발표",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "불안 해소",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "불안 해소 소식",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "불안 해소 발표",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "하락세 진정",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "하락세 진정 소식",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "하락세 진정 발표",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "부채 감소",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "부채 감소 소식",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "부채 감소 발표",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "실업자 감소",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "실업자 감소 소식",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "실업자 감소 발표",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "실적 개선",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "실적 개선 소식",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "실적 개선 발표",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "수출 증가",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "수출 증가 소식",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "수출 증가 발표",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "금리 하락",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "금리 하락 소식",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "금리 하락 발표",
+    "label": "POSITIVE"
+  },
+  {
+    "title": "부채 증가",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "부채 증가 소식",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "부채 증가 발표",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "실업자 증가",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "실업자 증가 소식",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "실업자 증가 발표",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "최대 낙폭",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "최대 낙폭 소식",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "최대 낙폭 발표",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "금리 상승",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "금리 상승 소식",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "금리 상승 발표",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "손실 확대",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "손실 확대 소식",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "손실 확대 발표",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "적자 증가",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "적자 증가 소식",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "적자 증가 발표",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "우려 확대",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "우려 확대 소식",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "우려 확대 발표",
+    "label": "NEGATIVE"
+  },
+  {
+    "title": "지원 일정 공개",
+    "label": "NEUTRAL"
+  },
+  {
+    "title": "지원 일정 공개 소식",
+    "label": "NEUTRAL"
+  },
+  {
+    "title": "지원 일정 공개 발표",
+    "label": "NEUTRAL"
+  },
+  {
+    "title": "환율 상승",
+    "label": "NEUTRAL"
+  },
+  {
+    "title": "환율 상승 소식",
+    "label": "NEUTRAL"
+  },
+  {
+    "title": "환율 상승 발표",
+    "label": "NEUTRAL"
+  },
+  {
+    "title": "수출 증가에도 비용 부담",
+    "label": "NEUTRAL"
+  },
+  {
+    "title": "수출 증가에도 비용 부담 소식",
+    "label": "NEUTRAL"
+  },
+  {
+    "title": "수출 증가에도 비용 부담 발표",
+    "label": "NEUTRAL"
+  }
+]
