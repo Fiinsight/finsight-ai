@@ -520,7 +520,7 @@ def _select_article_facts(title: str, content: str, limit: int, level: str = 'no
         outcomes = [sentence for sentence in sentences[1:] if re.search(r'올랐|내렸|하락|상승|증가|감소|급락|늘었|줄었|기록|결과', sentence) and not re.search(r'전망|예상|우려', sentence)]
         return [sentences[0]] + ([outcomes[-1]] if outcomes else sentences[-1:] if len(sentences) > 1 else [])
     ranked = sorted(enumerate(sentences[1:], start=1), key=lambda item: (
-        -(3 * sum(keyword in item[1] for keyword in keywords) + bool(re.search(r'\d', item[1]))) / max(1, len(item[1])), item[0]))
+        -(3 * sum(keyword in item[1] for keyword in keywords) + bool(re.search(r'\d', item[1]))) / max(60, len(item[1])), item[0]))
     return [sentences[0]] + [sentence for _, sentence in sorted(ranked[:limit - 1])]
 
 
@@ -547,6 +547,18 @@ def _is_tabular_article(title: str, body: str) -> bool:
     currencies = re.findall(r'미국달러|미국 달러|일본엔|일본 엔|유로|위안|파운드|스위스프랑|USD|JPY|EUR|GBP|CNY', body, re.I)
     return (bool(re.search(r'외국환시세|외국환 시세|환율표', title)) and len(numbers) >= 6
             or len(currencies) >= 4 and len(numbers) >= 12 and len(_split_sentences(body)) <= 1)
+
+
+def _clip_reading_text(text: str, size: int) -> str:
+    if len(text) <= size:
+        return text
+    prefix = text[:size - 1]
+    ends = list(re.finditer(r"[.!?。](?=\s|$)", prefix))
+    if ends:
+        return prefix[:ends[-1].end()].strip()
+    # A source can contain one very long sentence: at least keep complete words.
+    boundary = prefix.rfind(' ')
+    return (prefix[:boundary] if boundary > 0 else '') .rstrip() + '…'
 
 
 def _reading_summary(title: str, body: str, level: str) -> str:
@@ -589,10 +601,10 @@ def _reading_summary(title: str, body: str, level: str) -> str:
         all_sentences = _split_sentences(body)
         evidence_sentences = sentences[:1]
         risk_pattern = r'위험|리스크|불확실|우려|제약|변수|순매도|약세|하락|급락|하향|부진|매도 우위|부담|규제|변동성|불안|경고|제재|관세|둔화|지연'
-        risks = sorted([sentence for sentence in all_sentences if re.search(risk_pattern, sentence)], key=lambda sentence: (not bool(re.match(r'^(다만|그러나|하지만)', sentence)), sentence in evidence_sentences))
+        risks = sorted([sentence for sentence in all_sentences if re.search(risk_pattern, sentence) and (re.search(r'위험|리스크|불확실|우려|제약|변수|부담|불안|경고|매도 우위|순매도|규제|제재|관세', sentence) or _sentence_label(sentence) != '[사실]')], key=lambda sentence: (not bool(re.match(r'^(다만|그러나|하지만)', sentence)), sentence in evidence_sentences))
         risk_sentences = risks[:1]
         numeric = [sentence for sentence in all_sentences if sentence not in evidence_sentences + risk_sentences and re.search(r'\d', sentence)]
-        clip = lambda text, size: text if len(text) <= size else text[:size].rstrip() + '…'
+        clip = _clip_reading_text
         evidence = clip(' '.join(evidence_sentences), 210)
         figures = clip(' '.join(numeric[:2]), 170) if numeric else '추가 비교 수치 없음'
         lead_risks = list(dict.fromkeys(re.findall(risk_pattern, evidence)))
@@ -600,7 +612,7 @@ def _reading_summary(title: str, body: str, level: str) -> str:
         result = f'근거\n{evidence}\n\n수치·비교 기준\n{figures}\n\n리스크·확인할 점\n{risk}'
     else:
         result = '\n\n'.join(sentences)
-    return result if len(result) <= 600 else result[:600].rstrip() + '…'
+    return _clip_reading_text(result, 600)
 
 
 def _point_fact(title: str, content: str) -> str:
@@ -709,8 +721,8 @@ def _investment_points(title: str, cleaned: str) -> dict:
     }
 
 
-def _mock_rewrite_news(title: str, raw_content: str) -> dict:
-    cleaned = _clean_article_text(title, raw_content)
+def _mock_rewrite_news(title: str, raw_content: str, *, already_clean: bool = False) -> dict:
+    cleaned = raw_content if already_clean else _clean_article_text(title, raw_content)
     detected = _detected_terms(f"{title} {cleaned}")
     reasons = _investment_points(title, cleaned)
     return {
@@ -812,7 +824,7 @@ def rewrite_news(title: str, raw_content: str, article_key: str | None = None, *
     if _is_tabular_article(title, raw_content):
         return {**{level: '' for level in ('beginner', 'normal', 'analyst')}, 'importanceReason': None, 'importanceReasons': {}, 'detectedTerms': [], 'mode': 'UNAVAILABLE', 'retryable': False}
     cleaned_content = _clean_article_text(title, raw_content)
-    fallback = {**_mock_rewrite_news(title, cleaned_content), 'mode': 'EXCERPT', 'retryable': False}
+    fallback = {**_mock_rewrite_news(title, cleaned_content, already_clean=True), 'mode': 'EXCERPT', 'retryable': False}
     if not config.REWRITE_WITH_LLM or not allow_llm:
         return fallback
     if not local_batch and config.LLM_PROVIDER != "gemini":
