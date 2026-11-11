@@ -29,7 +29,7 @@ def generation(monkeypatch):
     return current, call
 
 
-def test_concurrent_rewrites_serialize_and_leave_six_seconds_between_calls(generation):
+def test_concurrent_rewrites_overlap_network_but_leave_six_seconds_between_starts(generation):
     current, call = generation
     active = 0
     maximum = 0
@@ -45,7 +45,7 @@ def test_concurrent_rewrites_serialize_and_leave_six_seconds_between_calls(gener
     call.side_effect = generate
     with ThreadPoolExecutor(max_workers=4) as pool:
         results = list(pool.map(lambda key: llm_client.rewrite_news('수출 증가',SOURCE,str(key)),range(4)))
-    assert maximum == 1 and len(starts) == 4
+    assert maximum > 1 and len(starts) == 4
     assert all(right-left >= 6 for left,right in zip(starts,starts[1:]))
     assert all(result['mode']=='REWRITTEN' for result in results)
 
