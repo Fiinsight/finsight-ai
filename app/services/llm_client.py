@@ -345,6 +345,20 @@ def _build_market_impact_prompt(title: str, body: str, related_symbol: str | Non
 """
 
 
+def _grounded_impact_evidence(evidence: str, source: str) -> bool:
+    if len(re.sub(r"\s", "", evidence)) < 10 or not _numbers_in_source(evidence, source):
+        return False
+    def grams(text):
+        text = re.sub(r"[^가-힣a-z0-9]", "", unicodedata.normalize("NFKC", text).lower())
+        return {text[i:i+3] for i in range(len(text)-2)}
+    cited = grams(evidence)
+    if len(cited) < 6:
+        return False
+    # Precision against one source sentence prevents generic words or scattered matches from passing.
+    return any(len(cited & grams(sentence)) / len(cited) >= 0.6
+               for sentence in re.split(r"(?<=[.!?。])\s+|\n+", source))
+
+
 def analyze_market_impact(title: str, body: str, related_symbol: str | None = None) -> dict:
     """Analyze direction with explicit targets and evidence, safely by default."""
     mock = _mock_market_impact(title, body, related_symbol)
@@ -370,9 +384,8 @@ def analyze_market_impact(title: str, body: str, related_symbol: str | None = No
         # deterministic, article-grounded result when its cited evidence is
         # missing or unrelated to the supplied article.
         source_text = f"{title} {body}"
-        if not result["evidence"] or not any(
-            any(token in source_text for token in str(item).split()) for item in result["evidence"]
-        ):
+        result["evidence"] = [item for item in result["evidence"] if _grounded_impact_evidence(item, source_text)]
+        if not result["evidence"]:
             return mock
         return result
     except Exception as exc:
