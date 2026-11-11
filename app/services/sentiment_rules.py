@@ -3,7 +3,7 @@ import json
 import re
 from pathlib import Path
 
-RULES = json.loads((Path(__file__).parent / 'data/sentiment-rules.json').read_text())
+RULES = json.loads((Path(__file__).parent / 'rules/sentiment-rules.json').read_text())
 COMPOUNDS = [(re.compile(row['pattern']), row['label']) for row in RULES['compounds']]
 
 
