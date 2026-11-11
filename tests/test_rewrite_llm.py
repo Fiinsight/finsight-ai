@@ -20,15 +20,16 @@ def test_rewrite_is_one_call_and_persists_daily_budget_and_article_identity(tmp_
         llm.assert_called_once()
 
 @pytest.mark.parametrize('failure', ['numeric', 'duplicate', 'timeout', 'style'])
-def test_validation_and_failure_fall_back_without_retry(tmp_path, failure):
+def test_fact_failures_retry_once_and_network_failures_do_not_retry(tmp_path, failure):
     data = json.loads(json.dumps(VALID))
     if failure == 'numeric': data['beginner'] = data['beginner'].replace('261', '999')
     if failure == 'style': data['beginner'] = data['beginner'].replace('늘었어요', '늘었다')
     if failure == 'duplicate': data['analyst']['risk'] = data['analyst']['evidence']
-    with patch.object(config, 'REWRITE_WITH_LLM', True), patch.object(config, 'REWRITE_LEDGER_PATH', str(tmp_path / 'ledger.db')), patch.object(llm_client, '_call_gemini', side_effect=TimeoutError() if failure == 'timeout' else None, return_value=json.dumps(data)) as llm:
-        assert llm_client.rewrite_news('수출 증가', SOURCE, 'same')['mode'] == 'EXCERPT'
-        assert llm_client.rewrite_news('수출 증가', SOURCE, 'same')['mode'] == 'EXCERPT'
-        llm.assert_called_once()
+    with patch.object(config, 'REWRITE_WITH_LLM', True), patch.object(config, 'REWRITE_MIN_INTERVAL_SECONDS', 0), patch.object(config, 'REWRITE_LEDGER_PATH', str(tmp_path / 'ledger.db')), patch.object(llm_client, '_call_gemini', side_effect=TimeoutError() if failure == 'timeout' else None, return_value=json.dumps(data)) as llm:
+        expected = 'REWRITTEN' if failure == 'style' else 'EXCERPT'
+        assert llm_client.rewrite_news('수출 증가', SOURCE, 'same')['mode'] == expected
+        assert llm_client.rewrite_news('수출 증가', SOURCE, 'same')['mode'] == expected
+        assert llm.call_count == (1 if failure in ('style', 'timeout') else 2)
 
 def test_other_llm_flag_does_not_enable_rewrite():
     with patch.object(config, 'REWRITE_WITH_LLM', False), patch.object(config, 'USE_REAL_LLM', True), patch.object(llm_client, '_call_llm') as llm:
