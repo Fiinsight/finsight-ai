@@ -219,20 +219,6 @@ _IMPACT_TARGET_KEYWORDS = {
 }
 
 
-def _topic_direction(text: str) -> str | None:
-    rate_topic = any(term in text for term in ("금리", "국채", "채권", "수익률"))
-    if rate_topic:
-        rises = any(term in text for term in ("금리 상승", "금리 급등", "금리 인상", "국채금리 상승", "국채 금리 상승", "수익률 상승", "수익률 급등"))
-        falls = any(term in text for term in ("금리 하락", "금리 급락", "금리 인하", "국채금리 하락", "국채 금리 하락", "수익률 하락", "수익률 급락"))
-        if rises and not falls:
-            return "NEGATIVE"
-        if falls and not rises:
-            return "POSITIVE"
-    if "환율" in text and not any(term in text for term in ("수출", "수입")):
-        return "NEUTRAL"
-    return None
-
-
 def _split_sentences(text: str) -> list[str]:
     return [part.strip() for part in re.split(r"(?<=[.!?。！？])(?!\d)\s*", text.strip()) if part.strip()]
 
@@ -266,26 +252,12 @@ def _detected_terms(text: str) -> list[str]:
 def _mock_market_impact(title: str, body: str, related_symbol: str | None) -> dict:
     """Produce a cautious, explainable result without a network or paid model call."""
     source_text = ". ".join(part.rstrip(".!?。！？") for part in (title.strip(), body.strip()) if part)
-    positive_hits = sum(source_text.count(keyword) for keyword in _IMPACT_POSITIVE_KEYWORDS)
-    negative_hits = sum(source_text.count(keyword) for keyword in _IMPACT_NEGATIVE_KEYWORDS)
-    score = positive_hits - negative_hits
-    topic_direction = _topic_direction(source_text)
-
-    if topic_direction is not None:
-        direction = topic_direction
-        confidence = 0.7 if topic_direction != "NEUTRAL" else 0.35
-    elif positive_hits and negative_hits:
-        direction = "NEUTRAL"
+    from app.services.ml_sentiment import predict_rule_sentiment
+    sentiment = predict_rule_sentiment(title, body)
+    direction, confidence = sentiment['label'], sentiment['confidence']
+    score = 1 if direction == 'POSITIVE' else -1 if direction == 'NEGATIVE' else 0
+    if direction == 'NEUTRAL' and any(k in source_text for k in _IMPACT_POSITIVE_KEYWORDS) and any(k in source_text for k in _IMPACT_NEGATIVE_KEYWORDS):
         confidence = 0.3
-    elif score > 0:
-        direction = "POSITIVE"
-        confidence = min(0.85, 0.55 + score * 0.05)
-    elif score < 0:
-        direction = "NEGATIVE"
-        confidence = min(0.85, 0.55 + abs(score) * 0.05)
-    else:
-        direction = "NEUTRAL"
-        confidence = 0.35
 
     sentences = _split_sentences(source_text)
     evidence_keywords = _IMPACT_POSITIVE_KEYWORDS if score > 0 else _IMPACT_NEGATIVE_KEYWORDS

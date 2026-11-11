@@ -4,22 +4,7 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
-POSITIVE_WORDS = ("상승", "급등", "강세", "회복", "증가", "흑자", "개선", "호조", "확대", "성장", "수혜")
-NEGATIVE_WORDS = ("하락", "급락", "약세", "감소", "적자", "악화", "부진", "축소", "우려", "위기", "손실")
-
-
-def _topic_direction(text: str) -> str | None:
-    rate_topic = any(term in text for term in ("금리", "국채", "채권", "수익률"))
-    if rate_topic:
-        rises = any(term in text for term in ("금리 상승", "금리 급등", "금리 인상", "국채금리 상승", "국채 금리 상승", "수익률 상승", "수익률 급등"))
-        falls = any(term in text for term in ("금리 하락", "금리 급락", "금리 인하", "국채금리 하락", "국채 금리 하락", "수익률 하락", "수익률 급락"))
-        if rises and not falls:
-            return "NEGATIVE"
-        if falls and not rises:
-            return "POSITIVE"
-    if "환율" in text and not any(term in text for term in ("수출", "수입")):
-        return "NEUTRAL"
-    return None
+from app.services.sentiment_rules import rule_label, topic_label as _topic_direction
 
 
 @lru_cache(maxsize=1)
@@ -71,20 +56,8 @@ def predict_sentiment(title: str, body: str) -> dict[str, object]:
 
 
 def predict_rule_sentiment(title: str, body: str) -> dict[str, object]:
-    text = f"{title}\n{body}"
-    topic_label = _topic_direction(text)
-    if topic_label is not None:
-        return {"label": topic_label, "confidence": 0.7 if topic_label != "NEUTRAL" else 0.35, "basis": "RULE_BASED_FALLBACK"}
-
-    positive = sum(text.count(word) for word in POSITIVE_WORDS)
-    negative = sum(text.count(word) for word in NEGATIVE_WORDS)
-    if positive == negative:
-        label, confidence = "NEUTRAL", 0.35
-    elif positive > negative:
-        label, confidence = "POSITIVE", min(0.85, 0.5 + 0.1 * (positive - negative))
-    else:
-        label, confidence = "NEGATIVE", min(0.85, 0.5 + 0.1 * (negative - positive))
-    return {"label": label, "confidence": round(confidence, 4), "basis": "RULE_BASED_FALLBACK"}
+    label = rule_label(f"{title}\n{body}")
+    return {"label": label, "confidence": 0.35 if label == "NEUTRAL" else 0.7, "basis": "RULE_BASED_FALLBACK"}
 
 
 def sentiment_note(label: str | None, confidence: float | None) -> str:
