@@ -819,6 +819,18 @@ def _quota_error(exc: Exception) -> bool:
         word in str(exc).lower() for word in ('resource_exhausted', 'quota', '429'))
 
 
+def _wait_generation_turn() -> None:
+    global _last_rewrite_started
+    while True:
+        with _rewrite_lock:
+            now = time.monotonic()
+            delay = 0 if _last_rewrite_started is None else config.REWRITE_MIN_INTERVAL_SECONDS - (now - _last_rewrite_started)
+            if delay <= 0:
+                _last_rewrite_started = now
+                return
+        time.sleep(delay)
+
+
 def rewrite_news(title: str, raw_content: str, article_key: str | None = None, *, local_batch: bool = False, allow_llm: bool = True) -> dict:
     global _last_rewrite_started, _rewrite_llm_calls
     if _is_tabular_article(title, raw_content):
@@ -836,49 +848,45 @@ def rewrite_news(title: str, raw_content: str, article_key: str | None = None, *
         fallback['_source_hash'] = _rewrite_source_hash(title, cleaned_content)
     from app.services import rewrite_budget
     key = article_key or title + '::' + cleaned_content
-    with _rewrite_lock:
+    try:
+        allowed, previous = rewrite_budget.reserve(key, fallback, prompt_version=REWRITE_PROMPT_VERSION)
+        if not allowed:
+            if local_batch and previous.get('_source_hash') != fallback['_source_hash']:
+                return fallback
+            return previous
+        if local_batch:
+            summaries = _local_rewrite(title, cleaned_content[:20000], before_retry=lambda: rewrite_budget.reserve_retry(key))
+        else:
+            prompt = _build_rewrite_prompt(title, cleaned_content)
+            for attempt in range(2):
+                _wait_generation_turn()
+                _rewrite_llm_calls += 1
+                raw = _call_gemini(prompt, max_tokens=2200, json_mode=True)
+                try:
+                    summaries = _validated_rewrite(_extract_json(raw), title + ' ' + cleaned_content)
+                    break
+                except ValueError as error:
+                    if attempt or not rewrite_budget.reserve_retry(key):
+                        raise
+                    prompt += '\n이전 응답 검증 실패: ' + str(error) + '. 원문 사실과 수치를 유지하고 요청한 JSON 형식으로 한 번만 바로잡으세요.'
+        result = {**fallback, **summaries, 'mode': 'REWRITTEN'}
+        rewrite_budget.finish(key, result)
+        return result
+    except Exception as exc:
+        quota = not local_batch and _quota_error(exc)
+        result = {**fallback, 'retryable': quota}
         try:
-            allowed, previous = rewrite_budget.reserve(key, fallback, prompt_version=REWRITE_PROMPT_VERSION)
-            if not allowed:
-                if local_batch and previous.get('_source_hash') != fallback['_source_hash']:
-                    return fallback
-                return previous
-            if local_batch:
-                summaries = _local_rewrite(title, cleaned_content[:20000], before_retry=lambda: rewrite_budget.reserve_retry(key))
-            else:
-                prompt = _build_rewrite_prompt(title, cleaned_content)
-                for attempt in range(2):
-                    now = time.monotonic()
-                    if _last_rewrite_started is not None:
-                        time.sleep(max(0, config.REWRITE_MIN_INTERVAL_SECONDS - (now - _last_rewrite_started)))
-                    _last_rewrite_started = time.monotonic()
-                    _rewrite_llm_calls += 1
-                    raw = _call_gemini(prompt, max_tokens=2200, json_mode=True)
-                    try:
-                        summaries = _validated_rewrite(_extract_json(raw), title + ' ' + cleaned_content)
-                        break
-                    except ValueError as error:
-                        if attempt or not rewrite_budget.reserve_retry(key):
-                            raise
-                        prompt += '\n이전 응답 검증 실패: ' + str(error) + '. 원문 사실과 수치를 유지하고 요청한 JSON 형식으로 한 번만 바로잡으세요.'
-            result = {**fallback, **summaries, 'mode': 'REWRITTEN'}
-            rewrite_budget.finish(key, result)
-            return result
-        except Exception as exc:
-            quota = not local_batch and _quota_error(exc)
-            result = {**fallback, 'retryable': quota}
-            try:
-                rewrite_budget.finish(key, result, failed=True, quota=quota, validation=isinstance(exc, ValueError))
-            except Exception:
-                logger.warning("리라이팅 ledger 상태 저장 실패; 발췌 유지")
-            safe_validation = {
-                'Invalid rewrite sentence count', 'Beginner rewrite must use polite Korean',
-                'Rewrite contains unsupported numbers', 'Missing analyst sections',
-                'Analyst contains unsupported numbers', 'Duplicate analyst sentence',
-            }
-            failure = str(exc) if type(exc) is ValueError and str(exc) in safe_validation else type(exc).__name__
-            logger.warning("뉴스 리라이팅 실패, 발췌로 대체: %s", failure)
-            return result
+            rewrite_budget.finish(key, result, failed=True, quota=quota, validation=isinstance(exc, ValueError))
+        except Exception:
+            logger.warning("리라이팅 ledger 상태 저장 실패; 발췌 유지")
+        safe_validation = {
+            'Invalid rewrite sentence count', 'Beginner rewrite must use polite Korean',
+            'Rewrite contains unsupported numbers', 'Missing analyst sections',
+            'Analyst contains unsupported numbers', 'Duplicate analyst sentence',
+        }
+        failure = str(exc) if type(exc) is ValueError and str(exc) in safe_validation else type(exc).__name__
+        logger.warning("뉴스 리라이팅 실패, 발췌로 대체: %s", failure)
+        return result
 
 
 # ---------------------------------------------------------------------------
@@ -1354,6 +1362,34 @@ def _repair_feedback_reasons(data: dict, *, lead: str, neutral_guidance: str, le
     return {**data, 'reasons': repaired}
 
 
+def _repair_feedback_format(data: dict, fallback: dict, reason: str | None,
+                            percent: float | None, index: float | None) -> dict:
+    data = dict(data)
+    if isinstance(data.get('reasons'), list):
+        data['reasons'] = [dict(item) if isinstance(item, dict) else item for item in data['reasons']]
+        for item, expected in zip(data['reasons'], fallback['reasons']):
+            if isinstance(item, dict) and isinstance(item.get('title'), str):
+                if item['title'].strip(' []:：\t\n') == expected['title']:
+                    item['title'] = expected['title']
+    def repair(text):
+        if not isinstance(text, str):
+            return text
+        if reason:
+            text = text.replace('"' + reason + '"', '“' + reason + '”')
+        for number in (percent, index):
+            if number is None:
+                continue
+            text = re.sub(r'(?<![\d.+-])[-+]?\d+(?:\.\d+)?%',
+                          lambda match: f'{number:+.2f}%' if Decimal(match[0][:-1]) == Decimal(str(number)) else match[0], text)
+        return text.strip()
+    for key in ('headline', 'summary', 'nextTip'):
+        data[key] = repair(data.get(key))
+    for item in data.get('reasons', []) if isinstance(data.get('reasons'), list) else []:
+        if isinstance(item, dict):
+            item['detail'] = repair(item.get('detail'))
+    return data
+
+
 def generate_feedback(news_summary: str, user_choice: str, actual_direction: str,
                       actual_change_percent: float | None, **context) -> dict:
     fallback = _mock_generate_feedback(news_summary, user_choice, actual_direction, actual_change_percent, **context)
@@ -1373,29 +1409,27 @@ def generate_feedback(news_summary: str, user_choice: str, actual_direction: str
             day = datetime.now(ZoneInfo('Asia/Seoul')).date().isoformat()
             key = json.dumps([FEEDBACK_PROMPT_VERSION, day, news_summary, user_choice, actual_direction, actual_change_percent, context], sort_keys=True, ensure_ascii=False)
             global _last_rewrite_started
-            with _rewrite_lock:
-                if rewrite_budget.status()['rewriteStoppedToday']: return reject('rewrite_stopped')
-                allowed, previous = feedback_budget.reserve(key, fallback)
-                if not allowed:
-                    logger.info('feedback_reused reason=cache_or_budget')
-                    if previous.get('mode') != 'LLM': return reject('cached_rule_or_budget')
-                    # Cached LLM text must pass the current coaching rules too.
-                    raw = json.dumps(previous, ensure_ascii=False)
-                else:
-                    reserved = True
-                    try:
-                        _reserve_process_llm_call()
-                        if _last_rewrite_started is not None:
-                            time.sleep(max(0, config.REWRITE_MIN_INTERVAL_SECONDS - (time.monotonic() - _last_rewrite_started)))
-                        _last_rewrite_started = time.monotonic()
-                        raw = _call_gemini(prompt, max_tokens=1800, json_mode=True)
-                    except Exception:
-                        feedback_budget.finish(key, fallback)
-                        raise
+            if rewrite_budget.status()['rewriteStoppedToday']: return reject('rewrite_stopped')
+            allowed, previous = feedback_budget.reserve(key, fallback)
+            if not allowed:
+                logger.info('feedback_reused reason=cache_or_budget')
+                if previous.get('mode') != 'LLM': return reject('cached_rule_or_budget')
+                # Cached LLM text must pass the current coaching rules too.
+                raw = json.dumps(previous, ensure_ascii=False)
+            else:
+                reserved = True
+                try:
+                    _reserve_process_llm_call()
+                    _wait_generation_turn()
+                    raw = _call_gemini(prompt, max_tokens=1800, json_mode=True)
+                except Exception:
+                    feedback_budget.finish(key, fallback)
+                    raise
         else:
             raw = _call_llm(prompt, max_tokens=1800, json_mode=True)
         data = _extract_json(raw)
         if not isinstance(data, dict): return reject('invalid_json_shape')
+        data = _repair_feedback_format(data, fallback, context.get('user_reason'), actual_change_percent, context.get('index_change_percent'))
         lead = (_split_sentences(_clean_article_text(context.get('news_title', ''), news_summary) or context.get('news_title', '')) or [''])[0]
         data = _repair_feedback_reasons(data, lead=lead, neutral_guidance=_feedback_neutral_check(user_choice, actual_direction, actual_change_percent), level=context.get('level', 'normal'))
         if data.get('verdict') != fallback['verdict']: return reject('verdict_mismatch')
