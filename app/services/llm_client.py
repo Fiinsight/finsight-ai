@@ -484,12 +484,25 @@ def _with_particle(word: str, pair: str) -> str:
 
 
 def _select_article_facts(title: str, content: str, limit: int, level: str = 'normal') -> list[str]:
-    sentences = _split_sentences(content)
+    sentences = _split_beginner_source(content) if level == 'beginner' else _split_sentences(content)
     keywords = _detected_terms(title) + re.findall(r'[가-힣A-Za-z]{3,}', title)
     if not sentences or limit <= 0:
         return []
     if level == 'beginner':
+        # Publisher contact details and photo captions are not reading facts.
+        readable = []
+        for sentence in sentences:
+            if re.search(r'주소\s*[:：]|전화\s*[:：]|신문등록번호|발행/편집인|^[가-힣]{2,5}\s+(?:[가-힣]+\s+)?기자\s*$', sentence):
+                continue
+            if '사진 확대' in sentence:
+                sentence = sentence.split('사진 확대', 1)[1].strip()
+                if re.search(r'(?:사옥|모습|전경|사진)[.!?]?$' , sentence):
+                    continue
+            readable.append(sentence)
+        sentences = readable or sentences[:1]
         outcomes = [sentence for sentence in sentences[1:] if re.search(r'올랐|내렸|하락|상승|증가|감소|급락|늘었|줄었|기록|결과', sentence) and not re.search(r'전망|예상|우려', sentence)]
+        if outcomes and len(outcomes[-1]) > 100:
+            outcomes = [min(outcomes, key=len)]
         return [sentences[0]] + ([outcomes[-1]] if outcomes else sentences[-1:] if len(sentences) > 1 else [])
     ranked = sorted(enumerate(sentences[1:], start=1), key=lambda item: (
         -(3 * sum(keyword in item[1] for keyword in keywords) + bool(re.search(r'\d', item[1]))) / max(60, len(item[1])), item[0]))
@@ -533,22 +546,106 @@ def _clip_reading_text(text: str, size: int) -> str:
     return (prefix[:boundary] if boundary > 0 else '') .rstrip() + '…'
 
 
+def _polite_article_sentence(sentence: str) -> str:
+    # Only the outer sentence ending changes; reported speech stays quoted.
+    sentence = re.sub(r'([가-힣])(?:이다|입니다)(?=[.!?]*$)',
+                      lambda m: m[1] + ('이에요' if (ord(m[1])-0xAC00)%28 else '예요'), sentence)
+    sentence = re.sub(r'([았었였혔렸랐췄냈봤줬썼뒀쳤섰])습니다(?=[.!?]*$)', r'\1어요', sentence)
+    endings = [('상승했다', '올랐어요'), ('하락했다', '내렸어요'), ('증가했다', '늘었어요'),
+               ('감소했다', '줄었어요'), ('내다봤다', '내다봤어요'), ('나타났다', '나타났어요'),
+               ('나선다', '나서요'), ('선보인다', '선보여요'), ('보인다', '보여요'),
+               ('밝혔다', '밝혔어요'), ('올랐다', '올랐어요'), ('내렸다', '내렸어요'),
+               ('늘었다', '늘었어요'), ('줄었다', '줄었어요'), ('이었다', '이었어요'),
+               ('였다', '였어요'), ('했다', '했어요'), ('됐다', '됐어요'), ('있다', '있어요'),
+               ('없다', '없어요'), ('한다', '해요'), ('된다', '돼요'), ('이다', '이에요'),
+               ('했습니다', '했어요'), ('됐습니다', '됐어요'), ('있습니다', '있어요'),
+               ('없습니다', '없어요'), ('합니다', '해요'), ('됩니다', '돼요'), ('아닙니다', '아니에요'),
+               ('우위다', '우위예요'), ('오른다', '올라요'), ('내린다', '내려요'),
+               ('늘다', '늘어요'), ('줄다', '줄어요'), ('늘어', '늘어요'), ('줄어', '줄어요'),
+               ('답니다', '다고 해요')]
+    for ending, replacement in endings:
+        sentence = re.sub(re.escape(ending) + r'(?=[.!?]*$)', replacement, sentence)
+    sentence = re.sub(r'([았었였혔렸랐췄냈봤줬썼뒀쳤섰])다(?=[.!?]*$)', r'\1어요', sentence)
+    return re.sub(r'다(?=[.!?]*$)', '다고 해요', sentence)
+
+
+def _protected_article_positions(sentence: str) -> set[int]:
+    protected = set()
+    stack = []
+    pairs = {'(': ')', '[': ']', '“': '”', '‘': '’', '"': '"', "'": "'"}
+    for index, char in enumerate(sentence):
+        if stack:
+            protected.add(index)
+            if char == stack[-1]:
+                stack.pop()
+            elif char in pairs and char not in ('"', "'"):
+                stack.append(pairs[char])
+        elif char in pairs:
+            protected.add(index)
+            stack.append(pairs[char])
+    return protected
+
+
+def _split_beginner_source(text: str) -> list[str]:
+    protected = _protected_article_positions(text)
+    start, sentences = 0, []
+    for match in re.finditer(r'[.!?。！？](?!\d)', text):
+        if match.start() not in protected:
+            sentences.append(text[start:match.end()].strip())
+            start = match.end()
+    if text[start:].strip():
+        sentences.append(text[start:].strip())
+    return sentences
+
+
+def _split_beginner_sentence(sentence: str, maximum: int = 60) -> list[str]:
+    """Split only known finite conjunctions, outside quotes and parentheses."""
+    if len(sentence) <= maximum:
+        return [_polite_article_sentence(sentence)]
+    protected = _protected_article_positions(sentence)
+    # A comma alone cannot turn a date, a company list or a dependent clause into a sentence.
+    endings = {'했으며': '했다', '됐으며': '됐다', '였으며': '였다', '었으며': '었다',
+               '았으며': '았다', '있으며': '있다', '없으며': '없다', '이며': '이다',
+               '했고': '했다', '됐고': '됐다', '였고': '였다', '었고': '었다', '았고': '았다',
+               '있고': '있다', '없고': '없다', '하고': '한다', '하면서': '한다',
+               '했지만': '했다', '됐지만': '됐다', '었지만': '었다', '았지만': '았다',
+               '하지만': '한다', '있지만': '있다', '없지만': '없다'}
+    endings.update({'했는데':'했다', '됐는데':'됐다', '었는데':'었다', '았는데':'았다',
+                    '늘어서':'늘어', '줄어서':'줄어', '늘며':'늘다', '줄며':'줄다',
+                    '오르며':'오른다', '내리며':'내린다'})
+    pattern = '|'.join(sorted(endings, key=len, reverse=True))
+    start, prefix, parts = 0, '', []
+    for match in re.finditer(r'(?:' + pattern + r')(?=,?\s)\s*,?\s+', sentence):
+        if any(i in protected for i in range(match.start(), match.end())):
+            continue
+        left = sentence[start:match.start()] + endings[match[0].rstrip(' ,')]
+        right = sentence[match.end():]
+        if len(left.strip()) < 12 or len(right.strip()) < 12:
+            continue
+        parts.append(prefix + _polite_article_sentence(left.strip() + '.'))
+        prefix = ('하지만 ' if '지만' in match[0] else '그래서 ' if '어서' in match[0]
+                  else '이와 함께 ' if '면서' in match[0] else '')
+        start = match.end()
+    parts.append(prefix + _polite_article_sentence(sentence[start:].strip()))
+    return parts
+
+
 def _reading_summary(title: str, body: str, level: str) -> str:
     if _is_tabular_article(title, body):
         return '표 형식 시세 자료는 문장형 읽기 지원을 제공하지 않아요.'
     sentences = _select_article_facts(title, body, {'beginner': 2, 'normal': 3, 'analyst': 4}[level], level)
     if level == 'beginner':
-        replacements = [('컨센서스', '시장 전문가들의 예상'), ('유동성', '시장에 돌고 있는 돈'), ('매크로 불확실성', '경제 전반을 예측하기 어려운 상황'), ('상방 압력', '오를 가능성을 높이는 힘'), ('하방 압력', '내릴 가능성을 높이는 힘'), ('전년 동기', '지난해 같은 기간'), ('전 거래일', '직전 거래일'), ('전장 대비', '직전 거래일과 비교해')]
+        replacements = [('컨센서스', '시장 전문가들의 예상'), ('유동성', '시장에 돌고 있는 돈'), ('매크로 불확실성', '경제 전반을 예측하기 어려운 상황'), ('상방 압력', '오를 가능성을 높이는 힘'), ('하방 압력', '내릴 가능성을 높이는 힘'), ('전년 동기', '지난해 같은 기간'), ('전년 동월', '지난해 같은 달'), ('전망치', '예상값'), ('전 거래일', '직전 거래일'), ('전장 대비', '직전 거래일과 비교해')]
         particles = {particle: pair for pair in ('은/는', '이/가', '을/를', '과/와') for particle in pair.split('/')}
         for original, plain in replacements:
-            sentences = [re.sub(re.escape(original) + r'(은|는|이|가|을|를|과|와)?',
-                                lambda match: _with_particle(plain, particles[match[1]]) if match[1] else plain,
-                                sentence) for sentence in sentences]
-        def polite(sentence: str) -> str:
-            for ending, replacement in [('상승했다', '올랐어요'), ('하락했다', '내렸어요'), ('밝혔다', '밝혔어요'), ('설명했다', '설명했어요'), ('전망했다', '전망했어요'), ('증가했다', '늘었어요'), ('감소했다', '줄었어요'), ('기록했다', '기록했어요'), ('내다봤다', '내다봤어요'), ('습니다', '어요'), ('했다', '했어요'), ('됐다', '됐어요'), ('있다', '있어요'), ('없다', '없어요'), ('한다', '해요'), ('된다', '돼요'), ('이다', '이에요'), ('우위다', '우위예요')]:
-                sentence = re.sub(re.escape(ending) + r'(?=[.!?]|$)', replacement, sentence)
-            return re.sub(r'다(?=[.!?]|$)', '다고 해요', sentence)
-        sentences = [polite(sentence) for sentence in sentences]
+            replaced = []
+            for sentence in sentences:
+                protected = _protected_article_positions(sentence)
+                replaced.append(re.sub(re.escape(original) + r'(은|는|이|가|을|를|과|와)?',
+                                       lambda match: match[0] if match.start() in protected else _with_particle(plain, particles[match[1]]) if match[1] else plain,
+                                       sentence))
+            sentences = replaced
+        sentences = [part for sentence in sentences for part in _split_beginner_sentence(sentence)]
         simplified = []
         for sentence in sentences:
             codes = re.findall(r'\[\d{6}\]', sentence)
@@ -563,6 +660,7 @@ def _reading_summary(title: str, body: str, level: str) -> str:
         sentences = simplified
         # Explain what the reader actually sees; prefer unfamiliar acronyms over a general topic.
         visible_terms = [term for term in _detected_terms(' '.join(sentences)) if term in TERM_DEFINITIONS]
+        visible_terms += [term for term in ('PBR', 'PER', '듀레이션') if re.search(r'(?<![A-Za-z])'+term+r'(?![A-Za-z])', ' '.join(sentences))]
         term = next((term for term in visible_terms if term.isascii() and term.isupper()), next(iter(visible_terms), None))
         if term:
             definition = re.sub(r'(?:입니다|이에요|예요)[.!?。]*$', '', TERM_DEFINITIONS[term]).rstrip('.!?。 ')
@@ -881,6 +979,9 @@ def rewrite_news(title: str, raw_content: str, article_key: str | None = None, *
 
 
 TERM_DEFINITIONS = {
+    'PBR': '주가를 주당순자산으로 나눈 주가순자산비율입니다.',
+    'PER': '주가를 주당순이익으로 나눈 주가수익비율입니다.',
+    '듀레이션': '채권 현금 흐름의 가중 평균 회수 기간으로 금리 변화에 따른 가격 민감도와 관련됩니다.',
     '기준금리': '중앙은행이 정하는 정책금리로 대출·예금 등 시중금리의 기준입니다.',
     '금리': '돈을 빌리거나 맡길 때 원금에 대해 적용되는 이자의 비율입니다.',
     '국채금리': '정부가 발행한 채권을 보유할 때 기대하는 수익률입니다. 채권 가격과 반대로 움직입니다.',
