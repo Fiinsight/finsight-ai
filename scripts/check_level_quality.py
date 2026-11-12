@@ -4,6 +4,11 @@ No LLM call involved here (free, deterministic) — this only measures whether
 the 3 levels are actually differentiated in a readability sense: shorter
 sentences and fewer finance jargon words for "beginner" than "analyst".
 
+The original length/jargon formula and beginner <= normal <= analyst condition
+apply to the reading body. Section labels, verified glossary notes and explicit
+absence notices are reported separately, rather than counted as article prose.
+Missing source evidence, unsupported numbers and empty bodies also fail.
+
 This is a text-statistics proxy for readability, not a judgment of factual
 accuracy or writing quality — it can't tell you whether a summary correctly
 reflects the source article. Treat it as a smoke test for "did the level
@@ -45,7 +50,7 @@ LEVELS = ["beginner", "normal", "analyst"]
 
 
 def fetch_rewrite(base_url: str, title: str, body: str, level: str) -> str:
-    payload = json.dumps({"title": title, "body": body, "level": level}).encode("utf-8")
+    payload = json.dumps({"title": title, "body": body, "level": level, "allow_llm": False}).encode("utf-8")
     req = urllib.request.Request(
         f"{base_url}/ai/news/rewrite",
         data=payload,
@@ -85,6 +90,50 @@ def analyze(text: str) -> dict:
     }
 
 
+def reading_body(text: str) -> str:
+    """Compare article prose in the same format; never remove unknown claims."""
+    from app.services.llm_client import TERM_DEFINITIONS
+    display_only = {'근거', '수치·비교 기준', '리스크·확인할 점', '추가 비교 수치 없음',
+                    '기사에 별도로 언급된 위험 요인은 없습니다.', '추가 확인이 필요합니다.',
+                    '기사에 별도로 언급된 위험 요인은 없습니다. 추가 확인이 필요합니다.'}
+    lines = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line in display_only:
+            continue
+        glossary = re.fullmatch(r'([^()]+)\(([^()]+)\)[을를] 함께 살펴봐요\.', line)
+        if glossary and glossary[1] in TERM_DEFINITIONS:
+            definition = re.sub(r'(?:입니다|이에요|예요)[.!?。]*$', '', TERM_DEFINITIONS[glossary[1]]).rstrip('.!?。 ')
+            if glossary[2] == definition:
+                continue
+        lines.append(re.sub(r'\[(?:사실|분석|전망)\]\s*', '', line))
+    return ' '.join(' '.join(lines).split())
+
+
+def assess(results: dict[str, str], source: str) -> dict:
+    from app.services.llm_client import _numbers_in_source
+    bodies = {level: reading_body(results[level]) for level in LEVELS}
+    stats = {level: analyze(bodies[level]) for level in LEVELS}
+    issues = []
+    for level in LEVELS:
+        if not bodies[level]:
+            issues.append(f'{level}: 발췌 본문 없음')
+        if not _numbers_in_source(bodies[level], source):
+            issues.append(f'{level}: 원문에 없는 수치')
+    scores = [stats[level]['difficulty_score'] for level in LEVELS]
+    if not scores[0] <= scores[1] <= scores[2]:
+        issues.append('난이도 순서가 기대와 다름')
+    # Do not excuse omitted normal-level evidence when it fits the same 600-char contract.
+    overhead = len(results['analyst']) - len(bodies['analyst'])
+    if len(bodies['normal']) + overhead <= 600:
+        source = ' '.join(source.split())
+        for sentence in split_sentences(bodies['normal']):
+            if sentence in source and sentence not in bodies['analyst']:
+                issues.append('analyst: 일반 수준의 원문 근거 누락: ' + sentence)
+    return {'stats': stats, 'rawStats': {level: analyze(results[level]) for level in LEVELS},
+            'issues': issues, 'passed': not issues}
+
+
 def cell(value):
     return html.escape(str(value)).replace('|','&#124;').replace('\n','<br>')
 
@@ -117,10 +166,11 @@ def main() -> None:
         print(f'Compared {min(10,len(rows))} saved articles; no model calls')
         return
 
-    results = {}
+    summaries = {}
     for level in LEVELS:
-        summary = fetch_rewrite(args.base_url, args.title, args.body, level)
-        results[level] = {"summary": summary, **analyze(summary)}
+        summaries[level] = fetch_rewrite(args.base_url, args.title, args.body, level)
+    assessment = assess(summaries, args.body)
+    results = assessment['stats']
 
     print(f"기사: {args.title}\n")
     header = f"{'레벨':<10}{'글자수':>8}{'문장수':>8}{'평균문장길이':>14}{'전문용어':>10}{'난이도점수':>10}"
@@ -134,20 +184,20 @@ def main() -> None:
         )
 
     print()
-    beginner_score = results["beginner"]["difficulty_score"]
-    normal_score = results["normal"]["difficulty_score"]
-    analyst_score = results["analyst"]["difficulty_score"]
-
-    ordered_correctly = beginner_score <= normal_score <= analyst_score
+    ordered_correctly = assessment['passed']
     print(
         "판정: "
         + ("PASS — beginner ≤ normal ≤ analyst 순서로 난이도가 올라감" if ordered_correctly
-           else "FAIL — 난이도 순서가 기대와 다름 (beginner가 더 어렵거나 순서가 뒤집힘)")
+           else "FAIL — " + '; '.join(assessment['issues']))
     )
+    print('표시 문구 포함 참고 점수:', ', '.join(f"{level}={assessment['rawStats'][level]['difficulty_score']}" for level in LEVELS))
     print(
-        "\n※ 참고: 이건 문장 길이·전문용어 개수만 보는 규칙 기반 지표라, "
+        "\n※ 본문 통계에서 섹션 제목·검증된 용어 풀이·부재 안내를 분리했습니다. "
+        "문장 길이·전문용어 개수는 규칙 기반 대용 지표이며, "
         "'내용이 원문과 맞는지'는 못 잽니다 — 레벨 구분이 문자 그대로 작동하는지 보는 스모크 테스트입니다."
     )
+    if not assessment['passed']:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
