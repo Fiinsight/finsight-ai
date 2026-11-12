@@ -561,7 +561,9 @@ def _reading_summary(title: str, body: str, level: str) -> str:
             else:
                 simplified.append(_strip_stock_codes(sentence))
         sentences = simplified
-        term = next((term for term in _detected_terms(title + ' ' + body) if term in TERM_DEFINITIONS), None)
+        # Explain what the reader actually sees; prefer unfamiliar acronyms over a general topic.
+        visible_terms = [term for term in _detected_terms(' '.join(sentences)) if term in TERM_DEFINITIONS]
+        term = next((term for term in visible_terms if term.isascii() and term.isupper()), next(iter(visible_terms), None))
         if term:
             definition = re.sub(r'(?:입니다|이에요|예요)[.!?。]*$', '', TERM_DEFINITIONS[term]).rstrip('.!?。 ')
             particle = _with_particle(term, '을/를')[len(term):]
@@ -576,12 +578,24 @@ def _reading_summary(title: str, body: str, level: str) -> str:
         risks = sorted([sentence for sentence in all_sentences if re.search(risk_pattern, sentence) and (re.search(r'위험|리스크|불확실|우려|제약|변수|부담|불안|경고|매도 우위|순매도|규제|제재|관세', sentence) or _sentence_label(sentence) != '[사실]')], key=lambda sentence: (not bool(re.match(r'^(다만|그러나|하지만)', sentence)), sentence in evidence_sentences))
         risk_sentences = risks[:1]
         numeric = [sentence for sentence in all_sentences if sentence not in evidence_sentences + risk_sentences and re.search(r'\d', sentence)]
+        numeric = [sentence for sentence in sentences if sentence in numeric] + [sentence for sentence in numeric if sentence not in sentences]
+        # Classification must not discard the selected causal/forecast evidence without digits.
+        evidence_sentences = sentences[:1] + [sentence for sentence in sentences[1:] if sentence not in numeric[:2] + risk_sentences]
         clip = _clip_reading_text
-        evidence = clip(' '.join(evidence_sentences), 210)
-        figures = clip(' '.join(numeric[:2]), 170) if numeric else '추가 비교 수치 없음'
+        labelled = lambda items: ' '.join(_sentence_label(sentence) + ' ' + sentence for sentence in items)
+        evidence = labelled(evidence_sentences)
+        figures = labelled(numeric[:2]) if numeric else '추가 비교 수치 없음'
         lead_risks = list(dict.fromkeys(re.findall(risk_pattern, evidence)))
-        risk = clip(' '.join(risk_sentences), 130) if risk_sentences else ('기사에 나타난 ' + '·'.join(lead_risks) + ' 흐름의 지속 여부를 확인하세요.' if lead_risks else '기사에 별도로 언급된 위험 요인은 없습니다. 추가 확인이 필요합니다.')
-        result = f'근거\n{evidence}\n\n수치·비교 기준\n{figures}\n\n리스크·확인할 점\n{risk}'
+        risk = labelled(risk_sentences) if risk_sentences else ('기사에 나타난 ' + '·'.join(lead_risks) + ' 흐름의 지속 여부를 확인하세요.' if lead_risks else '기사에 별도로 언급된 위험 요인은 없습니다.')
+        headings = ('근거', '수치·비교 기준', '리스크·확인할 점')
+        texts, limits = [evidence, figures, risk], [210, 170, 130]
+        # Share unused section space before clipping: short/no figures must not waste room for evidence.
+        remaining = 600 - len('\n\n'.join(heading + '\n' for heading in headings)) - sum(min(len(text), limit) for text, limit in zip(texts, limits))
+        for index, text in enumerate(texts):
+            extra = min(max(0, len(text) - limits[index]), remaining)
+            limits[index] += extra
+            remaining -= extra
+        result = '\n\n'.join(heading + '\n' + clip(text, limit) for heading, text, limit in zip(headings, texts, limits))
     else:
         result = '\n\n'.join(sentences)
     return _clip_reading_text(result, 600)
