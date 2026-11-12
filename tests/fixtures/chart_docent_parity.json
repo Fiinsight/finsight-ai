@@ -1,0 +1,2210 @@
+{
+  "cases" : [ {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자, 수주 소식에 4% 상승",
+        "summary" : "삼성전자는 공급 계약을 발표했다. SK하이닉스가 하락했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-DIRECT-D",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자, 수주 소식에 4% 상승",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자, 수주 소식에 4% 상승",
+        "summary" : "삼성전자는 공급 계약을 발표했다. SK하이닉스가 하락했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-DIRECT-W",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자, 수주 소식에 4% 상승",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자, 수주 소식에 4% 상승",
+        "summary" : "삼성전자는 공급 계약을 발표했다. SK하이닉스가 하락했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-DIRECT-MINUTE",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자, 수주 소식에 4% 상승",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "반도체 수요 발표",
+        "summary" : "반도체 업계는 재고 조정을 발표했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "SECTOR",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-SECTOR-D",
+    "expected" : {
+      "relation" : "SECTOR",
+      "whatHappened" : "반도체 업계는 재고 조정을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : 1,
+      "newsTitle" : "반도체 수요 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "반도체 수요 발표",
+        "summary" : "반도체 업계는 재고 조정을 발표했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "SECTOR",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-SECTOR-W",
+    "expected" : {
+      "relation" : "SECTOR",
+      "whatHappened" : "반도체 업계는 재고 조정을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : 1,
+      "newsTitle" : "반도체 수요 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "반도체 수요 발표",
+        "summary" : "반도체 업계는 재고 조정을 발표했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "SECTOR",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-SECTOR-MINUTE",
+    "expected" : {
+      "relation" : "SECTOR",
+      "whatHappened" : "반도체 업계는 재고 조정을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : 1,
+      "newsTitle" : "반도체 수요 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "코스피, 외국인 매도세에 4% 하락",
+        "summary" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "MARKET",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-MARKET-D",
+    "expected" : {
+      "relation" : "MARKET",
+      "whatHappened" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+      "possibleReason" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 이후 외국인·기관 매매가 이어지는지 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "코스피, 외국인 매도세에 4% 하락",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "코스피, 외국인 매도세에 4% 하락",
+        "summary" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "MARKET",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-MARKET-W",
+    "expected" : {
+      "relation" : "MARKET",
+      "whatHappened" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+      "possibleReason" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 이후 외국인·기관 매매가 이어지는지 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "코스피, 외국인 매도세에 4% 하락",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "코스피, 외국인 매도세에 4% 하락",
+        "summary" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "MARKET",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-MARKET-MINUTE",
+    "expected" : {
+      "relation" : "MARKET",
+      "whatHappened" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+      "possibleReason" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 이후 외국인·기관 매매가 이어지는지 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "코스피, 외국인 매도세에 4% 하락",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-NONE-D",
+    "expected" : {
+      "relation" : "NONE",
+      "whatHappened" : "이날 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+      "possibleReason" : "같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : null,
+      "newsTitle" : null,
+      "source" : null,
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-NONE-W",
+    "expected" : {
+      "relation" : "NONE",
+      "whatHappened" : "이 주간 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+      "possibleReason" : "같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : null,
+      "newsTitle" : null,
+      "source" : null,
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "beginner-NONE-MINUTE",
+    "expected" : {
+      "relation" : "NONE",
+      "whatHappened" : "이 시점 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+      "possibleReason" : "같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : null,
+      "newsTitle" : null,
+      "source" : null,
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자, 수주 소식에 4% 상승",
+        "summary" : "삼성전자는 공급 계약을 발표했다. SK하이닉스가 하락했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-DIRECT-D",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자, 수주 소식에 4% 상승",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자, 수주 소식에 4% 상승",
+        "summary" : "삼성전자는 공급 계약을 발표했다. SK하이닉스가 하락했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-DIRECT-W",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자, 수주 소식에 4% 상승",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자, 수주 소식에 4% 상승",
+        "summary" : "삼성전자는 공급 계약을 발표했다. SK하이닉스가 하락했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-DIRECT-MINUTE",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자, 수주 소식에 4% 상승",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "반도체 수요 발표",
+        "summary" : "반도체 업계는 재고 조정을 발표했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "SECTOR",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-SECTOR-D",
+    "expected" : {
+      "relation" : "SECTOR",
+      "whatHappened" : "반도체 업계는 재고 조정을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : 1,
+      "newsTitle" : "반도체 수요 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "반도체 수요 발표",
+        "summary" : "반도체 업계는 재고 조정을 발표했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "SECTOR",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-SECTOR-W",
+    "expected" : {
+      "relation" : "SECTOR",
+      "whatHappened" : "반도체 업계는 재고 조정을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : 1,
+      "newsTitle" : "반도체 수요 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "반도체 수요 발표",
+        "summary" : "반도체 업계는 재고 조정을 발표했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "SECTOR",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-SECTOR-MINUTE",
+    "expected" : {
+      "relation" : "SECTOR",
+      "whatHappened" : "반도체 업계는 재고 조정을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : 1,
+      "newsTitle" : "반도체 수요 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "코스피, 외국인 매도세에 4% 하락",
+        "summary" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "MARKET",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-MARKET-D",
+    "expected" : {
+      "relation" : "MARKET",
+      "whatHappened" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+      "possibleReason" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 이후 외국인·기관 매매가 이어지는지 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "코스피, 외국인 매도세에 4% 하락",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "코스피, 외국인 매도세에 4% 하락",
+        "summary" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "MARKET",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-MARKET-W",
+    "expected" : {
+      "relation" : "MARKET",
+      "whatHappened" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+      "possibleReason" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 이후 외국인·기관 매매가 이어지는지 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "코스피, 외국인 매도세에 4% 하락",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "코스피, 외국인 매도세에 4% 하락",
+        "summary" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "MARKET",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-MARKET-MINUTE",
+    "expected" : {
+      "relation" : "MARKET",
+      "whatHappened" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+      "possibleReason" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 이후 외국인·기관 매매가 이어지는지 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "코스피, 외국인 매도세에 4% 하락",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-NONE-D",
+    "expected" : {
+      "relation" : "NONE",
+      "whatHappened" : "이날 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+      "possibleReason" : "같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : null,
+      "newsTitle" : null,
+      "source" : null,
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-NONE-W",
+    "expected" : {
+      "relation" : "NONE",
+      "whatHappened" : "이 주간 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+      "possibleReason" : "같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : null,
+      "newsTitle" : null,
+      "source" : null,
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "같은 주간 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "normal-NONE-MINUTE",
+    "expected" : {
+      "relation" : "NONE",
+      "whatHappened" : "이 시점 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+      "possibleReason" : "같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : null,
+      "newsTitle" : null,
+      "source" : null,
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "같은 시점 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요. 가격 비교만으로 원인을 단정하지 않아요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자, 수주 소식에 4% 상승",
+        "summary" : "삼성전자는 공급 계약을 발표했다. SK하이닉스가 하락했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-DIRECT-D",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했다.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 날 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자, 수주 소식에 4% 상승",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 날 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자, 수주 소식에 4% 상승",
+        "summary" : "삼성전자는 공급 계약을 발표했다. SK하이닉스가 하락했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-DIRECT-W",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했다.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 주간 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자, 수주 소식에 4% 상승",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 주간 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자, 수주 소식에 4% 상승",
+        "summary" : "삼성전자는 공급 계약을 발표했다. SK하이닉스가 하락했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-DIRECT-MINUTE",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했다.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 시점 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자, 수주 소식에 4% 상승",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 시점 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "반도체 수요 발표",
+        "summary" : "반도체 업계는 재고 조정을 발표했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "SECTOR",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-SECTOR-D",
+    "expected" : {
+      "relation" : "SECTOR",
+      "whatHappened" : "반도체 업계는 재고 조정을 발표했다.",
+      "possibleReason" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 날 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : 1,
+      "newsTitle" : "반도체 수요 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 날 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "반도체 수요 발표",
+        "summary" : "반도체 업계는 재고 조정을 발표했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "SECTOR",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-SECTOR-W",
+    "expected" : {
+      "relation" : "SECTOR",
+      "whatHappened" : "반도체 업계는 재고 조정을 발표했다.",
+      "possibleReason" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 주간 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : 1,
+      "newsTitle" : "반도체 수요 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 주간 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "반도체 수요 발표",
+        "summary" : "반도체 업계는 재고 조정을 발표했다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "SECTOR",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-SECTOR-MINUTE",
+    "expected" : {
+      "relation" : "SECTOR",
+      "whatHappened" : "반도체 업계는 재고 조정을 발표했다.",
+      "possibleReason" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 시점 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : 1,
+      "newsTitle" : "반도체 수요 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "관련 소식: ‘반도체 수요 발표’, 이 종목을 직접 다룬 기사는 아니에요. 같은 시점 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "코스피, 외국인 매도세에 4% 하락",
+        "summary" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "MARKET",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-MARKET-D",
+    "expected" : {
+      "relation" : "MARKET",
+      "whatHappened" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+      "possibleReason" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 날 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 이후 외국인·기관 매매가 이어지는지 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "코스피, 외국인 매도세에 4% 하락",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 날 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "코스피, 외국인 매도세에 4% 하락",
+        "summary" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "MARKET",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-MARKET-W",
+    "expected" : {
+      "relation" : "MARKET",
+      "whatHappened" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+      "possibleReason" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 주간 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 이후 외국인·기관 매매가 이어지는지 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "코스피, 외국인 매도세에 4% 하락",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 주간 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "코스피, 외국인 매도세에 4% 하락",
+        "summary" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "MARKET",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-MARKET-MINUTE",
+    "expected" : {
+      "relation" : "MARKET",
+      "whatHappened" : "코스피 증시는 외국인 순매도에 약세를 보였다.",
+      "possibleReason" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 시점 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 이후 외국인·기관 매매가 이어지는지 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "코스피, 외국인 매도세에 4% 하락",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "기사의 ‘코스피, 외국인 매도세에’ 표현처럼 해당 요인이 영향을 줬을 수 있어요. 같은 시점 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-NONE-D",
+    "expected" : {
+      "relation" : "NONE",
+      "whatHappened" : "이날 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+      "possibleReason" : "같은 날 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요. 가격 비교만으로 원인을 단정하지 않아요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : null,
+      "newsTitle" : null,
+      "source" : null,
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "같은 날 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요. 가격 비교만으로 원인을 단정하지 않아요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "W",
+      "news" : [ ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-NONE-W",
+    "expected" : {
+      "relation" : "NONE",
+      "whatHappened" : "이 주간 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+      "possibleReason" : "같은 주간 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요. 가격 비교만으로 원인을 단정하지 않아요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : null,
+      "newsTitle" : null,
+      "source" : null,
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "같은 주간 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요. 가격 비교만으로 원인을 단정하지 않아요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "MINUTE",
+      "news" : [ ],
+      "level" : "analyst",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ]
+    },
+    "id" : "analyst-NONE-MINUTE",
+    "expected" : {
+      "relation" : "NONE",
+      "whatHappened" : "이 시점 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.",
+      "possibleReason" : "같은 시점 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요. 가격 비교만으로 원인을 단정하지 않아요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 추가로 확인할 개별 사건 자료가 없어요.",
+      "newsId" : null,
+      "newsTitle" : null,
+      "source" : null,
+      "mode" : "RULE",
+      "terms" : [ {
+        "term" : "재고 조정",
+        "definition" : "재고와 생산량을 조절하는 과정입니다."
+      } ],
+      "whyItMoved" : "같은 시점 코스피 -1.20%·삼성전자 -4.80%로, 초과 등락률은 -3.60%p예요. 가격 비교만으로 원인을 단정하지 않아요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -0.5,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자 우려 해소",
+        "summary" : "사진=합성 제공. SK하이닉스가 4% 하락했다. 삼성전자는 공급 계약을 발표했다.",
+        "published_at" : "2026-11-02T07:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : "POSITIVE",
+        "sentiment_confidence" : 0.9,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : null,
+      "terms" : [ ]
+    },
+    "id" : "boundaries-0",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식이 나왔지만 주가는 거의 움직이지 않았어요. 같은 날 코스피는 -1.20%, 삼성전자는 -0.50%로, 등락률이 시장보다 0.70%p 높았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 +0.70%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자 우려 해소",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식이 나왔지만 주가는 거의 움직이지 않았어요. 같은 날 코스피는 -1.20%, 삼성전자는 -0.50%로, 등락률이 시장보다 0.70%p 높았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : 0.5,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자 우려 해소",
+        "summary" : "사진=합성 제공. SK하이닉스가 4% 하락했다. 삼성전자는 공급 계약을 발표했다.",
+        "published_at" : "2026-11-02T07:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : "NEGATIVE",
+        "sentiment_confidence" : 0.9,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : null,
+      "terms" : [ ]
+    },
+    "id" : "boundaries-1",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식이 나왔지만 주가는 거의 움직이지 않았어요. 같은 날 코스피는 -1.20%, 삼성전자는 +0.50%로, 등락률이 시장보다 1.70%p 높았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 +1.70%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자 우려 해소",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식이 나왔지만 주가는 거의 움직이지 않았어요. 같은 날 코스피는 -1.20%, 삼성전자는 +0.50%로, 등락률이 시장보다 1.70%p 높았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : 3.0,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자 우려 해소",
+        "summary" : "사진=합성 제공. SK하이닉스가 4% 하락했다. 삼성전자는 공급 계약을 발표했다.",
+        "published_at" : "2026-11-02T07:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : 2.5,
+      "market_context" : null,
+      "terms" : [ ]
+    },
+    "id" : "boundaries-2",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "같은 날 코스피는 +2.50%, 삼성전자는 +3.00%로, 시장과 비슷한 방향·폭으로, 등락률이 시장보다 0.50%p 높았어요. 관련 소식: ‘삼성전자 우려 해소’.",
+      "marketImpact" : "시장 대비 초과 등락률은 +0.50%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자 우려 해소",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "같은 날 코스피는 +2.50%, 삼성전자는 +3.00%로, 시장과 비슷한 방향·폭으로, 등락률이 시장보다 0.50%p 높았어요. 관련 소식: ‘삼성전자 우려 해소’."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -3.0,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자 우려 해소",
+        "summary" : "사진=합성 제공. SK하이닉스가 4% 하락했다. 삼성전자는 공급 계약을 발표했다.",
+        "published_at" : "2026-11-02T07:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : 2.0,
+      "market_context" : null,
+      "terms" : [ ]
+    },
+    "id" : "boundaries-3",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 날 코스피는 +2.00%, 삼성전자는 -3.00%로, 시장과 반대 방향으로, 등락률이 시장보다 5.00%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -5.00%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자 우려 해소",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 날 코스피는 +2.00%, 삼성전자는 -3.00%로, 시장과 반대 방향으로, 등락률이 시장보다 5.00%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -3.0,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자 우려 해소",
+        "summary" : "사진=합성 제공. SK하이닉스가 4% 하락했다. 삼성전자는 공급 계약을 발표했다.",
+        "published_at" : "2026-11-02T07:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : null,
+      "market_context" : null,
+      "terms" : [ ]
+    },
+    "id" : "boundaries-4",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 주가는 -3.00% 움직였지만, 같은 기간 지수 자료는 확인하지 못했어요.",
+      "marketImpact" : "계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자 우려 해소",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 주가는 -3.00% 움직였지만, 같은 기간 지수 자료는 확인하지 못했어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -3.0,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자 우려 해소",
+        "summary" : "사진=합성 제공. SK하이닉스가 4% 하락했다. 삼성전자는 공급 계약을 발표했다.",
+        "published_at" : "2026-11-02T07:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : true,
+        "cause_phrase" : "삼성전자 외국인 매도세에"
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : null,
+      "terms" : [ ]
+    },
+    "id" : "boundaries-5",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 날 코스피는 -1.20%, 삼성전자는 -3.00%로, 등락률이 시장보다 1.80%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -1.80%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자 우려 해소",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "호재 소식에도 주가는 내렸어요, 다른 원인은 이 기사만으로 확인하기 어려워요. 같은 날 코스피는 -1.20%, 삼성전자는 -3.00%로, 등락률이 시장보다 1.80%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -3.215,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자 우려 해소",
+        "summary" : "사진=합성 제공. SK하이닉스가 4% 하락했다. 삼성전자는 공급 계약을 발표했다.",
+        "published_at" : "2026-11-02T07:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : "POSITIVE",
+        "sentiment_confidence" : 0.59,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "beginner",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.205,
+      "market_context" : null,
+      "terms" : [ ]
+    },
+    "id" : "boundaries-6",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자는 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘삼성전자 우려 해소’. 같은 날 코스피는 -1.21%, 삼성전자는 -3.22%로, 등락률이 시장보다 2.01%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -2.01%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자 우려 해소",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘삼성전자 우려 해소’. 같은 날 코스피는 -1.21%, 삼성전자는 -3.22%로, 등락률이 시장보다 2.01%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005930",
+      "symbol_name" : "삼성전자",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성전자 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. 삼성전자은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-005930",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성전자은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘삼성전자 실적 발표’. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성전자 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘삼성전자 실적 발표’. 같은 날 코스피는 -1.20%, 삼성전자는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "000660",
+      "symbol_name" : "SK하이닉스",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "SK하이닉스 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. SK하이닉스은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-000660",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "SK하이닉스은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘SK하이닉스 실적 발표’. 같은 날 코스피는 -1.20%, SK하이닉스는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "SK하이닉스 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘SK하이닉스 실적 발표’. 같은 날 코스피는 -1.20%, SK하이닉스는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "035720",
+      "symbol_name" : "카카오",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "카카오 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. 카카오은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-035720",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "카카오은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘카카오 실적 발표’. 같은 날 코스피는 -1.20%, 카카오는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "카카오 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘카카오 실적 발표’. 같은 날 코스피는 -1.20%, 카카오는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "035420",
+      "symbol_name" : "네이버",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "네이버 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. 네이버은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-035420",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "네이버은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘네이버 실적 발표’. 같은 날 코스피는 -1.20%, 네이버는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "네이버 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘네이버 실적 발표’. 같은 날 코스피는 -1.20%, 네이버는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "373220",
+      "symbol_name" : "LG에너지솔루션",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "LG에너지솔루션 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. LG에너지솔루션은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-373220",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "LG에너지솔루션은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘LG에너지솔루션 실적 발표’. 같은 날 코스피는 -1.20%, LG에너지솔루션은 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "LG에너지솔루션 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘LG에너지솔루션 실적 발표’. 같은 날 코스피는 -1.20%, LG에너지솔루션은 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005380",
+      "symbol_name" : "현대차",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "현대차 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. 현대차은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-005380",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "현대차은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘현대차 실적 발표’. 같은 날 코스피는 -1.20%, 현대차는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "현대차 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘현대차 실적 발표’. 같은 날 코스피는 -1.20%, 현대차는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "000270",
+      "symbol_name" : "기아",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "기아 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. 기아은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-000270",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "기아은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘기아 실적 발표’. 같은 날 코스피는 -1.20%, 기아는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "기아 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘기아 실적 발표’. 같은 날 코스피는 -1.20%, 기아는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "207940",
+      "symbol_name" : "삼성바이오로직스",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성바이오로직스 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. 삼성바이오로직스은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-207940",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성바이오로직스은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘삼성바이오로직스 실적 발표’. 같은 날 코스피는 -1.20%, 삼성바이오로직스는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성바이오로직스 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘삼성바이오로직스 실적 발표’. 같은 날 코스피는 -1.20%, 삼성바이오로직스는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "051910",
+      "symbol_name" : "LG화학",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "LG화학 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. LG화학은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-051910",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "LG화학은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘LG화학 실적 발표’. 같은 날 코스피는 -1.20%, LG화학은 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "LG화학 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘LG화학 실적 발표’. 같은 날 코스피는 -1.20%, LG화학은 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "068270",
+      "symbol_name" : "셀트리온",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "셀트리온 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. 셀트리온은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-068270",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "셀트리온은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘셀트리온 실적 발표’. 같은 날 코스피는 -1.20%, 셀트리온은 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "셀트리온 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘셀트리온 실적 발표’. 같은 날 코스피는 -1.20%, 셀트리온은 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "005490",
+      "symbol_name" : "포스코홀딩스",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "포스코홀딩스 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. 포스코홀딩스은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-005490",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "포스코홀딩스은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘포스코홀딩스 실적 발표’. 같은 날 코스피는 -1.20%, 포스코홀딩스는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "포스코홀딩스 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘포스코홀딩스 실적 발표’. 같은 날 코스피는 -1.20%, 포스코홀딩스는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  }, {
+    "request" : {
+      "symbol" : "006400",
+      "symbol_name" : "삼성SDI",
+      "date" : "2026-11-02T15:30:00",
+      "change_percent" : -4.8,
+      "period" : "D",
+      "news" : [ {
+        "news_id" : 1,
+        "title" : "삼성SDI 실적 발표",
+        "summary" : "다른회사는 4% 하락했다. 삼성SDI은 공급 계약을 발표했다. 사진=합성 제공.",
+        "published_at" : "2026-11-02T03:00:00Z",
+        "relation" : "DIRECT",
+        "source" : "합성",
+        "sentiment_hint" : null,
+        "sentiment_confidence" : null,
+        "after_close_report" : false,
+        "cause_phrase" : null
+      } ],
+      "level" : "normal",
+      "index_name" : "코스피",
+      "index_change_percent" : -1.2,
+      "market_context" : "INDIVIDUAL",
+      "terms" : [ ]
+    },
+    "id" : "company-006400",
+    "expected" : {
+      "relation" : "DIRECT",
+      "whatHappened" : "삼성SDI은 공급 계약을 발표했어요.",
+      "possibleReason" : "관련 소식: ‘삼성SDI 실적 발표’. 같은 날 코스피는 -1.20%, 삼성SDI는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요.",
+      "marketImpact" : "시장 대비 초과 등락률은 -3.60%p이며, 계약 규모·기간 공시를 확인해요.",
+      "newsId" : 1,
+      "newsTitle" : "삼성SDI 실적 발표",
+      "source" : "합성",
+      "mode" : "RULE",
+      "terms" : [ ],
+      "whyItMoved" : "관련 소식: ‘삼성SDI 실적 발표’. 같은 날 코스피는 -1.20%, 삼성SDI는 -4.80%로, 등락률이 시장보다 3.60%p 낮았어요."
+    }
+  } ]
+}
