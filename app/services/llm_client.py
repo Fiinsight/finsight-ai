@@ -492,6 +492,7 @@ def _select_article_facts(title: str, content: str, limit: int, level: str = 'no
         # Publisher contact details and photo captions are not reading facts.
         readable = []
         for sentence in sentences:
+            sentence = re.sub(r'^기자\s+', '', sentence)
             if re.search(r'주소\s*[:：]|전화\s*[:：]|신문등록번호|발행/편집인|^[가-힣]{2,5}\s+(?:[가-힣]+\s+)?기자\s*$', sentence):
                 continue
             if '사진 확대' in sentence:
@@ -561,6 +562,8 @@ def _polite_article_sentence(sentence: str) -> str:
                ('했습니다', '했어요'), ('됐습니다', '됐어요'), ('있습니다', '있어요'),
                ('없습니다', '없어요'), ('합니다', '해요'), ('됩니다', '돼요'), ('아닙니다', '아니에요'),
                ('우위다', '우위예요'), ('오른다', '올라요'), ('내린다', '내려요'),
+               ('의미다', '의미예요'), ('상태다', '상태예요'), ('계기다', '계기예요'),
+               ('행보다', '행보예요'), ('수치다', '수치예요'), ('시기다', '시기예요'),
                ('늘다', '늘어요'), ('줄다', '줄어요'), ('늘어', '늘어요'), ('줄어', '줄어요'),
                ('답니다', '다고 해요')]
     for ending, replacement in endings:

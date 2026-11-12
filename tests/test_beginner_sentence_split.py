@@ -58,6 +58,14 @@ def test_glossary_substitution_does_not_change_a_direct_quote():
     assert '"전망치가 컨센서스를 웃돌았다"라고 밝혔어요.' in text
 
 
+def test_stray_byline_and_vowel_copula_are_readable_without_losing_a_quote():
+    body = '기자 "공급이 늘어났다." 관계자는 해외 공급을 확대했다고 밝혔다. 수요가 늘었다는 의미다.'
+    text = llm._reading_summary('공급과 수요',body,'beginner')
+    assert not text.startswith('기자 ')
+    assert '"공급이 늘어났다."' in text
+    assert text.endswith('의미예요.')
+
+
 @pytest.mark.parametrize(('source','expected'), [
     ('매출은 늘었습니다.', '매출은 늘었어요.'), ('투자를 확대했습니다.', '투자를 확대했어요.'),
     ('공장은 국내에 있습니다.', '공장은 국내에 있어요.'), ('본사는 연구 회사입니다.', '본사는 연구 회사예요.'),
