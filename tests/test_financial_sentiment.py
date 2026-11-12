@@ -56,7 +56,7 @@ def test_batch_is_readonly_without_apply_and_counts_changes(monkeypatch,capsys):
 
 @pytest.mark.parametrize('confidence,contains',[(.59,False),(.6,True)])
 def test_docent_confidence_never_changes_relation(confidence,contains):
-    request=DocentRequest(symbol='005930',symbol_name='삼성전자',date='2026-10-12',change_percent=-2,period='D',news=[{'news_id':1,'title':'실적 발표','summary':'매출이 늘었다.','published_at':'2026-10-12T00:00:00Z','relation':'DIRECT','sentiment_hint':'POSITIVE','sentiment_confidence':confidence}])
+    request=DocentRequest(symbol='005930',symbol_name='삼성전자',date='2026-10-12',change_percent=-2,period='D',news=[{'news_id':1,'title':'삼성전자 실적 발표','summary':'삼성전자 매출이 늘었다.','published_at':'2026-10-12T00:00:00Z','relation':'DIRECT','sentiment_hint':'POSITIVE','sentiment_confidence':confidence}])
     result=rule_docent(request)
     assert result['relation']=='DIRECT'
     assert ('호재 소식에도' in result['possibleReason']) is contains

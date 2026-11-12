@@ -46,7 +46,7 @@ def test_market_importance_is_source_grounded(title,body):
 
 def request(sentiment='POSITIVE',change=3,relation='DIRECT',index=-2):
     return chart.DocentRequest(symbol='005930',symbol_name='삼성전자',date='2026-11-02',change_percent=change,period='D',level='beginner',index_name='코스피',index_change_percent=index,
-       news=[chart.RelatedNews(news_id=1,title='기업 실적 발표',summary='AI 수요로 매출이 12% 증가했다고 밝혔다.',published_at=datetime.now(timezone.utc),relation=relation,sentiment_hint=sentiment,sentiment_confidence=.9)])
+       news=[chart.RelatedNews(news_id=1,title='삼성전자 실적 발표',summary='삼성전자는 AI 수요로 매출이 12% 증가했다고 밝혔다.',published_at=datetime.now(timezone.utc),relation=relation,sentiment_hint=sentiment,sentiment_confidence=.9)])
 
 @pytest.mark.parametrize('sentiment,change',[('POSITIVE',3),('POSITIVE',-3),('NEGATIVE',3),('NEGATIVE',-3)])
 def test_docent_four_sign_combinations(sentiment,change):

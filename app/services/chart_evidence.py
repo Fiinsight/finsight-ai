@@ -74,18 +74,21 @@ def lead(request,article):
     if eligible:return max(eligible,key=lambda pair:(2 if EVENT.search(pair[1]) else 0,1 if direction.search(pair[1]) else 0,-pair[0]))[1]
     return article.title if subject(request,article.title,article.relation) else '이 종목을 직접 다루는 문장을 확인하지 못했어요.' if article.relation=='DIRECT' else '이 시점의 관련 보도를 확인했어요.'
 
-def polite(text,level):
-    if level=='analyst':return text
-    return re.sub(r'이다(?=[.!?。！？]|$)','이에요',llm_client._repair_rewrite_style(text))
-
 def cause(request,article):
     if article.cause_phrase is not None:return article.cause_phrase
     for text in [article.title]+sentences(article.title,article.summary,request.date):
-        if not subject(request,text,article.relation):continue
+        industry_headline=article.relation=='SECTOR' and text==article.title and MARKET.search(article.title) and subject(request,article.summary,'SECTOR')
+        if not subject(request,text,article.relation) and not industry_headline:continue
         for match in CAUSE.finditer(text):
             phrase=match[1].strip()
-            if CAUSE_EVENT.search(phrase) and '에도' not in phrase and '지만' not in phrase:return phrase
+            if len(text)<=200 and CAUSE_EVENT.search(phrase) and '에도' not in phrase and '지만' not in phrase:return text.strip()
     return None
+
+def company_event(request,title,body):
+    return bool(subject(request,title,'DIRECT') and EVENT.search(title) or any(subject(request,s,'DIRECT') and EVENT.search(s) for s in sentences(title,body,request.date)))
+
+def own_event(request,article):
+    return bool(article and article.relation=='DIRECT' and company_event(request,article.title,article.summary))
 
 def comparison(request):
     if request.index_change_percent is None or request.index_name is None:return ''
@@ -99,23 +102,27 @@ def comparison(request):
 def reason(request,article):
     market=comparison(request)
     if article is None:return market+' 가격 비교만으로 원인을 단정하지 않아요.' if market else f'주가는 {signed(request.change_percent)} 움직였지만, 이 시점을 설명하는 뉴스와 시장 자료를 찾지 못했어요.'
+    if article.relation=='MARKET':
+        values=market or f'주가는 {signed(request.change_percent)} 움직였지만 같은 기간 지수 자료는 확인하지 못했어요.'
+        return values+(' 시장이 움직인 날에도 주가는 거의 변하지 않았어요.' if abs(request.change_percent)<=.5 else ' 시장 관련 보도이며, 이 종목의 개별 원인으로 확인된 것은 아니에요.')
     title=article.title
     hint=sentiment(title.split('에도',1)[0],article.sentiment_hint,article.sentiment_confidence)
     neutral=abs(request.change_percent)<=.5
-    opposite=not neutral and (hint=='POSITIVE' and request.change_percent<0 or hint=='NEGATIVE' and request.change_percent>0)
+    opposite=own_event(request,article) and not neutral and (hint=='POSITIVE' and request.change_percent<0 or hint=='NEGATIVE' and request.change_percent>0)
     phrase=cause(request,article)
     if neutral:first='시장이 움직인 날에도 주가는 거의 변하지 않았어요.' if article.relation=='MARKET' else '관련 소식이 나왔지만 주가는 거의 움직이지 않았어요.'
     elif opposite:first=f"{'호재' if hint=='POSITIVE' else '악재'} 소식에도 주가는 {'내렸어요' if request.change_percent<0 else '올랐어요'}, 다른 원인은 이 기사만으로 확인하기 어려워요."
-    elif phrase:first=f"{'마감 후 보도의 ' if article.after_close_report else '기사의 '}‘{phrase}’ 표현처럼 해당 요인이 영향을 줬을 수 있어요."
+    elif phrase:first=("마감 후 보도의 " if article.after_close_report else "기사의 ")+"‘"+re.sub(r"[.!?。！？]+$","",phrase)+"’를 원인 후보로 볼 수 있어요."
     else:first=f"{'마감 후 관련 소식: ‘' if article.after_close_report else '관련 소식: ‘'}{title}’."
     if article.relation=='SECTOR':first=first[:-1]+', 이 종목을 직접 다룬 기사는 아니에요.'
     if market and not neutral and (request.market_context=='FOLLOWING' or request.market_context is None and request.change_percent*request.index_change_percent>=0 and abs(request.change_percent-request.index_change_percent)<1):return market+' '+first
     return first+' '+(market or f'주가는 {signed(request.change_percent)} 움직였지만, 같은 기간 지수 자료는 확인하지 못했어요.')
 
 def impact(request,article,selected_lead):
-    evidence=article.title+' '+selected_lead if article else ''
-    if re.search('수주|계약',evidence):next_check='계약 규모·기간 공시를 확인해요'
-    elif re.search('실적|매출|영업이익',evidence):next_check='발표 실적과 시장 예상치의 차이를 확인해요'
+    corporate=own_event(request,article)
+    evidence=(article.title+' '+selected_lead if corporate else selected_lead) if article else ''
+    if corporate and re.search('수주|계약',evidence):next_check='계약 규모·기간 공시를 확인해요'
+    elif corporate and re.search('실적|매출|영업이익',evidence):next_check='발표 실적과 시장 예상치의 차이를 확인해요'
     elif re.search('규제|정책|관세',evidence):next_check='발표한 정책의 시행 시점을 확인해요'
     elif re.search(r'(?:외국인|기관).{0,20}(?:순매수|순매도|매도세|매수세|매매)|수급|프로그램 매매',evidence):next_check='이후 외국인·기관 매매가 이어지는지 확인해요'
     else:next_check='추가로 확인할 개별 사건 자료가 없어요'

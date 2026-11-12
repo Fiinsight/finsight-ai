@@ -13,7 +13,7 @@ from app import config
 from app.services import llm_client, chart_evidence
 
 router = APIRouter()
-DOCENT_CACHE_VERSION = 'chart-cause-v6'
+DOCENT_CACHE_VERSION = 'chart-cause-v7'
 
 class RelatedNews(BaseModel):
     news_id: int
@@ -81,7 +81,7 @@ def event_lead(title: str, summary: str, day: str, change: float) -> str:
 def rule_docent(request: DocentRequest) -> dict:
     article=next(iter(request.news),None)
     context='이 주간' if request.period=='W' else '이 시점' if request.period=='MINUTE' else '이날'
-    lead=chart_evidence.polite(chart_evidence.lead(request,article),request.level) if article else f'{context} 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.'
+    lead=chart_evidence.lead(request,article) if article else f'{context} 주가 움직임을 직접 설명하는 뉴스를 찾지 못했어요.'
     return DocentResponse(relation=article.relation if article else 'NONE',whatHappened=lead,
                           possibleReason=chart_evidence.reason(request,article),marketImpact=chart_evidence.impact(request,article,lead),
                           newsId=article.news_id if article else None,newsTitle=article.title if article else None,
