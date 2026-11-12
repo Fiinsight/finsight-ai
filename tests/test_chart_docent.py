@@ -22,12 +22,12 @@ def test_rule_relations_and_no_causal_claims(relation):
     assert result['relation']==relation and result['mode']=='RULE'
     assert '때문에' not in ' '.join(str(v) for v in result.values())
     assert result['marketImpact'] and result['possibleReason']
-    if relation=='DIRECT': assert '+3.25%' in result['possibleReason'] and '호재' in result['possibleReason']
-    if relation=='MARKET': assert '%' not in result['possibleReason']
+    if relation=='DIRECT': assert '+3.25%' in result['possibleReason'] and '관련 소식' in result['possibleReason']
+    if relation=='MARKET': assert '+3.25%' in result['possibleReason'] and '코스피' not in result['possibleReason']
     paid.assert_not_called()
 
 def test_market_numbers_only_when_supplied():
-    assert '코스피 -1.20%' in docent(request('MARKET',index_name='코스피',index_change_percent=-1.2))['possibleReason']
+    assert '코스피는 -1.20%' in docent(request('MARKET',index_name='코스피',index_change_percent=-1.2))['possibleReason']
 
 def test_persistent_reuse_and_daily_ceiling(monkeypatch):
     monkeypatch.setattr(config,'DOCENT_WITH_LLM',True);monkeypatch.setattr(config,'MAX_DAILY_DOCENT_CALLS',1)

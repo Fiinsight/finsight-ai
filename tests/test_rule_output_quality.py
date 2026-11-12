@@ -46,24 +46,24 @@ def test_market_importance_is_source_grounded(title,body):
 
 def request(sentiment='POSITIVE',change=3,relation='DIRECT',index=-2):
     return chart.DocentRequest(symbol='005930',symbol_name='삼성전자',date='2026-11-02',change_percent=change,period='D',level='beginner',index_name='코스피',index_change_percent=index,
-       news=[chart.RelatedNews(news_id=1,title='기업 실적 발표',summary='AI 수요로 매출이 12% 증가했다고 밝혔다.',published_at=datetime.now(timezone.utc),relation=relation,sentiment_hint=sentiment,sentiment_confidence=.9)])
+       news=[chart.RelatedNews(news_id=1,title='삼성전자 실적 발표',summary='삼성전자는 AI 수요로 매출이 12% 증가했다고 밝혔다.',published_at=datetime.now(timezone.utc),relation=relation,sentiment_hint=sentiment,sentiment_confidence=.9)])
 
 @pytest.mark.parametrize('sentiment,change',[('POSITIVE',3),('POSITIVE',-3),('NEGATIVE',3),('NEGATIVE',-3)])
 def test_docent_four_sign_combinations(sentiment,change):
     r=chart.rule_docent(request(sentiment,change))
     opposite=(sentiment=='POSITIVE' and change<0 or sentiment=='NEGATIVE' and change>0)
     if opposite:assert '소식에도 주가는' in r['possibleReason'] and '받아들여졌을 가능성' not in r['possibleReason']
-    else:assert '받아들여졌을 가능성' in r['possibleReason']
+    else:assert '관련 소식' in r['possibleReason'] and '받아들여졌을 가능성' not in r['possibleReason']
     assert '(을/를)' not in r['whatHappened']
 
 @pytest.mark.parametrize('change,index',[(3,-2),(-3,2)])
 def test_market_opposite_and_cache_signs(change,index):
     r=chart.docent(request(change=change,relation='MARKET',index=index))
-    assert '시장과 반대로' in r['possibleReason']
+    assert '시장과 반대 방향으로' in r['possibleReason']
     opposite=chart.docent(request(change=-change,relation='MARKET',index=index))
-    assert '함께 움직였을' in opposite['possibleReason']
+    assert '코스피는' in opposite['possibleReason'] and '시장과 반대 방향으로' not in opposite['possibleReason']
     changed_index=chart.docent(request(change=change,relation='MARKET',index=-index))
-    assert '함께 움직였을' in changed_index['possibleReason']
+    assert '코스피는' in changed_index['possibleReason'] and '시장과 반대 방향으로' not in changed_index['possibleReason']
 
 @pytest.mark.parametrize('percent',[-.5,0,.5])
 def test_neutral_correct(percent):
@@ -113,12 +113,12 @@ def test_docent_neutral_band_boundaries(change,relation,sentiment):
     neutral=abs(change)<=.5
     if neutral:
         assert ('소식이 나왔지만 주가는 거의 움직이지 않았어요' if relation=='DIRECT' else '시장이 움직인 날에도 주가는 거의 변하지 않았어요') in text
-        assert '받아들여졌을 가능성' not in text and '시장과 반대로' not in text and '소식에도 주가는' not in text
-        assert (f'{change:+.2f}%' if relation=='DIRECT' else '코스피 -1.20%') in text
+        assert '받아들여졌을 가능성' not in text and '시장과 반대 방향으로' not in text and '소식에도 주가는' not in text
+        assert (f'{change:+.2f}%' if relation=='DIRECT' else '코스피는 -1.20%') in text
     else:
         assert '거의' not in text
         if relation=='MARKET':
-            assert ('시장과 반대로' if change>0 else '함께 움직였을') in text
+            assert ('시장과 반대 방향으로' if change>0 else '시장과 비슷한 방향·폭으로') in text
         else:
             opposite=(sentiment=='POSITIVE' and change<0 or sentiment=='NEGATIVE' and change>0)
-            assert ('소식에도 주가는' if opposite else '받아들여졌을 가능성') in text
+            assert ('소식에도 주가는' if opposite else '관련 소식') in text
